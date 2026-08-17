@@ -9,21 +9,21 @@ if (post_password_required()) {
 
 <div x-data="commentsSystem()" @click="handleClicks($event)">
 
-    <section id="comments" class="bg-primary">
+    <section id="comments" class="bg-slate-950">
         <div class="container grid relative h-fit lg:grid-cols-12 gap-4 items-start max-lg:mt-0 my-8 py-10 p-5">
 
             <?php $bluebox_comment_count = get_comments_number(); ?>
 
             <div id="comment-form-wrapper"
-                 class="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-24 max-lg:order-1 p-5 lg:p-8 bg-white border border-white/25 rounded-2xl">
+                 class="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-24 max-lg:order-1 p-5 lg:p-8 bg-slate-800 border border-white/10 rounded-2xl">
                 <header class="mb-5">
-                    <h2 class="text-xl font-black text-primary flex items-center gap-2">
+                    <h2 class="text-xl font-black text-white flex items-center gap-2">
                         دیدگاه کاربران
                         <?php if ('0' < $bluebox_comment_count) : ?>
-                            <span class="text-sm font-normal text-primary/70">(<?= number_format_i18n($bluebox_comment_count); ?>)</span>
+                            <span class="text-sm font-normal text-white/70">(<?= number_format_i18n($bluebox_comment_count); ?>)</span>
                         <?php endif; ?>
                     </h2>
-                    <p class="text-sm text-gray-700 mt-2">شما هم می‌توانید دیدگاه خود را درباره این مطلب ثبت کنید.</p>
+                    <p class="text-sm text-white/80 mt-2">شما هم می‌توانید دیدگاه خود را درباره این مطلب ثبت کنید.</p>
                 </header>
 
                 <div x-show="isReplying"
@@ -34,15 +34,15 @@ if (post_password_required()) {
                      x-transition:leave-start="opacity-100 translate-y-0"
                      x-transition:leave-end="opacity-0 -translate-y-4"
                      style="display: none;"
-                     class="mb-4 bg-primary/10 border border-primary/15 p-3 rounded-xl flex items-center justify-between">
-                    <div class="text-sm text-primary flex items-center gap-2">
+                     class="mb-4 bg-slate-700 border border-white/15 p-3 rounded-xl flex items-center justify-between">
+                    <div class="text-sm text-white flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
                         </svg>
                         پاسخ به: <strong class="font-black" x-text="replyToName"></strong>
                     </div>
                     <button type="button" @click="cancelReply()"
-                            class="text-primary/70 hover:text-white transition-colors bg-primary/10 hover:bg-primary rounded-full p-1"
+                            class="text-white/70 hover:text-white transition-colors bg-primary/10 hover:bg-primary rounded-full p-1"
                             aria-label="لغو پاسخ">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -58,9 +58,9 @@ if (post_password_required()) {
                     'label_submit' => __('ثبت دیدگاه', 'bluebox'),
                     'class_submit' => 'w-full bg-primary text-white hover:bg-primary/90 font-bold py-5 px-4 rounded-xl transition-all cursor-pointer',
                     'class_form' => 'flex flex-col gap-4',
-                    'comment_field' => '<div class="flex flex-col gap-2"><label for="comment" class="text-sm font-bold text-primary/50">دیدگاه شما</label><textarea id="comment" name="comment" cols="45" rows="3" aria-required="true" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 focus:border-gray-500 focus:ring-2 focus:ring-gray-500 outline-none transition-all resize-none"></textarea></div>',
+                    'comment_field' => '<div class="flex flex-col gap-2"><label for="comment" class="text-sm font-bold text-white/60">دیدگاه شما</label><textarea id="comment" name="comment" cols="45" rows="3" aria-required="true" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 focus:border-gray-500 focus:ring-2 focus:ring-gray-500 outline-none transition-all resize-none"></textarea></div>',
                     'must_log_in' => '<p class="must-log-in text-sm text-red-400">' . sprintf(__('شما باید <a href="%s" class="font-bold underline text-primary">وارد سیستم</a> شوید.', 'bluebox'), wp_login_url(apply_filters('the_permalink', get_permalink()))) . '</p>',
-                    'logged_in_as' => '<p class="logged-in-as text-sm text-primary/50 mb-4">' . sprintf(__('وارد شده به عنوان <a href="%1$s" class="text-primary font-bold">%2$s</a>. <a href="%3$s" class="text-red-300">خروج؟</a>', 'bluebox'), admin_url('profile.php'), $user_identity, wp_logout_url(apply_filters('the_permalink', get_permalink()))) . '</p>',
+                    'logged_in_as' => '<p class="logged-in-as text-sm text-primary/50 mb-4">' . sprintf(__('وارد شده به عنوان <a href="%1$s" class="text-white font-bold">%2$s</a>. <a href="%3$s" class="text-red-300">خروج؟</a>', 'bluebox'), admin_url('profile.php'), $user_identity, wp_logout_url(apply_filters('the_permalink', get_permalink()))) . '</p>',
                     'comment_notes_before' => '',
                 );
                 comment_form($comment_args);

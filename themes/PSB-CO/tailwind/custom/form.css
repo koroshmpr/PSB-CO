@@ -52,7 +52,7 @@ body:not(.page-template-form):not(.page-template-contact-us) {
 #comments {
 	.comment-form-author , .comment-form-email {
 		label {
-			@apply text-sm font-bold text-primary/50;
+			@apply text-sm font-bold text-white/50;
 		}
 		input {
 			@apply w-full bg-gray-50 border border-gray-200 rounded-xl p-3 focus:border-gray-500 focus:ring-2 focus:ring-gray-500 outline-none transition-all resize-none;
@@ -94,12 +94,6 @@ body:not(.page-template-form):not(.page-template-contact-us) {
 	input , textarea {
 		@apply border border-black/10 rounded-sm w-full py-3 px-2;
 	}
-	.comment-form-cookies-consent {
-		@apply flex lg:col-span-2 justify-start;
-		label {
-			@apply w-full relative translate-y-0 text-xs
-		}
-	}
 	.comment-notes { @apply text-xs mb-3}
 	#wp-comment-cookies-consent {
 		@apply w-fit;
@@ -110,4 +104,10 @@ body:not(.page-template-form):not(.page-template-contact-us) {
 	}
 .select2-selection {
 	@apply !border !border-black/10 !rounded-sm !w-full !px-2 !py-1;
+}
+.comment-form-cookies-consent {
+	@apply flex lg:col-span-2 justify-start;
+	label {
+		@apply w-full relative translate-y-0 text-xs text-white;
+	}
 }

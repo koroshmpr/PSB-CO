@@ -310,7 +310,7 @@ body:not(.page-template-form):not(.page-template-contact-us) .gform_wrapper {
   line-height: var(--tw-leading, var(--text-sm--line-height));
   --tw-font-weight: var(--font-weight-bold);
   font-weight: var(--font-weight-bold);
-  color: color-mix(in oklab, var(--color-primary) 50%, transparent);
+  color: color-mix(in oklab, var(--color-white) 50%, transparent);
 }
 :is(#comments .comment-form-author,#comments .comment-form-email) input {
   width: 100%;
@@ -429,23 +429,6 @@ body:not(.page-template-form):not(.page-template-contact-us) .gform_wrapper {
   padding-inline: calc(var(--spacing) * 2);
   padding-block: calc(var(--spacing) * 3);
 }
-.comment-form .comment-form-cookies-consent {
-  display: flex;
-  justify-content: flex-start;
-}
-@media (width >= 64rem) {
-  .comment-form .comment-form-cookies-consent {
-    grid-column: span 2 / span 2;
-  }
-}
-:is(.comment-form .comment-form-cookies-consent) label {
-  position: relative;
-  width: 100%;
-  --tw-translate-y: calc(var(--spacing) * 0);
-  translate: var(--tw-translate-x) var(--tw-translate-y);
-  font-size: var(--text-xs);
-  line-height: var(--tw-leading, var(--text-xs--line-height));
-}
 .comment-form .comment-notes {
   margin-bottom: calc(var(--spacing) * 3);
   font-size: var(--text-xs);
@@ -471,6 +454,24 @@ body:not(.page-template-form):not(.page-template-contact-us) .gform_wrapper {
   border-color: color-mix(in oklab, var(--color-black) 10%, transparent) !important;
   padding-inline: calc(var(--spacing) * 2) !important;
   padding-block: calc(var(--spacing) * 1) !important;
+}
+.comment-form-cookies-consent {
+  display: flex;
+  justify-content: flex-start;
+}
+@media (width >= 64rem) {
+  .comment-form-cookies-consent {
+    grid-column: span 2 / span 2;
+  }
+}
+.comment-form-cookies-consent label {
+  position: relative;
+  width: 100%;
+  --tw-translate-y: calc(var(--spacing) * 0);
+  translate: var(--tw-translate-x) var(--tw-translate-y);
+  font-size: var(--text-xs);
+  line-height: var(--tw-leading, var(--text-xs--line-height));
+  color: var(--color-white);
 }
 @font-face {
   font-family: 'swiper-icons';
@@ -3848,9 +3849,6 @@ blockquote {
 .border-white\/20 {
   border-color: color-mix(in oklab, var(--color-white) 20%, transparent);
 }
-.border-white\/25 {
-  border-color: color-mix(in oklab, var(--color-white) 25%, transparent);
-}
 .border-white\/30 {
   border-color: color-mix(in oklab, var(--color-white) 30%, transparent);
 }
@@ -4201,6 +4199,9 @@ blockquote {
 }
 .bg-slate-600 {
   background-color: var(--color-slate-600);
+}
+.bg-slate-700 {
+  background-color: var(--color-slate-700);
 }
 .bg-slate-800 {
   background-color: var(--color-slate-800);
@@ -5086,9 +5087,6 @@ blockquote {
 }
 .text-primary\/50 {
   color: color-mix(in oklab, var(--color-primary) 50%, transparent);
-}
-.text-primary\/70 {
-  color: color-mix(in oklab, var(--color-primary) 70%, transparent);
 }
 .text-primary\/90 {
   color: color-mix(in oklab, var(--color-primary) 90%, transparent);
