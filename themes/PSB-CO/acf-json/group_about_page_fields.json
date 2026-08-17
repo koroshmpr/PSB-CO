@@ -1,0 +1,130 @@
+{
+    "key": "group_about_page_fields",
+    "title": "تنظیمات صفحه درباره ما",
+    "fields": [
+        {
+            "key": "field_about_hero_badge",
+            "label": "بج بالای عنوان",
+            "name": "about_hero_badge",
+            "type": "text",
+            "default_value": "نزدیک به نیم قرن سابقه در صنعت تابلوسازی برق"
+        },
+        {
+            "key": "field_about_hero_subtitle",
+            "label": "خلاصه معرفی زیر عنوان",
+            "name": "about_hero_subtitle",
+            "type": "textarea",
+            "rows": 3,
+            "default_value": "طراحی، تولید و مونتاژ انواع تابلوهای برق فشار ضعیف، متوسط، کشویی و پست‌های پاساژ بر اساس استانداردهای بین‌المللی"
+        },
+        {
+            "key": "field_about_stats",
+            "label": "آمار و افتخارات کلیدی شرکت",
+            "name": "about_stats",
+            "type": "repeater",
+            "layout": "table",
+            "sub_fields": [
+                {
+                    "key": "field_stat_number",
+                    "label": "عدد آمار",
+                    "name": "number",
+                    "type": "text",
+                    "placeholder": "مثال: 50+ / 500+ / 100%"
+                },
+                {
+                    "key": "field_stat_label",
+                    "label": "عنوان آمار",
+                    "name": "label",
+                    "type": "text",
+                    "placeholder": "مثال: سال سابقه / پروژه اجرا شده"
+                }
+            ]
+        },
+        {
+            "key": "field_about_values",
+            "label": "ارزش‌های سازمانی و ماموریت",
+            "name": "about_values",
+            "type": "repeater",
+            "layout": "block",
+            "sub_fields": [
+                {
+                    "key": "field_value_icon",
+                    "label": "آیکون یا ایموجی",
+                    "name": "icon",
+                    "type": "text",
+                    "placeholder": "مثال: ⚡ / 🛡️ / 🎯"
+                },
+                {
+                    "key": "field_value_title",
+                    "label": "عنوان ارزش",
+                    "name": "title",
+                    "type": "text"
+                },
+                {
+                    "key": "field_value_description",
+                    "label": "توضیحات",
+                    "name": "description",
+                    "type": "textarea",
+                    "rows": 2
+                }
+            ]
+        },
+        {
+            "key": "field_about_owners",
+            "label": "مدیران ارشد و اعضای هیئت مدیره",
+            "name": "owners",
+            "type": "repeater",
+            "layout": "block",
+            "sub_fields": [
+                {
+                    "key": "field_owner_name",
+                    "label": "نام و نام خانوادگی",
+                    "name": "name",
+                    "type": "text"
+                },
+                {
+                    "key": "field_owner_position",
+                    "label": "سمت سازمانی",
+                    "name": "position",
+                    "type": "text"
+                },
+                {
+                    "key": "field_owner_image",
+                    "label": "تصویر پرتره",
+                    "name": "image",
+                    "type": "image",
+                    "return_format": "array"
+                }
+            ]
+        },
+        {
+            "key": "field_about_factory_gallery",
+            "label": "گالری تصاویر کارخانه و واحد تولید",
+            "name": "about_factory_gallery",
+            "type": "gallery",
+            "return_format": "array"
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "page_template",
+                "operator": "==",
+                "value": "about-us.php"
+            }
+        ],
+        [
+            {
+                "param": "page",
+                "operator": "==",
+                "value": "about"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "active": true
+}

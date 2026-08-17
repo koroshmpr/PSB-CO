@@ -1,0 +1,25 @@
+{
+    "key": "post_type_rating",
+    "title": "Ratings",
+    "post_type": "rating",
+    "advanced_configuration": true,
+    "labels": {
+        "name": "Ratings",
+        "singular_name": "Rating",
+        "menu_name": "Ratings"
+    },
+    "public": true,
+    "hierarchical": false,
+    "show_ui": true,
+    "show_in_menu": true,
+    "supports": [
+        "title"
+    ],
+    "has_archive": true,
+    "rewrite": {
+        "permalink_rewrite": "custom_permalink",
+        "slug": "ratings",
+        "with_front": false
+    },
+    "active": true
+}

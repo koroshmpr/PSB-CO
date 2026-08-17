@@ -1,0 +1,23 @@
+{
+    "key": "taxonomy_certificate_category",
+    "title": "دسته‌بندی تائیدیه",
+    "taxonomy": "certificate_category",
+    "object_type": [
+        "certificates"
+    ],
+    "advanced_configuration": true,
+    "labels": {
+        "name": "دسته‌بندی تائیدیه",
+        "singular_name": "دسته‌بندی تائیدیه",
+        "menu_name": "دسته‌بندی تائیدیه"
+    },
+    "public": true,
+    "hierarchical": true,
+    "show_ui": true,
+    "show_admin_column": true,
+    "rewrite": {
+        "slug": "certificate-category",
+        "with_front": false
+    },
+    "active": true
+}

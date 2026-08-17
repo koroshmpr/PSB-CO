@@ -1,0 +1,75 @@
+{
+    "key": "group_services_fields",
+    "title": "مشخصات فنی و امکانات خدمت",
+    "fields": [
+        {
+            "key": "field_services_badge",
+            "label": "زیرعنوان یا بج خدمت",
+            "name": "services_badge",
+            "type": "text",
+            "instructions": "مانند: خط تولید CNC / آزمایشگاه تست روتین / طراحی EPLAN",
+            "placeholder": "مثال: تجهیزات کارگاهی & تولید"
+        },
+        {
+            "key": "field_services_icon",
+            "label": "نماد آیکون (Emoji یا کد آیکون)",
+            "name": "service_icon",
+            "type": "text",
+            "placeholder": "مثال: 🔬 / 🛠️ / ⚡ / 🎨"
+        },
+        {
+            "key": "field_services_description",
+            "label": "خلاصه امکانات و توضیحات فنی",
+            "name": "services_description",
+            "type": "textarea",
+            "rows": 3,
+            "instructions": "خلاصه کوتاه برای کارت‌های صفحه اصلی"
+        },
+        {
+            "key": "field_services_features",
+            "label": "لیست امکانات و قابلیت‌های فنی (هر خط یک مورد)",
+            "name": "technical_features",
+            "type": "textarea",
+            "rows": 4,
+            "instructions": "هر قابلیت را در یک خط وارد کنید (مثال: پرس پانچ ۳۰ تن CNC)",
+            "placeholder": "دستگاه برش لیزر و پانچ ۳۰ تن CNC\nدستگاه خم‌کاری هیدرولیک NC\nرنگ پودری الکترواستاتیک ۸۰ میکرون"
+        },
+        {
+            "key": "field_services_standards",
+            "label": "استانداردها و تائیدیه‌های مربوطه",
+            "name": "standards_compliance",
+            "type": "text",
+            "placeholder": "مثال: IEC 61439-1 / ISO 9001"
+        },
+        {
+            "key": "field_services_brochure",
+            "label": "کاتالوگ فنی / کاتالوگ خدمت (PDF)",
+            "name": "brochure_pdf",
+            "type": "file",
+            "return_format": "array"
+        },
+        {
+            "key": "field_services_gallery",
+            "label": "گالری تصاویر ماشین‌آلات و کارگاه",
+            "name": "service_gallery",
+            "type": "gallery",
+            "return_format": "array",
+            "preview_size": "medium"
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "services"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "active": true
+}

@@ -1,0 +1,48 @@
+{
+    "key": "group_certificates_fields",
+    "title": "مشخصات گواهینامه و تایپ‌تست",
+    "fields": [
+        {
+            "key": "field_cert_issuing_body",
+            "label": "مرجع صادرکننده",
+            "name": "issuing_body",
+            "type": "text",
+            "placeholder": "مثال: DQS آلمان / پژوهشگاه نیرو (Niroo Research Institute)"
+        },
+        {
+            "key": "field_cert_standard_number",
+            "label": "شماره استاندارد یا تایپ‌تست",
+            "name": "standard_number",
+            "type": "text",
+            "placeholder": "مثال: ISO 9001:2015 / IEC 61439-1"
+        },
+        {
+            "key": "field_cert_validity",
+            "label": "تاریخ صدور / اعتبار",
+            "name": "validity_date",
+            "type": "text",
+            "placeholder": "مثال: معتبر تا 2026 / 1405"
+        },
+        {
+            "key": "field_cert_document",
+            "label": "تصویر با کیفیت / فایل PDF گواهینامه",
+            "name": "certificate_file",
+            "type": "file",
+            "return_format": "array"
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "certificates"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "active": true
+}

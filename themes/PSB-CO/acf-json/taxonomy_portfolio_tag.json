@@ -1,0 +1,30 @@
+{
+    "key": "taxonomy_portfolio_tag",
+    "title": "برچسب نمونه کار",
+    "taxonomy": "portfolio_tag",
+    "object_type": [
+        "portfolio"
+    ],
+    "advanced_configuration": true,
+    "labels": {
+        "name": "برچسب نمونه کار",
+        "singular_name": "برچسب نمونه کار",
+        "menu_name": "برچسب نمونه کار"
+    },
+    "public": true,
+    "publicly_queryable": true,
+    "hierarchical": false,
+    "show_ui": true,
+    "show_in_menu": true,
+    "show_in_nav_menus": true,
+    "show_in_rest": true,
+    "show_tagcloud": true,
+    "show_admin_column": true,
+    "query_var": true,
+    "rewrite": {
+        "permalink_rewrite": "custom_permalink",
+        "slug": "tag-portfolio",
+        "with_front": false
+    },
+    "active": true
+}

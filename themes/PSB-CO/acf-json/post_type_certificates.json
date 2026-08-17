@@ -1,0 +1,31 @@
+{
+    "key": "post_type_certificates",
+    "title": "تائیدیه‌ها",
+    "post_type": "certificates",
+    "advanced_configuration": true,
+    "labels": {
+        "name": "تائیدیه",
+        "singular_name": "تائیدیه",
+        "menu_name": "تائیدیه‌ها",
+        "all_items": "همه ی تائیدیه‌ها",
+        "add_new": "افزودن تائیدیه جدید",
+        "add_new_item": "افزودن تائیدیه جدید",
+        "edit_item": "ویرایش تائیدیه"
+    },
+    "public": true,
+    "hierarchical": false,
+    "menu_icon": "dashicons-awards",
+    "supports": [
+        "title",
+        "editor",
+        "custom-fields",
+        "thumbnail"
+    ],
+    "has_archive": true,
+    "rewrite": {
+        "permalink_rewrite": "custom_permalink",
+        "slug": "certificate",
+        "with_front": false
+    },
+    "active": true
+}

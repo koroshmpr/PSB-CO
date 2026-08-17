@@ -1,0 +1,30 @@
+{
+    "key": "taxonomy_portfolio_categories",
+    "title": "دسته‌بندی نمونه کارها",
+    "taxonomy": "portfolio_categories",
+    "object_type": [
+        "portfolio"
+    ],
+    "advanced_configuration": true,
+    "labels": {
+        "name": "دسته بندی نمونه کار",
+        "singular_name": "دسته بندی نمونه کار",
+        "menu_name": "دسته بندی نمونه کار"
+    },
+    "public": true,
+    "publicly_queryable": true,
+    "hierarchical": true,
+    "show_ui": true,
+    "show_in_menu": true,
+    "show_in_nav_menus": true,
+    "show_in_rest": true,
+    "show_tagcloud": true,
+    "show_admin_column": true,
+    "query_var": true,
+    "rewrite": {
+        "permalink_rewrite": "custom_permalink",
+        "slug": "portfolio-category",
+        "with_front": false
+    },
+    "active": true
+}

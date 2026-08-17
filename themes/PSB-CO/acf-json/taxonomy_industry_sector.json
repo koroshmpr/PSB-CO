@@ -1,0 +1,39 @@
+{
+    "key": "taxonomy_industry_sector",
+    "title": "حوزه صنعت و کاربرد",
+    "taxonomy": "industry_sector",
+    "object_type": [
+        "portfolio",
+        "services",
+        "product"
+    ],
+    "advanced_configuration": true,
+    "labels": {
+        "name": "حوزه صنعت و کاربرد",
+        "singular_name": "حوزه صنعت",
+        "menu_name": "حوزه‌های صنعت",
+        "all_items": "همه حوزه‌های صنعت",
+        "edit_item": "ویرایش حوزه صنعت",
+        "view_item": "نمایش حوزه صنعت",
+        "update_item": "بروزرسانی حوزه صنعت",
+        "add_new_item": "افزودن حوزه صنعت جدید",
+        "new_item_name": "نام حوزه صنعت جدید",
+        "search_items": "جستجوی حوزه صنعت"
+    },
+    "public": true,
+    "publicly_queryable": true,
+    "hierarchical": true,
+    "show_ui": true,
+    "show_in_menu": true,
+    "show_in_nav_menus": true,
+    "show_in_rest": true,
+    "show_tagcloud": true,
+    "show_admin_column": true,
+    "query_var": true,
+    "rewrite": {
+        "permalink_rewrite": "custom_permalink",
+        "slug": "industry-sector",
+        "with_front": false
+    },
+    "active": true
+}

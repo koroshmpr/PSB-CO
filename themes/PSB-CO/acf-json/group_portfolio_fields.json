@@ -1,0 +1,131 @@
+{
+    "key": "group_portfolio_fields",
+    "title": "مشخصات فنی پروژه تابلوسازی",
+    "fields": [
+        {
+            "key": "field_portfolio_client_name",
+            "label": "نام کارفرما / مشاور",
+            "name": "client_name",
+            "type": "text",
+            "instructions": "نام کارفرما، مشاور یا پیمانکار اصلی پروژه",
+            "placeholder": "مثال: شرکت پتروشیمی عسلویه / مهندسین مشاور سازه"
+        },
+        {
+            "key": "field_portfolio_voltage_level_tax",
+            "label": "سطح ولتاژ (تکسونومی)",
+            "name": "voltage_level",
+            "type": "taxonomy",
+            "instructions": "انتخاب سطح ولتاژ کاری تابلو برق",
+            "taxonomy": "voltage_level",
+            "field_type": "select",
+            "allow_null": 0,
+            "add_term": 1,
+            "save_terms": 1,
+            "load_terms": 1,
+            "return_format": "object"
+        },
+        {
+            "key": "field_portfolio_industry_sector_tax",
+            "label": "حوزه صنعت و کاربرد (تکسونومی)",
+            "name": "industry_sector",
+            "type": "taxonomy",
+            "instructions": "انتخاب حوزه صنعت و کاربرد پروژه (جهت نمایش در صفحات مرتبط خدمات و محصولات)",
+            "taxonomy": "industry_sector",
+            "field_type": "select",
+            "allow_null": 0,
+            "add_term": 1,
+            "save_terms": 1,
+            "load_terms": 1,
+            "return_format": "object"
+        },
+        {
+            "key": "field_portfolio_rated_current",
+            "label": "جریان نامی (Amperage)",
+            "name": "rated_current",
+            "type": "text",
+            "placeholder": "مثال: 2500A / 4000A"
+        },
+        {
+            "key": "field_portfolio_short_circuit",
+            "label": "تحمل جریان اتصال کوتاه",
+            "name": "short_circuit_current",
+            "type": "text",
+            "placeholder": "مثال: 40kA / 1s"
+        },
+        {
+            "key": "field_portfolio_ip_rating",
+            "label": "درجه حفاظت بدنه (IP Rating)",
+            "name": "ip_rating",
+            "type": "text",
+            "placeholder": "مثال: IP54 / IP55"
+        },
+        {
+            "key": "field_portfolio_panel_type",
+            "label": "نوع و ساختار تابلو",
+            "name": "panel_type",
+            "type": "text",
+            "placeholder": "مثال: کشویی (Withdrawable) / فیکس / پست پاساژ"
+        },
+        {
+            "key": "field_portfolio_standards",
+            "label": "استاندارد مرجع",
+            "name": "standards_compliance",
+            "type": "text",
+            "placeholder": "مثال: IEC 61439 / IEC 62271"
+        },
+        {
+            "key": "field_portfolio_location",
+            "label": "محل اجرای پروژه",
+            "name": "project_location",
+            "type": "text",
+            "placeholder": "مثال: عسلویه، فاز ۱۴"
+        },
+        {
+            "key": "field_portfolio_execution_year",
+            "label": "سال اجرای پروژه",
+            "name": "execution_year",
+            "type": "text",
+            "placeholder": "مثال: 1402"
+        },
+        {
+            "key": "field_portfolio_brand_logo",
+            "label": "لوگوی کارفرما",
+            "name": "brand-logo",
+            "type": "image",
+            "return_format": "array",
+            "preview_size": "thumbnail"
+        },
+        {
+            "key": "field_portfolio_sld_document",
+            "label": "نقشه تک خطی (SLD) / کاتالوگ فنی",
+            "name": "sld_document",
+            "type": "file",
+            "return_format": "array",
+            "instructions": "فایل PDF نقشه یا مشخصات فنی"
+        },
+        {
+            "key": "field_portfolio_project_gallery",
+            "label": "گالری تصاویر کارگاه و تجهيزات",
+            "name": "project_gallery",
+            "type": "gallery",
+            "return_format": "array",
+            "insert": "append",
+            "preview_size": "medium"
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "portfolio"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "active": true
+}

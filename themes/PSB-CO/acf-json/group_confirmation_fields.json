@@ -1,0 +1,48 @@
+{
+    "key": "group_confirmation_fields",
+    "title": "مشخصات تأییدیه و رضایت‌نامه",
+    "fields": [
+        {
+            "key": "field_conf_organization",
+            "label": "سازمان / شرکت صادرکننده تأییدیه",
+            "name": "issuing_organization",
+            "type": "text",
+            "placeholder": "مثال: شرکت توانیر / شرکت توزیع نیروی برق تهران / شرکت مپنا"
+        },
+        {
+            "key": "field_conf_letter_number",
+            "label": "شماره نامه یا ثبت وندورلیست",
+            "name": "letter_number",
+            "type": "text",
+            "placeholder": "مثال: 1402/102/548"
+        },
+        {
+            "key": "field_conf_scope",
+            "label": "موضوع و دامنه تأییدیه",
+            "name": "approval_scope",
+            "type": "text",
+            "placeholder": "مثال: تأییدیه ساخت تابلوهای برق ۲۰ کیلوولت و کشویی"
+        },
+        {
+            "key": "field_conf_document",
+            "label": "تصویر با کیفیت نامه یا فایل PDF",
+            "name": "letter_file",
+            "type": "file",
+            "return_format": "array"
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "confirmation"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "active": true
+}

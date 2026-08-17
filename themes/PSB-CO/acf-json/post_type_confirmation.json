@@ -1,0 +1,50 @@
+{
+    "key": "post_type_confirmation",
+    "title": "تأییدیه‌ها",
+    "post_type": "confirmation",
+    "advanced_configuration": true,
+    "labels": {
+        "name": "تأییدیه‌ها",
+        "singular_name": "تأییدیه",
+        "menu_name": "تأییدیه‌ها",
+        "all_items": "همه تأییدیه‌ها",
+        "add_new": "افزودن تأییدیه جدید",
+        "add_new_item": "افزودن تأییدیه جدید",
+        "edit_item": "ویرایش تأییدیه",
+        "new_item": "تأییدیه جدید",
+        "view_item": "نمایش تأییدیه",
+        "view_items": "نمایش تأییدیه‌ها",
+        "search_items": "جستجوی تأییدیه‌ها",
+        "not_found": "تأییدیه‌ای یافت نشد",
+        "not_found_in_trash": "تأییدیه‌ای در زباله‌دان یافت نشد"
+    },
+    "description": "Custom post type for Confirmations (تأییدیه‌ها)",
+    "public": true,
+    "hierarchical": false,
+    "exclude_from_search": false,
+    "publicly_queryable": true,
+    "show_ui": true,
+    "show_in_menu": true,
+    "show_in_nav_menus": true,
+    "show_in_admin_bar": true,
+    "menu_position": 8,
+    "menu_icon": "dashicons-verified",
+    "capability_type": "post",
+    "map_meta_cap": true,
+    "supports": [
+        "title",
+        "editor",
+        "custom-fields",
+        "thumbnail"
+    ],
+    "has_archive": true,
+    "rewrite": {
+        "permalink_rewrite": "custom_permalink",
+        "slug": "confirmation",
+        "with_front": false
+    },
+    "query_var": true,
+    "can_export": true,
+    "show_in_rest": true,
+    "active": true
+}

@@ -1,0 +1,25 @@
+{
+    "key": "taxonomy_services_categories",
+    "title": "دسته‌بندی خدمات",
+    "taxonomy": "services_categories",
+    "object_type": [
+        "services"
+    ],
+    "advanced_configuration": true,
+    "labels": {
+        "name": "دسته بندی خدمات",
+        "singular_name": "دسته بندی خدمات",
+        "menu_name": "دسته بندی خدمات"
+    },
+    "public": true,
+    "publicly_queryable": true,
+    "hierarchical": true,
+    "show_ui": true,
+    "show_in_menu": true,
+    "show_in_nav_menus": true,
+    "show_in_rest": true,
+    "show_tagcloud": true,
+    "show_admin_column": true,
+    "query_var": true,
+    "active": true
+}

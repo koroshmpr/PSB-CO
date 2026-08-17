@@ -1,0 +1,39 @@
+{
+    "key": "taxonomy_voltage_level",
+    "title": "سطح ولتاژ",
+    "taxonomy": "voltage_level",
+    "object_type": [
+        "portfolio",
+        "services",
+        "product"
+    ],
+    "advanced_configuration": true,
+    "labels": {
+        "name": "سطح ولتاژ",
+        "singular_name": "سطح ولتاژ",
+        "menu_name": "سطح ولتاژ",
+        "all_items": "همه سطوح ولتاژ",
+        "edit_item": "ویرایش سطح ولتاژ",
+        "view_item": "نمایش سطح ولتاژ",
+        "update_item": "بروزرسانی سطح ولتاژ",
+        "add_new_item": "افزودن سطح ولتاژ جدید",
+        "new_item_name": "نام سطح ولتاژ جدید",
+        "search_items": "جستجوی سطح ولتاژ"
+    },
+    "public": true,
+    "publicly_queryable": true,
+    "hierarchical": true,
+    "show_ui": true,
+    "show_in_menu": true,
+    "show_in_nav_menus": true,
+    "show_in_rest": true,
+    "show_tagcloud": true,
+    "show_admin_column": true,
+    "query_var": true,
+    "rewrite": {
+        "permalink_rewrite": "custom_permalink",
+        "slug": "voltage-level",
+        "with_front": false
+    },
+    "active": true
+}

@@ -1,0 +1,46 @@
+{
+    "key": "post_type_services",
+    "title": "خدمات ما",
+    "post_type": "services",
+    "advanced_configuration": true,
+    "labels": {
+        "name": "خدمات ما",
+        "singular_name": "خدمت",
+        "menu_name": "خدمات ما",
+        "all_items": "همه‌ی خدمات",
+        "add_new": "افزودن خدمت جدید",
+        "add_new_item": "افزودن خدمت جدید",
+        "edit_item": "ویرایش خدمت"
+    },
+    "description": "Custom post type for Services",
+    "public": true,
+    "hierarchical": false,
+    "exclude_from_search": false,
+    "publicly_queryable": true,
+    "show_ui": true,
+    "show_in_menu": true,
+    "show_in_nav_menus": true,
+    "show_in_admin_bar": true,
+    "menu_position": 6,
+    "menu_icon": "dashicons-admin-generic",
+    "capability_type": "post",
+    "map_meta_cap": true,
+    "supports": [
+        "title",
+        "editor",
+        "comments",
+        "excerpt",
+        "custom-fields",
+        "thumbnail"
+    ],
+    "has_archive": true,
+    "rewrite": {
+        "permalink_rewrite": "custom_permalink",
+        "slug": "services",
+        "with_front": false
+    },
+    "query_var": true,
+    "can_export": true,
+    "show_in_rest": true,
+    "active": true
+}

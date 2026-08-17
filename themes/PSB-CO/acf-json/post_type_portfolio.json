@@ -1,0 +1,46 @@
+{
+    "key": "post_type_portfolio",
+    "title": "نمونه کارها",
+    "post_type": "portfolio",
+    "advanced_configuration": true,
+    "labels": {
+        "name": "نمونه کارها",
+        "singular_name": "نمونه کار",
+        "menu_name": "نمونه کارها",
+        "all_items": "همه نمونه کارها",
+        "add_new": "افزودن نمونه کار جدید",
+        "add_new_item": "افزودن نمونه کار جدید",
+        "edit_item": "ویرایش نمونه کار"
+    },
+    "description": "Custom post type for Portfolios",
+    "public": true,
+    "hierarchical": false,
+    "exclude_from_search": false,
+    "publicly_queryable": true,
+    "show_ui": true,
+    "show_in_menu": true,
+    "show_in_nav_menus": true,
+    "show_in_admin_bar": true,
+    "menu_position": 5,
+    "menu_icon": "dashicons-portfolio",
+    "capability_type": "post",
+    "map_meta_cap": true,
+    "supports": [
+        "title",
+        "editor",
+        "comments",
+        "excerpt",
+        "custom-fields",
+        "thumbnail"
+    ],
+    "has_archive": true,
+    "rewrite": {
+        "permalink_rewrite": "custom_permalink",
+        "slug": "portfolios",
+        "with_front": false
+    },
+    "query_var": true,
+    "can_export": true,
+    "show_in_rest": true,
+    "active": true
+}
