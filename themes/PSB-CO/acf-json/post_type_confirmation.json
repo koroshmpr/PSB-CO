@@ -28,7 +28,7 @@
     "show_in_nav_menus": true,
     "show_in_admin_bar": true,
     "menu_position": 8,
-    "menu_icon": "dashicons-verified",
+    "menu_icon": "dashicons-awards",
     "capability_type": "post",
     "map_meta_cap": true,
     "supports": [

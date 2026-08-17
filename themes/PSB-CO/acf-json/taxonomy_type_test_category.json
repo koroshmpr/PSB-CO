@@ -1,0 +1,21 @@
+{
+    "key": "taxonomy_type_test_category",
+    "title": "دسته‌بندی تایپ‌تست",
+    "taxonomy": "type_test_category",
+    "object_type": [
+        "type-test"
+    ],
+    "labels": {
+        "name": "دسته‌بندی تایپ‌تست",
+        "singular_name": "دسته‌بندی تایپ‌تست",
+        "menu_name": "دسته‌بندی تایپ‌تست"
+    },
+    "active": true,
+    "public": true,
+    "hierarchical": true,
+    "rewrite": {
+        "slug": "type-test-category",
+        "with_front": "0"
+    },
+    "query_var": "type_test_category"
+}

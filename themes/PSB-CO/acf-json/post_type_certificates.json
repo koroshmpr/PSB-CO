@@ -1,20 +1,20 @@
 {
     "key": "post_type_certificates",
-    "title": "تائیدیه‌ها",
+    "title": "گواهی نامه ها",
     "post_type": "certificates",
     "advanced_configuration": true,
     "labels": {
-        "name": "تائیدیه",
-        "singular_name": "تائیدیه",
-        "menu_name": "تائیدیه‌ها",
-        "all_items": "همه ی تائیدیه‌ها",
-        "add_new": "افزودن تائیدیه جدید",
-        "add_new_item": "افزودن تائیدیه جدید",
-        "edit_item": "ویرایش تائیدیه"
+        "name": "گواهی نامه ها",
+        "singular_name": "گواهی نامه",
+        "menu_name": "گواهی نامه ها",
+        "all_items": "همه گواهی نامه ها",
+        "add_new": "افزودن گواهی نامه جدید",
+        "add_new_item": "افزودن گواهی نامه جدید",
+        "edit_item": "ویرایش گواهی نامه"
     },
     "public": true,
     "hierarchical": false,
-    "menu_icon": "dashicons-awards",
+    "menu_icon": "dashicons-id-alt",
     "supports": [
         "title",
         "editor",
@@ -24,7 +24,7 @@
     "has_archive": true,
     "rewrite": {
         "permalink_rewrite": "custom_permalink",
-        "slug": "certificate",
+        "slug": "certificates",
         "with_front": false
     },
     "active": true

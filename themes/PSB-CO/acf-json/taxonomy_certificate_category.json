@@ -1,15 +1,15 @@
 {
     "key": "taxonomy_certificate_category",
-    "title": "دسته‌بندی تائیدیه",
+    "title": "دسته‌بندی گواهی‌نامه",
     "taxonomy": "certificate_category",
     "object_type": [
         "certificates"
     ],
     "advanced_configuration": true,
     "labels": {
-        "name": "دسته‌بندی تائیدیه",
-        "singular_name": "دسته‌بندی تائیدیه",
-        "menu_name": "دسته‌بندی تائیدیه"
+        "name": "دسته‌بندی گواهی‌نامه",
+        "singular_name": "دسته‌بندی گواهی‌نامه",
+        "menu_name": "دسته‌بندی گواهی‌نامه"
     },
     "public": true,
     "hierarchical": true,

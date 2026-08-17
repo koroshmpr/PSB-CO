@@ -15,11 +15,11 @@ function handle_custom_ajax_search()
     if (empty($keyword) || mb_strlen($keyword) < 2) {
         wp_send_json_success(array(
             'html' => '',
-            'counts' => array('all' => 0, 'services' => 0, 'portfolio' => 0, 'certificates' => 0, 'confirmation' => 0, 'post' => 0),
+            'counts' => array('all' => 0, 'services' => 0, 'portfolio' => 0, 'certificates' => 0, 'confirmation' => 0, 'type-test' => 0, 'post' => 0),
         ));
     }
 
-    $all_post_types = array('services', 'portfolio', 'certificates', 'confirmation', 'post');
+    $all_post_types = array('services', 'portfolio', 'certificates', 'confirmation', 'type-test', 'post');
 
     // Calculate count per post type
     $counts = array('all' => 0);
@@ -185,6 +185,42 @@ function handle_custom_ajax_search()
                     </div>
                     <a href="<?= esc_url($permalink); ?>" class="inline-flex items-center justify-between w-full pt-3 border-t border-slate-100 text-xs font-bold text-blue-700 hover:text-blue-800">
                         <span>مشاهده نامه تاییدیه</span>
+                        <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </a>
+                </div>
+
+            <?php elseif ($p_type === 'type-test') :
+                $issuing_body = get_field('issuing_body') ?: 'آزمایشگاه آکردیته IEC';
+                $standard_number = get_field('standard_number');
+                $tested_equipment = get_field('tested_equipment');
+            ?>
+                <div class="group bg-white p-5 rounded-2xl border border-indigo-200/80 hover:border-indigo-500 shadow-sm hover:shadow-lg transition-all flex flex-col justify-between space-y-4 h-full">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">
+                                🔬 <?= esc_html($issuing_body); ?>
+                            </span>
+                            <?php if ($standard_number) : ?>
+                                <span class="text-[10px] font-mono font-bold text-blue-700"><?= esc_html($standard_number); ?></span>
+                            <?php endif; ?>
+                        </div>
+
+                        <?php if ($thumb) : ?>
+                            <div class="w-14 h-14 bg-white p-2 rounded-xl border border-slate-200 shadow-sm flex items-center justify-center">
+                                <img src="<?= esc_url($thumb); ?>" alt="<?= esc_attr($title); ?>" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform" />
+                            </div>
+                        <?php endif; ?>
+
+                        <h4 class="text-sm font-bold text-slate-900 group-hover:text-indigo-700 transition-colors line-clamp-2 leading-snug">
+                            <?= esc_html($title); ?>
+                        </h4>
+
+                        <?php if ($tested_equipment) : ?>
+                            <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">⚙️ <?= esc_html($tested_equipment); ?></p>
+                        <?php endif; ?>
+                    </div>
+                    <a href="<?= esc_url($permalink); ?>" class="inline-flex items-center justify-between w-full pt-3 border-t border-slate-100 text-xs font-bold text-indigo-700 hover:text-indigo-800">
+                        <span>مشاهده گزارش تایپ‌تست</span>
                         <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </a>
                 </div>

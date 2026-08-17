@@ -97,6 +97,9 @@ $thumbnail = get_the_post_thumbnail_url(get_the_ID(), 'full');
         <!-- 5. Reusable Certificates & ISO Quality Standards Component (Grid Mode) -->
         <?php get_template_part('template-parts/certificates/recently-certificates', null, array('layout' => 'grid', 'postCount' => 4)); ?>
 
+        <!-- 6. Reusable Type-Tests & Laboratory Standards Component (Grid Mode) -->
+        <?php get_template_part('template-parts/type-test/recently-type-tests', null, array('layout' => 'grid', 'postCount' => 4)); ?>
+
         <!-- 6. Mission, Vision & Core Values Section -->
         <section class="space-y-6" data-aos="fade-up">
             <div class="text-center space-y-1">

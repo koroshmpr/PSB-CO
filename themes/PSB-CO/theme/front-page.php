@@ -28,7 +28,10 @@ get_template_part('template-parts/confirmation/recently-confirmations', null, ar
 // 6. Technical Quality Certificates & ISO Standards Component
 get_template_part('template-parts/certificates/recently-certificates', null, array('layout' => 'slider'));
 
-// 7. Corporate Blog & News Slider
+// 7. Laboratory Type-Test Reports & Equipment Standards Component
+get_template_part('template-parts/type-test/recently-type-tests', null, array('layout' => 'slider'));
+
+// 8. Corporate Blog & News Slider
 get_template_part('template-parts/homepage/blog-slider');
 
 get_footer();

@@ -76,19 +76,6 @@ function psb_co_register_custom_post_types() {
         'rewrite' => array('slug' => 'tag-services', 'with_front' => false),
     ));
 
-    // 3. Rating Post Type
-    register_post_type('rating', array(
-        'labels' => array(
-            'name' => 'Ratings',
-            'singular_name' => 'Rating',
-            'menu_name' => 'Ratings'
-        ),
-        'public' => true,
-        'has_archive' => true,
-        'supports' => array('title'),
-        'rewrite' => array('slug' => 'ratings', 'with_front' => false)
-    ));
-
     // 4. Certificates Post Type & Taxonomy
     register_post_type('certificates', array(
         'supports' => array('title', 'editor', 'custom-fields', 'thumbnail'),
@@ -96,22 +83,23 @@ function psb_co_register_custom_post_types() {
         'has_archive' => true,
         'public' => true,
         'labels' => array(
-            'name' => 'تائیدیه',
-            'add_new' => 'افزودن تائیدیه جدید',
-            'add_new_item' => 'افزودن تائیدیه جدید',
-            'edit_item' => 'ویرایش تائیدیه',
-            'all_items' => 'همه ی تائیدیه‌ها',
-            'singular_name' => 'تائیدیه'
+            'name' => 'گواهی نامه ها',
+            'singular_name' => 'گواهی نامه',
+            'menu_name' => 'گواهی نامه ها',
+            'add_new' => 'افزودن گواهی نامه جدید',
+            'add_new_item' => 'افزودن گواهی نامه جدید',
+            'edit_item' => 'ویرایش گواهی نامه',
+            'all_items' => 'همه گواهی نامه ها'
         ),
-        'menu_icon' => 'dashicons-awards'
+        'menu_icon' => 'dashicons-id-alt'
     ));
 
     register_taxonomy('certificate_category', 'certificates', array(
         'hierarchical' => true,
         'labels' => array(
-            'name' => 'دسته‌بندی تائیدیه',
-            'singular_name' => 'دسته‌بندی تائیدیه',
-            'menu_name' => 'دسته‌بندی تائیدیه',
+            'name' => 'دسته‌بندی گواهی‌نامه',
+            'singular_name' => 'دسته‌بندی گواهی‌نامه',
+            'menu_name' => 'دسته‌بندی گواهی‌نامه',
         ),
         'show_ui' => true,
         'show_admin_column' => true,
@@ -134,7 +122,38 @@ function psb_co_register_custom_post_types() {
             'add_new_item' => 'افزودن تأییدیه جدید',
             'edit_item' => 'ویرایش تأییدیه'
         ),
-        'menu_icon' => 'dashicons-verified'
+        'menu_icon' => 'dashicons-awards'
+    ));
+
+    // 6. Type-Test Post Type & Taxonomy (آزمون‌های تایپ‌تست و استانداردهای تجهیزات برق)
+    register_post_type('type-test', array(
+        'supports' => array('title', 'editor', 'custom-fields', 'thumbnail', 'excerpt'),
+        'rewrite' => array('slug' => 'type-test', 'with_front' => false),
+        'has_archive' => true,
+        'public' => true,
+        'labels' => array(
+            'name' => 'تایپ تست',
+            'singular_name' => 'تایپ تست',
+            'menu_name' => 'تایپ تست',
+            'all_items' => 'همه تایپ تست‌ها',
+            'add_new' => 'افزودن تایپ تست جدید',
+            'add_new_item' => 'افزودن تایپ تست جدید',
+            'edit_item' => 'ویرایش تایپ تست'
+        ),
+        'menu_icon' => 'dashicons-yes-alt'
+    ));
+
+    register_taxonomy('type_test_category', 'type-test', array(
+        'hierarchical' => true,
+        'labels' => array(
+            'name' => 'دسته‌بندی تایپ‌تست',
+            'singular_name' => 'دسته‌بندی تایپ‌تست',
+            'menu_name' => 'دسته‌بندی تایپ‌تست',
+        ),
+        'show_ui' => true,
+        'show_admin_column' => true,
+        'query_var' => true,
+        'rewrite' => array('slug' => 'type-test-category', 'with_front' => false),
     ));
 }
 add_action('init', 'psb_co_register_custom_post_types');

@@ -1,0 +1,33 @@
+{
+    "key": "post_type_type_test",
+    "title": "تایپ تست",
+    "fields": [],
+    "post_type": "type-test",
+    "labels": {
+        "name": "تایپ تست",
+        "singular_name": "تایپ تست",
+        "menu_name": "تایپ تست",
+        "all_items": "همه تایپ تست‌ها",
+        "add_new": "افزودن تایپ تست جدید",
+        "add_new_item": "افزودن تایپ تست جدید",
+        "edit_item": "ویرایش تایپ تست"
+    },
+    "description": "گزارش‌ها و گواهی‌نامه‌های آزمون‌های تایپ‌تست آزمایشگاهی تجهیزات تابلوسازی برق",
+    "active": true,
+    "public": true,
+    "hierarchical": false,
+    "has_archive": true,
+    "rewrite": {
+        "slug": "type-test",
+        "with_front": "0"
+    },
+    "query_var": "type-test",
+    "menu_icon": "dashicons-yes-alt",
+    "supports": [
+        "title",
+        "editor",
+        "excerpt",
+        "custom-fields",
+        "thumbnail"
+    ]
+}

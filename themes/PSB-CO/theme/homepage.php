@@ -26,6 +26,10 @@ echo '<div class="[content-visibility:auto] [contain-intrinsic-size:auto_400px]"
 get_template_part('template-parts/homepage/portfolios-slider');
 echo '</div>';
 
+echo '<div class="[content-visibility:auto] [contain-intrinsic-size:auto_400px]">';
+get_template_part('template-parts/type-test/recently-type-tests', null, array('layout' => 'slider'));
+echo '</div>';
+
 echo '<div class="[content-visibility:auto] [contain-intrinsic-size:auto_500px]">';
 get_template_part('template-parts/blog/latest-blog');
 echo '</div>';

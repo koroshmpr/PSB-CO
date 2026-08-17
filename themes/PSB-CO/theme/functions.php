@@ -245,7 +245,7 @@ remove_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 3
 require get_template_directory() . '/inc/template-tags.php';
 require get_template_directory() . '/inc/template-functions.php';
 require get_template_directory() . '/inc/walker.php';
-// require get_template_directory() . '/inc/custom-post-type.php';
+require get_template_directory() . '/inc/custom-post-type.php';
 require get_template_directory() . '/inc/gravity-form.php';
 require get_template_directory() . '/inc/optimize.php';
 require get_template_directory() . '/inc/otp-login-form.php';
@@ -254,14 +254,14 @@ include_once get_template_directory() . '/inc/ajax-search.php';
 
 /**
  * Fix WP Nav Menu active classes for Custom Post Types
- * Ensures CPT pages (Services, Portfolio, Certificates, Confirmation) highlight their respective menu item
+ * Ensures CPT pages (Services, Portfolio, Certificates, Confirmation, Type-Test) highlight their respective menu item
  * and prevents the Blog (مقالات) menu item from incorrectly staying active.
  */
 add_filter('nav_menu_css_class', 'psb_fix_cpt_menu_active_classes', 10, 3);
 function psb_fix_cpt_menu_active_classes($classes, $item, $args) {
     if (is_admin()) return $classes;
 
-    $cpt_slugs = array('services', 'portfolio', 'certificates', 'confirmation', 'product');
+    $cpt_slugs = array('services', 'portfolio', 'certificates', 'confirmation', 'type-test', 'product');
 
     // Determine current post type
     $current_cpt = '';

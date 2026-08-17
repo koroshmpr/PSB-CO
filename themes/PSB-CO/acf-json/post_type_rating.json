@@ -8,18 +8,13 @@
         "singular_name": "Rating",
         "menu_name": "Ratings"
     },
-    "public": true,
+    "public": false,
     "hierarchical": false,
-    "show_ui": true,
-    "show_in_menu": true,
+    "show_ui": false,
+    "show_in_menu": false,
     "supports": [
         "title"
     ],
-    "has_archive": true,
-    "rewrite": {
-        "permalink_rewrite": "custom_permalink",
-        "slug": "ratings",
-        "with_front": false
-    },
-    "active": true
+    "has_archive": false,
+    "active": false
 }

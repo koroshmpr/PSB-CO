@@ -10,7 +10,7 @@
         query: '',
         activeTab: 'all',
         isSearching: false,
-        counts: { all: 0, services: 0, portfolio: 0, certificates: 0, confirmation: 0, post: 0 },
+        counts: { all: 0, services: 0, portfolio: 0, certificates: 0, confirmation: 0, 'type-test': 0, post: 0 },
         htmlResults: '',
         searchDebounceTimer: null,
         performSearch() {
@@ -52,7 +52,7 @@
         clearQuery() {
             this.query = '';
             this.htmlResults = '';
-            this.counts = { all: 0, services: 0, portfolio: 0, certificates: 0, confirmation: 0, post: 0 };
+            this.counts = { all: 0, services: 0, portfolio: 0, certificates: 0, confirmation: 0, 'type-test': 0, post: 0 };
         }
     }"
     x-transition:enter="transition ease-out duration-300"
@@ -153,6 +153,13 @@
                     class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
                 <span>🏛️ تأییدیه‌ها</span>
                 <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-black/20" x-text="counts.confirmation || 0"></span>
+            </button>
+
+            <button @click="setTab('type-test')"
+                    :class="activeTab === 'type-test' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-200'"
+                    class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
+                <span>🔬 تایپ‌تست‌ها</span>
+                <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-black/20" x-text="counts['type-test'] || 0"></span>
             </button>
 
             <button @click="setTab('post')"

@@ -1,0 +1,62 @@
+{
+    "key": "group_type_test_fields",
+    "title": "مشخصات و نتایج آزمون‌های تایپ‌تست (Type Test Reports)",
+    "fields": [
+        {
+            "key": "field_type_test_lab",
+            "label": "مرجع و آزمایشگاه صادرکننده (Testing Laboratory)",
+            "name": "issuing_body",
+            "type": "text",
+            "placeholder": "مثال: پژوهشگاه نیرو / EPIL / KEMA / CESI"
+        },
+        {
+            "key": "field_type_test_standard",
+            "label": "شماره استاندارد یا شماره گزارش آزمون",
+            "name": "standard_number",
+            "type": "text",
+            "placeholder": "مثال: IEC 61439-2 / Test Report No. TR-2024-884"
+        },
+        {
+            "key": "field_type_test_equipment",
+            "label": "تجهیز و نوع تابلو تست شده (Tested Equipment)",
+            "name": "tested_equipment",
+            "type": "text",
+            "placeholder": "مثال: تابلو فشار متوسط کشویی 36kV / تابلو مرکز کنترل موتور MCC"
+        },
+        {
+            "key": "field_type_test_parameters",
+            "label": "مشخصات و پارامترهای فنی تست (Test Parameters)",
+            "name": "test_parameters",
+            "type": "text",
+            "placeholder": "مثال: جریان اتصال کوتاه 50kA/1s - درجه حفاظت IP55 - قوس داخلی 31.5kA"
+        },
+        {
+            "key": "field_type_test_validity",
+            "label": "تاریخ انجام آزمون / اعتبار",
+            "name": "validity_date",
+            "type": "text",
+            "placeholder": "مثال: معتبر / سال 2024 (1403)"
+        },
+        {
+            "key": "field_type_test_document",
+            "label": "تصویر با کیفیت / فایل PDF گزارش تایپ‌تست",
+            "name": "type_test_file",
+            "type": "file",
+            "return_format": "array"
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "type-test"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "active": true
+}

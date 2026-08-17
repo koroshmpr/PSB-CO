@@ -113,6 +113,7 @@ $legacy_map = get_field('map-link', 'option') ?: '#';
                 'fallback_links' => array(
                     array('url' => site_url('/portfolios'), 'label' => 'پروژه‌های کلید در دست'),
                     array('url' => site_url('/certificates'), 'label' => 'گواهینامه‌های کیفیت'),
+                    array('url' => site_url('/type-test'), 'label' => 'گزارش‌های تایپ‌تست'),
                 ),
             )); ?>
 
