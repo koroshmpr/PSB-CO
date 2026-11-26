@@ -23,7 +23,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-const PSB_LIVE_SETUP_VERSION = 2;
+const PSB_LIVE_SETUP_VERSION = 3;
 
 function psb_live_setup_is_live() {
 	return 'psb.co.ir' === strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
@@ -96,13 +96,13 @@ function psb_live_setup_run() {
 		'incomplete' => false,
 	);
 
-	// 1. Publish reviewed drafts. NIOPDC 1861 and NIOEC 1863 (state oil companies) stay drafts until the owner decides.
+	// 1. Publish reviewed drafts (NIOPDC 1861 and NIOEC 1863 approved by the owner on 2026-11-26).
 	$publish = array(
 		'product'      => array( 1891, 1896, 1897, 1898, 1899, 1900, 1901, 1902, 1903, 1904, 1905 ),
 		'services'     => array( 1892, 1893, 1894, 1895 ),
 		'certificates' => array( 1845, 1847, 1849, 1851, 1853, 1855 ),
 		'type-test'    => array( 1857, 1859 ),
-		'confirmation' => array( 1865, 1867, 1869, 1871, 1873, 1875, 1877, 1879, 1881, 1883 ),
+		'confirmation' => array( 1861, 1863, 1865, 1867, 1869, 1871, 1873, 1875, 1877, 1879, 1881, 1883 ),
 	);
 	foreach ( $publish as $type => $ids ) {
 		foreach ( $ids as $id ) {
