@@ -16,21 +16,9 @@ global $woo_active;
 	<meta name="theme-color" content="#0B1220">
 	<?php endif; ?>
 	<?php
-	// LCP: preload the front-page hero image with the same srcset/sizes as the <img>.
+	// LCP: preload the front-page hero photo (AVIF, per breakpoint; same srcset/sizes as the <picture>).
 	if ( is_front_page() ) {
-		$psb_img = psb_home_hero_image();
-		if ( $psb_img ) {
-			$psb_src    = wp_get_attachment_image_url( $psb_img, 'full' );
-			$psb_srcset = wp_get_attachment_image_srcset( $psb_img, 'full' );
-			if ( $psb_src ) {
-				printf(
-					'<link rel="preload" as="image" href="%s"%s imagesizes="%s" fetchpriority="high">' . "\n",
-					esc_url( $psb_src ),
-					$psb_srcset ? ' imagesrcset="' . esc_attr( $psb_srcset ) . '"' : '',
-					esc_attr( psb_hero_sizes() )
-				);
-			}
-		}
+		psb_photo_preload( 'hero' );
 	}
 
 	wp_head();

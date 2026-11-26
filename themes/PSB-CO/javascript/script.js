@@ -11,6 +11,7 @@ import { initSwiperLoader } from './modules/swiper-loader';
 import psbSearch from './modules/search';
 import { initNavFeedback } from './modules/nav-feedback';
 import { initHeaderCompact } from './modules/header-compact';
+import { initTimeline } from './modules/timeline';
 
 window.Alpine = Alpine;
 Alpine.plugin(intersect);
@@ -22,6 +23,7 @@ const boot = () => {
 	initSwiperLoader();
 	initNavFeedback();
 	initHeaderCompact();
+	initTimeline();
 };
 
 if (document.readyState === 'loading') {

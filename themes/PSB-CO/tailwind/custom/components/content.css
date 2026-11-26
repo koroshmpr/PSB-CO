@@ -152,6 +152,72 @@
 		@apply mt-0.5 text-sm leading-7 text-slate-600;
 	}
 
+	/* Scroll progress: javascript/modules/timeline.js adds .is-anim (and drives --tl-p) only when
+	   JS runs and motion is allowed — otherwise the static timeline above is what renders. */
+	.timeline.is-anim::after {
+		content: "";
+		@apply pointer-events-none absolute start-[calc(0.25rem-0.5px)] top-1 w-0.5 origin-top rounded-full bg-foreground;
+		height: calc(100% - 0.5rem);
+		transform: scaleY(var(--tl-p, 0));
+		will-change: transform;
+	}
+
+	.timeline.is-anim .timeline-item {
+		opacity: 0;
+		transform: translate3d(0, 10px, 0);
+		transition:
+			opacity 0.5s var(--ease-out-quart),
+			transform 0.5s var(--ease-out-quart);
+	}
+
+	.timeline.is-anim .timeline-item.is-in {
+		opacity: 1;
+		transform: none;
+	}
+
+	.timeline.is-anim .timeline-item::before {
+		@apply bg-white shadow-[inset_0_0_0_1.5px_var(--color-line-strong)];
+		transition:
+			background-color 0.25s ease,
+			box-shadow 0.25s ease;
+	}
+
+	.timeline.is-anim .timeline-item.is-passed::before {
+		@apply bg-foreground shadow-[inset_0_0_0_1.5px_var(--color-foreground)];
+	}
+
+	.timeline.is-anim .timeline-item.is-current.is-passed::before {
+		@apply bg-primary-600 shadow-[0_0_0_4px_rgb(214_15_26/0.14)];
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.timeline.is-anim .timeline-item {
+			opacity: 1;
+			transform: none;
+			transition: none;
+		}
+	}
+
+	/* ---------------- Home about photo (sticky beside the timeline at lg+) ---------------- */
+	.about-photo {
+		@apply relative m-0 self-start overflow-hidden rounded-panel border border-line bg-slate-100;
+	}
+
+	.about-photo img {
+		@apply block;
+	}
+
+	.about-photo-cap {
+		@apply absolute bottom-3 start-3 rounded-control border border-line bg-white/95 px-2.5 py-1 text-[0.8125rem] font-medium text-foreground;
+	}
+
+	@media (width >= 64rem) {
+		.about-photo {
+			position: sticky;
+			top: calc(var(--header-h, 4rem) + var(--wp-admin--admin-bar--height, 0px) + 2rem);
+		}
+	}
+
 	/* ---------------- Logo wall (greyscale issuers) ---------------- */
 	.logo-wall {
 		@apply grid grid-cols-2 gap-px overflow-hidden rounded-card border border-line bg-line sm:grid-cols-3 lg:grid-cols-6;

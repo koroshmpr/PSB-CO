@@ -478,3 +478,126 @@ function psb_lat( $text ) {
 	// Latin company forms without digits (e.g. «SAREL s.r.l.») also use the Latin face.
 	return (string) preg_replace( '/(?<![\p{L}>])(SAREL s\.r\.l\.?|EPIL)(?![\p{L}<])/u', '<span class="lat">$1</span>', $html );
 }
+
+/**
+ * Theme-shipped photos (images/photos/): real PSB photos from the live media library,
+ * re-graded (white balance, gentle contrast) and cut per breakpoint as AVIF + WebP with a
+ * JPEG fallback (scratchpad proc.py). No retouching beyond that — nothing added or removed.
+ * Live sources: hero-mv-lineup* = attachment 1831 (MV switchgear line-up),
+ * about-assembly* = 1922 / 1921 (panel assembly interior).
+ *
+ * @return array<string,array> Set name => { img: [file, w, h], sources: [ {media, base, widths, w, h, sizes} ] }.
+ */
+function psb_photo_sets() {
+	return array(
+		'hero'  => array(
+			'img'     => array( 'hero-mv-lineup-960.jpg', 1280, 920 ),
+			'sources' => array(
+				array(
+					'media'  => '(min-width: 48rem)',
+					'base'   => 'hero-mv-lineup',
+					'widths' => array( 640, 960, 1280 ),
+					'w'      => 1280,
+					'h'      => 920,
+					'sizes'  => '(min-width: 64rem) 60vw, 100vw',
+				),
+				array(
+					'media'  => '(max-width: 47.99rem)',
+					'base'   => 'hero-mv-lineup-m',
+					'widths' => array( 480, 720 ),
+					'w'      => 720,
+					'h'      => 900,
+					'sizes'  => '100vw',
+				),
+			),
+		),
+		'about' => array(
+			'img'     => array( 'about-assembly-640.jpg', 640, 800 ),
+			'sources' => array(
+				array(
+					'media'  => '(min-width: 64rem)',
+					'base'   => 'about-assembly',
+					'widths' => array( 640, 960 ),
+					'w'      => 960,
+					'h'      => 1200,
+					'sizes'  => '(min-width: 80rem) 36rem, 45vw',
+				),
+				array(
+					'media'  => '(max-width: 63.99rem)',
+					'base'   => 'about-assembly-w',
+					'widths' => array( 768, 1280 ),
+					'w'      => 1280,
+					'h'      => 720,
+					'sizes'  => '(min-width: 48rem) 42rem, 100vw',
+				),
+			),
+		),
+	);
+}
+
+/** srcset string for one photo source in one format. */
+function psb_photo_srcset( $base, $widths, $ext ) {
+	$out = array();
+	foreach ( $widths as $w ) {
+		$out[] = get_theme_file_uri( "images/photos/{$base}-{$w}.{$ext}" ) . " {$w}w";
+	}
+	return implode( ', ', $out );
+}
+
+/**
+ * <picture> for a theme photo set (AVIF, WebP, then JPEG <img>).
+ *
+ * @param string $set   Key of psb_photo_sets().
+ * @param array  $attrs <img> attributes (class, alt, loading, fetchpriority …).
+ * @return string HTML.
+ */
+function psb_photo_picture( $set, $attrs = array() ) {
+	$sets = psb_photo_sets();
+	if ( empty( $sets[ $set ] ) ) {
+		return '';
+	}
+	$s    = $sets[ $set ];
+	$html = '<picture>';
+	foreach ( $s['sources'] as $src ) {
+		foreach ( array( 'avif', 'webp' ) as $ext ) {
+			$html .= sprintf(
+				'<source type="image/%1$s" media="%2$s" srcset="%3$s" sizes="%4$s" width="%5$d" height="%6$d">',
+				$ext,
+				esc_attr( $src['media'] ),
+				esc_attr( psb_photo_srcset( $src['base'], $src['widths'], $ext ) ),
+				esc_attr( $src['sizes'] ),
+				$src['w'],
+				$src['h']
+			);
+		}
+	}
+	$attrs = array_merge(
+		array(
+			'src'      => get_theme_file_uri( 'images/photos/' . $s['img'][0] ),
+			'width'    => $s['img'][1],
+			'height'   => $s['img'][2],
+			'alt'      => '',
+			'loading'  => 'lazy',
+			'decoding' => 'async',
+		),
+		$attrs
+	);
+	$html .= '<img';
+	foreach ( $attrs as $k => $v ) {
+		$html .= ' ' . $k . '="' . esc_attr( $v ) . '"';
+	}
+	return $html . '></picture>';
+}
+
+/** AVIF preload links (one per breakpoint) for a theme photo set — used for the home hero (LCP). */
+function psb_photo_preload( $set ) {
+	$sets = psb_photo_sets();
+	foreach ( $sets[ $set ]['sources'] ?? array() as $src ) {
+		printf(
+			'<link rel="preload" as="image" type="image/avif" media="%s" imagesrcset="%s" imagesizes="%s" fetchpriority="high">' . "\n",
+			esc_attr( $src['media'] ),
+			esc_attr( psb_photo_srcset( $src['base'], $src['widths'], 'avif' ) ),
+			esc_attr( $src['sizes'] )
+		);
+	}
+}

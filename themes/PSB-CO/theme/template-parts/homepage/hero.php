@@ -2,10 +2,10 @@
 /**
  * Home hero (spec v2 §5.1): full-bleed graphite photo, value-proposition H1, 2 CTAs + direct line,
  * ruled 4-stat trust row. Static (no slider / no reveal) — the photo is the LCP image
- * (eager, fetchpriority=high, preloaded in header.php with the same srcset/sizes).
+ * (theme photo set «hero», psb_photo_picture(): MV line-up on the inline-end side at lg+, separate 4:5
+ * mobile crop; eager, fetchpriority=high, AVIF preloaded in header.php with the same srcset/sizes).
  * Counts come from the CPTs; other facts are verified (SCRATCH/company-facts.md).
  */
-$psb_image = psb_home_hero_image();
 $psb_phone = psb_primary_phone();
 $psb_count = function ( $type ) {
 	return post_type_exists( $type ) ? (int) ( wp_count_posts( $type )->publish ?? 0 ) : 0;
@@ -27,21 +27,19 @@ if ( PSB_WARRANTY_MONTHS ) {
 }
 ?>
 <section class="relative isolate overflow-hidden bg-dark text-white on-dark" aria-labelledby="home-hero-title">
-	<?php if ( $psb_image ) : ?>
+	<div class="hero-media absolute inset-y-0 end-0 -z-20" aria-hidden="true">
 		<?php
-		echo psb_image( // phpcs:ignore
-			$psb_image,
-			'full',
+		echo psb_photo_picture( // phpcs:ignore
+			'hero',
 			array(
-				'class'         => 'absolute inset-0 -z-20 size-full object-cover object-[35%_50%] md:object-[30%_55%] [filter:saturate(.8)_contrast(1.05)]',
-				'alt'           => '',
-				'sizes'         => psb_hero_sizes(),
+				'class'         => 'size-full object-cover object-[50%_40%] lg:object-[78%_50%]',
 				'loading'       => 'eager',
 				'fetchpriority' => 'high',
+				'decoding'      => 'sync',
 			)
 		);
 		?>
-	<?php endif; ?>
+	</div>
 	<div class="hero-overlay absolute inset-0 -z-10" aria-hidden="true"></div>
 
 	<div class="container flex flex-col justify-between pt-10 md:min-h-[640px] md:pt-[5.5rem]">

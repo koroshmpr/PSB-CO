@@ -115,7 +115,7 @@ while ( have_posts() ) :
 				)
 			);
 			?>
-			<ol class="timeline">
+			<ol class="timeline" data-timeline>
 				<?php
 				$psb_last = count( $psb_timeline ) - 1;
 				foreach ( $psb_timeline as $psb_i => $psb_t ) :
