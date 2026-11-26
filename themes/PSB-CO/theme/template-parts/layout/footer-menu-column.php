@@ -1,52 +1,43 @@
 <?php
 /**
- * Reusable Footer Navigation Menu Column Component
- * PSB-CO High-Voltage Theme
- * 
- * Supported $args:
- * - 'theme_location': string (required, e.g. 'footerLocationOne', 'footerLocationTwo', 'footerLocationThree')
- * - 'fallback_title': string (optional)
- * - 'fallback_links': array of array('url' => '...', 'label' => '...') (optional)
+ * Footer navigation column.
+ *
+ * $args:
+ * - theme_location  'footerLocationOne' | 'footerLocationTwo' | 'footerLocationThree'
+ * - fallback_title  heading when the menu has no name
+ * - fallback_links  array( array( 'url' => '', 'label' => '' ) ) when no menu is assigned
  */
+$psb_location = $args['theme_location'] ?? 'footerLocationOne';
+$psb_title    = $args['fallback_title'] ?? '';
+$psb_links    = $args['fallback_links'] ?? array();
 
-$theme_location = $args['theme_location'] ?? 'footerLocationOne';
-$fallback_title = $args['fallback_title'] ?? 'فهرست فوتر';
-$fallback_links = $args['fallback_links'] ?? array();
-
-// Dynamically retrieve menu title set in WP Admin for this location
-$menu_title = $fallback_title;
-$locations = get_nav_menu_locations();
-if (isset($locations[$theme_location]) && $locations[$theme_location] > 0) {
-    $menu_obj = wp_get_nav_menu_object($locations[$theme_location]);
-    if ($menu_obj && !empty($menu_obj->name)) {
-        $menu_title = $menu_obj->name;
-    }
+$psb_locations = get_nav_menu_locations();
+if ( ! empty( $psb_locations[ $psb_location ] ) ) {
+	$psb_menu = wp_get_nav_menu_object( $psb_locations[ $psb_location ] );
+	if ( $psb_menu && ! empty( $psb_menu->name ) ) {
+		$psb_title = $psb_menu->name;
+	}
 }
 ?>
-
-<div class="lg:col-span-2 space-y-4 select-none">
-    <h4 class="font-bold text-white text-base border-b border-slate-800/80 pb-2.5 flex items-center justify-between">
-        <span class="flex items-center gap-2">
-            <span class="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block"></span>
-            <?= esc_html($menu_title); ?>
-        </span>
-    </h4>
-    <?php
-    if (has_nav_menu($theme_location)) {
-        wp_nav_menu(array(
-            'theme_location' => $theme_location,
-            'menu_class'     => 'flex flex-col gap-2.5 text-xs text-slate-300 font-medium',
-            'container'      => false,
-            'depth'          => 1,
-            'link_before'    => '<span class="inline-flex items-center gap-2 text-white/80 hover:text-blue-400 transition-colors py-1"><span class="w-1 h-1 rounded-full bg-slate-600"></span>',
-            'link_after'     => '</span>',
-        ));
-    } elseif (!empty($fallback_links)) {
-        echo '<ul class="flex flex-col gap-2.5 text-xs text-slate-300 font-medium">';
-        foreach ($fallback_links as $link) {
-            echo '<li><a href="' . esc_url($link['url']) . '" class="inline-flex items-center gap-2 hover:text-blue-400 transition-colors py-1"><span class="w-1 h-1 rounded-full bg-slate-600"></span>' . esc_html($link['label']) . '</a></li>';
-        }
-        echo '</ul>';
-    }
-    ?>
-</div>
+<nav aria-label="<?php echo esc_attr( $psb_title ); ?>">
+	<p class="footer-title"><?php echo esc_html( $psb_title ); ?></p>
+	<?php
+	if ( has_nav_menu( $psb_location ) ) {
+		wp_nav_menu(
+			array(
+				'theme_location' => $psb_location,
+				'menu_class'     => 'footer-links',
+				'container'      => false,
+				'depth'          => 1,
+				'fallback_cb'    => false,
+			)
+		);
+	} elseif ( $psb_links ) {
+		echo '<ul class="footer-links">';
+		foreach ( $psb_links as $psb_link ) {
+			printf( '<li><a href="%s">%s</a></li>', esc_url( $psb_link['url'] ), esc_html( $psb_link['label'] ) );
+		}
+		echo '</ul>';
+	}
+	?>
+</nav>

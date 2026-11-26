@@ -1,0 +1,141 @@
+name: Deploy PSB-CO theme
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'themes/PSB-CO/**'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch: # "Run workflow" button in the Actions tab
+
+# Never run two deploys at the same time; a newer push waits for the running one.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  THEME_DIR: themes/PSB-CO
+  SITE_URL: https://psb.co.ir
+  # Only three secrets are required: FTP_SERVER, FTP_USERNAME, FTP_PASSWORD.
+  # Everything below has a default; each can be overridden by a repo secret or
+  # repo variable (Settings > Secrets and variables > Actions) of the same name.
+  #
+  # cPanel account "psbco": WP_CONTENT_DIR on the server is
+  # /home/psbco/public_html/wp-content. The main cPanel FTP account lands in
+  # /home/psbco, so the theme path is relative to that home directory.
+  FTP_SERVER_DIR: ${{ secrets.FTP_SERVER_DIR || vars.FTP_SERVER_DIR || 'public_html/wp-content/themes/PSB-CO/theme/' }}
+  FTP_PORT: ${{ secrets.FTP_PORT || vars.FTP_PORT || '21' }}
+  # Explicit FTPS (TLS on port 21). If the host only supports plain FTP
+  # (common on Iranian shared hosts), set FTP_PROTOCOL to "ftp".
+  FTP_PROTOCOL: ${{ secrets.FTP_PROTOCOL || vars.FTP_PROTOCOL || 'ftps' }}
+
+jobs:
+  build:
+    name: Build & check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: themes/PSB-CO/package-lock.json
+
+      - name: Install & build (Tailwind + esbuild)
+        working-directory: ${{ env.THEME_DIR }}
+        run: |
+          npm ci --no-audit --no-fund
+          npm run production
+
+      # Same PHP minor version as the server (8.1).
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: none
+
+      - name: PHP syntax check
+        run: |
+          php -v | head -1
+          find "$THEME_DIR/theme" -name '*.php' -print0 | xargs -0 -n1 -P4 php -l -d display_errors=1 > /tmp/lint.txt 2>&1 || {
+            grep -v '^No syntax errors' /tmp/lint.txt; exit 1; }
+          echo "All PHP files OK ($(find "$THEME_DIR/theme" -name '*.php' | wc -l) files)"
+
+      - name: Upload built theme
+        uses: actions/upload-artifact@v4
+        with:
+          name: theme
+          path: ${{ env.THEME_DIR }}/theme/
+          retention-days: 14
+
+  deploy:
+    name: Deploy to psb.co.ir
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://psb.co.ir
+    steps:
+      - name: Check secrets and server dir
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          for v in FTP_SERVER FTP_USERNAME FTP_PASSWORD; do
+            [ -n "${!v}" ] || { echo "::error::Secret $v is not set"; exit 1; }
+          done
+          # The active theme lives in wp-content/themes/PSB-CO/theme/ on the server.
+          # Refuse anything else so a typo can never upload into the wrong folder.
+          case "$FTP_SERVER_DIR" in
+            */themes/PSB-CO/theme/) echo "Server dir: $FTP_SERVER_DIR" ;;
+            *) echo "::error::FTP_SERVER_DIR must end with /themes/PSB-CO/theme/ (got '$FTP_SERVER_DIR')"; exit 1 ;;
+          esac
+          case "$FTP_PROTOCOL" in
+            ftp|ftps|ftps-legacy) echo "Protocol: $FTP_PROTOCOL, port $FTP_PORT" ;;
+            *) echo "::error::FTP_PROTOCOL must be ftp, ftps or ftps-legacy"; exit 1 ;;
+          esac
+
+      - name: Download built theme
+        uses: actions/download-artifact@v4
+        with:
+          name: theme
+          path: theme
+
+      - name: Upload changed files via FTP(S)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ env.FTP_PORT }}
+          protocol: ${{ env.FTP_PROTOCOL }}
+          local-dir: ./theme/
+          server-dir: ${{ env.FTP_SERVER_DIR }}
+          dangerous-clean-slate: false
+          state-name: .htftp-deploy-state.json # ".ht*" files are denied by Apache
+          log-level: standard
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/.DS_Store
+            **/*.map
+
+      - name: Smoke test the live site
+        run: |
+          set -e
+          for path in "/" "/about-us/" "/shop/" "/blog/"; do
+            for i in 1 2 3 4 5; do
+              code=$(curl -s -L -o /tmp/page.html -w '%{http_code}' -A 'Mozilla/5.0 (deploy-check)' "$SITE_URL$path?nocache=$GITHUB_RUN_ID") || code=000
+              [ "$code" = "200" ] && break
+              sleep 5
+            done
+            echo "$path -> HTTP $code"
+            [ "$code" = "200" ] || { echo "::error::$path returned $code"; exit 1; }
+            if grep -qiE 'Fatal error|Parse error|critical error on this website|خطای مهلکی' /tmp/page.html; then
+              echo "::error::PHP fatal error on $path"; grep -iE -m3 'Fatal error|Parse error' /tmp/page.html || true; exit 1
+            fi
+          done
+          echo "Site is healthy"

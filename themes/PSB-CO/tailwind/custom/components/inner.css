@@ -1,0 +1,753 @@
+/**
+ * Inner templates (archives, singles, credentials hub, catalogue, letters, blog series).
+ * Owned by the inner-templates agent. Follows SCRATCH/design-spec.md v2:
+ * light-dominant, hairlines, 4/6/8px radii, no tints/tech-grid on light, red only for actions.
+ */
+@layer components {
+	/* ---------------- Latin codes (IEC 61439, IP54, SYStem6, report numbers) ---------------- */
+	.lat {
+		font-family: var(--font-latin, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+		direction: ltr;
+		unicode-bidi: isolate;
+		font-feature-settings: "tnum" 1;
+	}
+
+	/* ---------------- Underline tabs (credentials hub, product sections) — spec 4.14 ---------------- */
+	.subnav {
+		@apply relative z-30 border-b border-line bg-white lg:sticky;
+		top: var(--header-h, 4rem);
+	}
+
+	.subnav-list {
+		@apply container flex gap-6 overflow-x-auto;
+		scrollbar-width: none;
+	}
+
+	.subnav-list::-webkit-scrollbar {
+		display: none;
+	}
+
+	.subnav-link {
+		@apply relative inline-flex min-h-12 shrink-0 items-center gap-2 text-[0.9375rem] font-medium text-slate-600 transition-colors duration-150 hover:text-foreground;
+	}
+
+	.subnav-link[aria-current="page"] {
+		@apply text-foreground;
+	}
+
+	.subnav-link[aria-current="page"]::after {
+		content: "";
+		@apply absolute inset-x-0 bottom-0 h-0.5 bg-primary;
+	}
+
+	.subnav-count {
+		@apply rounded-[3px] bg-slate-100 px-1.5 text-xs leading-5 text-slate-600;
+	}
+
+	/* ---------------- Layout helpers ---------------- */
+	.inner-grid {
+		@apply grid gap-10 lg:grid-cols-12 lg:gap-6;
+	}
+
+	.inner-main {
+		@apply min-w-0 lg:col-span-8;
+	}
+
+	.inner-aside {
+		@apply flex flex-col gap-5 lg:sticky lg:col-span-4 lg:self-start lg:ps-6;
+		top: calc(var(--header-h, 4rem) + 4rem);
+	}
+
+	.panel {
+		@apply rounded-card border border-line bg-white p-5 sm:p-6;
+	}
+
+	.panel-title {
+		@apply mb-3 text-base font-bold text-foreground;
+	}
+
+	/* Plain-text facts in a ruled row (no pills) */
+	.fact-list {
+		@apply grid gap-2.5 text-[0.9375rem] text-slate-700;
+	}
+
+	.fact-list li {
+		@apply flex items-start gap-2;
+	}
+
+	.fact-list svg {
+		@apply mt-1 size-4 shrink-0 text-foreground;
+	}
+
+	/* ---------------- Empty state ---------------- */
+	.empty-state {
+		@apply mx-auto flex max-w-2xl flex-col items-center gap-4 rounded-panel border border-line bg-white px-6 py-14 text-center;
+	}
+
+	.empty-state-title {
+		@apply text-h3 font-bold text-foreground;
+	}
+
+	.empty-state-text {
+		@apply max-w-md text-[0.9375rem] leading-8 text-slate-600;
+	}
+
+	/* ---------------- Documents: 3:4 preview, 1px border on steel-50 (spec 7.3/7.5) ---------------- */
+	.doc-frame {
+		@apply relative block overflow-hidden rounded-card border border-line bg-slate-50;
+		aspect-ratio: 3 / 4;
+	}
+
+	.doc-frame img {
+		@apply block size-full object-cover object-top;
+	}
+
+	.doc-frame--empty {
+		@apply flex flex-col items-center justify-center gap-2 text-center text-xs text-slate-600;
+	}
+
+	.doc-frame--empty svg {
+		@apply text-slate-300;
+	}
+
+	.doc-link {
+		@apply flex min-h-14 items-center gap-3 rounded-card border border-line bg-white p-3 text-sm transition-colors duration-150 hover:border-line-strong;
+	}
+
+	.doc-link-meta {
+		@apply text-xs text-slate-600;
+	}
+
+	/* ---------------- Register rows (approvals / type tests), spec 4.3 ---------------- */
+	.register {
+		@apply flex flex-col;
+	}
+
+	.register-group + .register-group {
+		@apply mt-12;
+	}
+
+	.register-head {
+		@apply mb-1 flex items-baseline justify-between gap-4 border-t-2 border-foreground pt-3 text-sm font-semibold text-slate-600;
+	}
+
+	.reg-row {
+		@apply relative flex items-center gap-4 border-b border-line py-4;
+	}
+
+	.reg-tile {
+		@apply flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-card border border-line bg-white text-xs font-bold text-slate-700;
+	}
+
+	.reg-tile img {
+		@apply size-full object-contain p-1.5 opacity-85 grayscale;
+		mix-blend-mode: multiply;
+	}
+
+	.reg-tile .lat {
+		letter-spacing: 0.05em;
+	}
+
+	.reg-title {
+		@apply text-base font-bold leading-7 text-foreground;
+	}
+
+	.reg-title a:hover {
+		@apply text-primary;
+	}
+
+	.reg-meta {
+		@apply mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.8125rem] leading-6 text-slate-600;
+	}
+
+	.reg-meta > * + *::before {
+		content: "·";
+		@apply me-2 text-slate-300;
+	}
+
+	.reg-action {
+		@apply relative z-10 hidden shrink-0 items-center gap-1.5 text-sm font-semibold text-primary-700 sm:inline-flex;
+	}
+
+	/* ---------------- Credential / letter cards (grid version) ---------------- */
+	.cred-card,
+	.letter-card {
+		@apply relative flex h-full flex-col overflow-hidden rounded-card border border-line bg-white transition-[border-color,box-shadow] duration-200;
+	}
+
+	.cred-card {
+		@apply gap-4 p-5;
+	}
+
+	.cred-card:has(.card-link:hover),
+	.cred-card:has(.card-link:focus-visible),
+	.letter-card:has(.card-link:hover),
+	.letter-card:has(.card-link:focus-visible) {
+		@apply border-line-strong;
+		box-shadow: 0 12px 32px -16px rgb(17 20 24 / 0.25);
+	}
+
+	.cred-card-head {
+		@apply flex items-start gap-3;
+	}
+
+	.cred-card-title {
+		@apply text-base font-bold leading-7 text-foreground;
+	}
+
+	.cred-card-issuer {
+		@apply text-[0.8125rem] font-semibold text-slate-600;
+	}
+
+	.cred-card-foot {
+		@apply mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3 text-xs text-slate-600;
+	}
+
+	.letter-card-media {
+		@apply border-b border-line bg-slate-50 p-5;
+	}
+
+	.letter-card-media .doc-frame {
+		@apply mx-auto w-full max-w-[13rem] bg-white;
+	}
+
+	.letter-quote {
+		@apply border-s-2 border-line-strong ps-4 text-[1.0625rem] leading-[1.9] text-slate-700;
+	}
+
+	/* ---------------- Lightbox (native <dialog>) ---------------- */
+	.lightbox {
+		@apply m-auto max-h-[92vh] w-[min(56rem,94vw)] overflow-hidden rounded-panel border-0 bg-white p-0 text-foreground;
+	}
+
+	.lightbox::backdrop {
+		background: rgb(17 20 24 / 0.86);
+	}
+
+	.lightbox-head {
+		@apply flex items-center justify-between gap-3 border-b border-line px-4 py-2;
+	}
+
+	.lightbox-body {
+		@apply flex max-h-[calc(92vh-8rem)] items-start justify-center overflow-auto bg-slate-100 p-3 sm:p-5;
+	}
+
+	.lightbox-body img {
+		@apply h-auto max-w-full bg-white;
+	}
+
+	.lightbox-foot {
+		@apply flex flex-wrap items-center justify-end gap-2 border-t border-line px-4 py-3;
+	}
+
+	/* ---------------- Article helpers ---------------- */
+	.toc {
+		@apply rounded-card border border-line bg-white;
+	}
+
+	.toc-title,
+	.toc-summary {
+		@apply text-sm font-bold text-foreground;
+	}
+
+	.toc-list {
+		@apply flex flex-col gap-0.5;
+	}
+
+	.toc a {
+		@apply -ms-px block rounded-e-[3px] border-s-2 border-transparent px-3 py-1.5 text-[0.8125rem] leading-6 text-slate-600 transition-colors duration-150 hover:bg-slate-50 hover:text-foreground;
+	}
+
+	.toc .toc-label {
+		@apply line-clamp-2;
+	}
+
+	.toc a[aria-current="true"] {
+		@apply border-primary bg-slate-50 font-semibold text-foreground;
+	}
+
+	.toc-children {
+		@apply ms-3 flex flex-col gap-0.5 border-s border-line;
+	}
+
+	.toc .toc-sub a {
+		@apply text-xs;
+	}
+
+	/* Desktop side TOC: sticky, viewport-capped, own scrollbar, h3 only for the active section */
+	.toc-stick {
+		@apply xl:sticky;
+		top: calc(var(--header-live, var(--header-h, 4rem)) + 24px);
+	}
+
+	@media (min-width: 80rem) {
+		.toc-stick {
+			max-height: calc(100vh - var(--header-live, var(--header-h, 4rem)) - 48px);
+		}
+	}
+
+	.toc--side {
+		@apply relative flex min-h-0 flex-col overflow-hidden p-0 xl:flex;
+		flex: 0 1 auto;
+	}
+
+	.toc--side .toc-title {
+		@apply shrink-0 px-4 pt-4 pb-2;
+	}
+
+	.toc-scroll {
+		@apply min-h-0 flex-1 overflow-y-auto px-2 pb-3;
+		scrollbar-width: thin;
+		scrollbar-color: var(--color-line-strong) transparent;
+		overscroll-behavior: contain;
+	}
+
+	.toc-scroll::-webkit-scrollbar {
+		width: 6px;
+	}
+
+	.toc-scroll::-webkit-scrollbar-thumb {
+		@apply rounded-[3px] bg-line-strong;
+	}
+
+	.toc--side .toc-children {
+		@apply hidden;
+	}
+
+	.toc--side .toc-item.is-open > .toc-children {
+		@apply flex;
+	}
+
+	.toc-progress {
+		@apply absolute inset-x-0 top-0 h-0.5 bg-line;
+	}
+
+	.toc-progress span {
+		@apply block h-full w-0 bg-primary;
+		transition: width 0.12s linear;
+	}
+
+	.toc-stick > .panel {
+		@apply shrink-0;
+	}
+
+	/* Mobile / tablet: collapsible «فهرست مطالب» */
+	.toc--inline {
+		@apply p-4;
+	}
+
+	.toc-summary {
+		@apply flex min-h-11 cursor-pointer list-none items-center justify-between;
+	}
+
+	.toc-summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.toc--inline[open] .toc-summary svg {
+		@apply rotate-90;
+	}
+
+	.toc--inline .toc-list {
+		@apply mt-2 border-t border-line pt-2;
+	}
+
+	.about-box {
+		@apply flex items-start gap-4 rounded-card border border-line bg-white p-5;
+	}
+
+	.share-list {
+		@apply flex flex-wrap items-center gap-2;
+	}
+
+	/* ---------------- Catalogue (WooCommerce, no prices) ---------------- */
+	.product-gallery-main {
+		@apply relative block w-full overflow-hidden rounded-card border border-line bg-slate-50;
+		aspect-ratio: 4 / 3;
+	}
+
+	.product-gallery-main img {
+		@apply size-full object-cover transition-transform duration-[400ms];
+	}
+
+	.product-gallery-main:hover img {
+		transform: scale(1.03);
+	}
+
+	.product-thumbs {
+		@apply mt-3 flex gap-2;
+	}
+
+	.product-thumbs a {
+		@apply block size-[72px] overflow-hidden rounded-control border border-line bg-white transition-colors duration-150 hover:border-foreground;
+	}
+
+	.product-thumbs img {
+		@apply size-full object-cover;
+	}
+
+	.anchor-nav {
+		@apply relative z-30 flex gap-6 overflow-x-auto border-b border-line bg-white lg:sticky;
+		top: var(--header-h, 4rem);
+		scrollbar-width: none;
+	}
+
+	.anchor-nav a {
+		@apply relative inline-flex min-h-12 shrink-0 items-center text-[0.9375rem] font-medium text-slate-600 transition-colors duration-150 hover:text-foreground;
+	}
+
+	.anchor-nav a[aria-current="true"] {
+		@apply text-foreground;
+	}
+
+	.anchor-nav a[aria-current="true"]::after {
+		content: "";
+		@apply absolute inset-x-0 bottom-0 h-0.5 bg-primary;
+	}
+
+	/* Sticky mobile CTA (product pages): 64px, white, top hairline; sits above the tab bar if shown. */
+	.sticky-cta {
+		@apply fixed inset-x-0 z-50 flex min-h-16 items-center gap-3 border-t border-line bg-white px-4 py-2 lg:hidden;
+		bottom: var(--tabbar-offset, 0px);
+		padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+	}
+
+	/* Product hero key facts: ruled icon rows (label at the start, value after) */
+	.product-facts {
+		@apply grid border-t border-line;
+	}
+
+	.product-fact {
+		@apply grid gap-1 border-b border-line py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:items-center sm:gap-4;
+	}
+
+	.product-fact dt {
+		@apply flex items-center gap-2 text-sm font-medium text-slate-600;
+	}
+
+	.product-fact dd {
+		@apply flex flex-wrap items-center gap-1.5 text-[0.9375rem] font-semibold leading-7 text-foreground;
+	}
+
+	/* Catalogue category navigation: scrollable chips on mobile, side list with counts on desktop */
+	.cat-list {
+		@apply -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 lg:mx-0 lg:flex-col lg:gap-0 lg:overflow-visible lg:border-t-2 lg:border-foreground lg:px-0 lg:pb-0;
+		scrollbar-width: none;
+	}
+
+	.cat-list::-webkit-scrollbar {
+		display: none;
+	}
+
+	.cat-list > li {
+		@apply shrink-0 lg:shrink;
+	}
+
+	.cat-link {
+		@apply inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full border border-line-strong bg-white px-3.5 text-sm font-medium whitespace-nowrap text-slate-700 lg:whitespace-normal transition-colors duration-150 hover:border-foreground hover:text-foreground lg:flex lg:min-h-12 lg:rounded-none lg:border-0 lg:border-b lg:border-line lg:bg-transparent lg:px-1;
+	}
+
+	.cat-link svg {
+		@apply text-slate-500;
+	}
+
+	.cat-link-label {
+		@apply lg:flex-1;
+	}
+
+	.cat-link-count {
+		@apply rounded-[3px] bg-slate-100 px-1.5 text-xs leading-5 text-slate-600 tabular-nums;
+	}
+
+	.cat-link[aria-current="page"] {
+		@apply border-foreground bg-foreground text-white lg:bg-transparent lg:font-semibold lg:text-foreground;
+	}
+
+	.cat-link[aria-current="page"] svg {
+		@apply text-white lg:text-primary;
+	}
+
+	.cat-link[aria-current="page"] .cat-link-count {
+		@apply bg-white/20 text-white lg:bg-slate-100 lg:text-slate-700;
+	}
+
+	.cat-link--child {
+		@apply lg:ps-6;
+	}
+
+	/* Product cards: 2-line excerpt, equal heights inside the grid */
+	.card--product .card-footer {
+		@apply flex-wrap gap-y-2;
+	}
+
+	.card--product .card-footer .link-arrow,
+	.card--product .card-footer .btn {
+		@apply whitespace-nowrap;
+	}
+
+	.card--product .card-text {
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
+	}
+
+	/* ---------------- Contact ---------------- */
+	.contact-card {
+		@apply flex h-full flex-col gap-4 rounded-card border border-line bg-white p-5 sm:p-6;
+	}
+
+	.map-placeholder {
+		@apply relative flex w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-card border border-line bg-slate-50 text-center;
+		aspect-ratio: 16 / 9;
+	}
+
+	.map-placeholder iframe {
+		@apply absolute inset-0 size-full border-0;
+	}
+
+	/* Gravity Forms inside design-system pages (spec 4.12) */
+	.gform-psb .gform_wrapper {
+		@apply text-foreground;
+	}
+
+	.gform-psb .gform_required_legend {
+		@apply hidden;
+	}
+
+	.gform-psb .gform_fields {
+		@apply grid gap-4 sm:grid-cols-2;
+	}
+
+	.gform-psb .gfield {
+		@apply col-span-full;
+	}
+
+	.gform-psb .gfield--width-half {
+		@apply sm:col-span-1;
+	}
+
+	.gform-psb .gfield_label {
+		@apply mb-1.5 block text-sm font-medium text-foreground;
+	}
+
+	.gform-psb .gfield_required {
+		@apply text-primary;
+	}
+
+	.gform-psb input:not([type="submit"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]),
+	.gform-psb textarea,
+	.gform-psb select {
+		@apply block min-h-12 w-full rounded-control border border-line-strong bg-white px-4 py-2.5 text-base text-foreground transition-colors duration-150 placeholder:text-slate-500 focus:border-foreground focus:outline-none focus:ring-2 focus:ring-foreground/10;
+	}
+
+	.gform-psb textarea {
+		@apply min-h-32;
+	}
+
+	.gform-psb input[type="file"] {
+		@apply block w-full rounded-control border border-dashed border-line-strong bg-slate-50 p-3 text-sm;
+	}
+
+	.gform-psb .gform_footer {
+		@apply mt-5;
+	}
+
+	.gform-psb .gform_button,
+	.gform-psb input[type="submit"] {
+		@apply inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-control bg-primary px-8 text-[0.9375rem] font-semibold text-white transition-colors duration-150 hover:bg-primary-700 sm:w-auto;
+	}
+
+	.gform-psb .validation_message,
+	.gform-psb .gform_validation_errors {
+		@apply mt-1 text-xs text-red-700;
+	}
+
+	.gform-psb .gfield_description {
+		@apply mt-1 text-xs text-slate-600;
+	}
+
+	/* ---------------- Article series ---------------- */
+	.series-box[open] .series-box-toggle svg {
+		@apply rotate-90;
+	}
+
+	[data-series-item].is-read .series-num-n {
+		@apply hidden;
+	}
+
+	[data-series-item].is-read .series-num-check {
+		@apply block;
+	}
+
+	[data-series-item].is-read .series-num {
+		@apply border-emerald-200 bg-emerald-50;
+	}
+
+	/* Mobile "next part" bar: above the app tab bar, slides in after ~60% of the article. */
+	.series-bar {
+		@apply fixed inset-x-3 z-50 flex min-h-12 items-center gap-3 rounded-card border border-line bg-white px-4 py-2 transition-[transform,opacity] duration-200 lg:hidden;
+		bottom: calc(var(--tabbar-offset, 0px) + 0.5rem);
+		transform: translateY(calc(100% + 1rem + var(--tabbar-offset, 0px)));
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.series-bar.is-visible {
+		transform: none;
+		opacity: 1;
+		pointer-events: auto;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.series-bar,
+		.product-gallery-main img {
+			transition: none;
+		}
+	}
+
+	/* ---------------- Comments ---------------- */
+	.comment-list {
+		@apply flex flex-col gap-4;
+	}
+
+	.comment-list .children {
+		@apply mt-4 flex flex-col gap-4 border-s border-line ps-4;
+	}
+}
+
+/* Unlayered on purpose: must beat body.has-tabbar padding (layout.css, also unlayered).
+ * Reserve room for fixed bottom bars so they never cover the end of the content. */
+@media (width < 64rem) {
+	body:has(.sticky-cta),
+	body.has-tabbar:has(.sticky-cta) {
+		padding-bottom: calc(var(--tabbar-offset, 0px) + 4.5rem + env(safe-area-inset-bottom));
+	}
+
+	body:has(.series-bar),
+	body.has-tabbar:has(.series-bar) {
+		padding-bottom: calc(var(--tabbar-offset, 0px) + 4.25rem);
+	}
+}
+
+/* Comments: neutralise the legacy floating-label rules of form.css (unlayered) inside .comments-area. */
+.comments-area .comment-form {
+	display: block;
+}
+
+.comments-area .comment-form p {
+	display: block;
+	margin-top: 0;
+}
+
+.comments-area .comment-form label {
+	position: static;
+	transform: none;
+	background: none;
+	padding: 0;
+	width: auto;
+}
+
+.comments-area .comment-form .form-submit #submit {
+	background-color: var(--color-primary) !important;
+}
+
+.comments-area .comment-form-cookies-consent {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.comments-area .comment-form-cookies-consent input {
+	width: 1.25rem;
+	height: 1.25rem;
+}
+
+.comments-area .comment-form-cookies-consent label {
+	color: var(--color-slate-600);
+	font-size: 0.8125rem;
+	min-height: 2.75rem;
+	display: flex;
+	align-items: center;
+}
+
+/* Long product descriptions are clamped on mobile only when JS is available (see single-product.php). */
+[data-clamp].is-clamped {
+	max-height: 56rem;
+	overflow: hidden;
+	-webkit-mask-image: linear-gradient(to bottom, #000 80%, transparent);
+	mask-image: linear-gradient(to bottom, #000 80%, transparent);
+}
+
+[data-clamp].is-clamped-sm {
+	max-height: 22rem;
+}
+
+/* In-article anchors: html already has scroll-padding-top = header + 16px (base.css);
+ * a heading margin on top of it would double the offset. */
+.article-prose h2[id],
+.article-prose h3[id] {
+	scroll-margin-top: 0;
+}
+
+/* Long words / URLs never force horizontal scroll on narrow screens. */
+.article-prose,
+.card-title,
+.cred-card-title,
+.reg-title,
+.spec-table td,
+.spec-list dd,
+.page-hero-title,
+.page-hero-lead {
+	overflow-wrap: anywhere;
+}
+
+.article-prose img,
+.article-prose video,
+.article-prose iframe {
+	max-width: 100%;
+	height: auto;
+}
+
+.article-prose iframe {
+	aspect-ratio: 16 / 9;
+	width: 100%;
+}
+
+/* Horizontally scrollable tables with an edge-shadow hint (works in RTL and LTR). */
+.table-wrap {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+.table-wrap,
+.article-prose table {
+	background:
+		linear-gradient(to right, #fff 30%, rgb(255 255 255 / 0)) left center / 2.5rem 100% no-repeat local,
+		linear-gradient(to left, #fff 30%, rgb(255 255 255 / 0)) right center / 2.5rem 100% no-repeat local,
+		radial-gradient(farthest-side at 0 50%, rgb(17 20 24 / 0.14), transparent) left center / 0.75rem 100% no-repeat scroll,
+		radial-gradient(farthest-side at 100% 50%, rgb(17 20 24 / 0.14), transparent) right center / 0.75rem 100% no-repeat scroll;
+	background-color: #fff;
+}
+
+/* Keep the back-to-top FAB clear of my bottom bars (product sticky CTA, series «بعدی» bar). */
+@media (width < 64rem) {
+	body:has(.sticky-cta) .fab {
+		bottom: calc(var(--tabbar-offset, 0px) + 5rem);
+	}
+
+	body:has(.series-bar.is-visible) .fab {
+		bottom: calc(var(--tabbar-offset, 0px) + 4.75rem);
+	}
+}
+
+/* Prose tables: never split words inside cells; tables wider than the screen scroll (edge-shadow hint above). */
+.article-prose th,
+.article-prose td {
+	overflow-wrap: normal;
+	word-break: normal;
+	min-width: 6.5rem;
+}
+
+.article-prose th:first-child,
+.article-prose td:first-child {
+	min-width: 5.5rem;
+}

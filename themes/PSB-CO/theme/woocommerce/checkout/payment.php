@@ -31,7 +31,7 @@ if ( ! wp_doing_ajax() ) {
 				}
 			} else {
 				echo '<li>';
-				wc_print_notice( apply_filters( 'woocommerce_no_available_payment_methods_message', WC()->customer->get_billing_country() ? esc_html__( 'Sorry, it seems that there are no available payment methods. Please contact us if you require assistance or wish to make alternate arrangements.', 'woocommerce' ) : esc_html__( 'Please fill in your details above to see available payment methods.', 'woocommerce' ) ), 'notice' ); // phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment
+				wc_print_notice( apply_filters( 'woocommerce_no_available_payment_methods_message', ( WC()->customer && WC()->customer->get_billing_country() ) ? esc_html__( 'Sorry, it seems that there are no available payment methods. Please contact us if you require assistance or wish to make alternate arrangements.', 'woocommerce' ) : esc_html__( 'Please fill in your details above to see available payment methods.', 'woocommerce' ) ), 'notice' ); // phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment
 				echo '</li>';
 			}
 			?>
@@ -49,9 +49,9 @@ if ( ! wp_doing_ajax() ) {
 		<?php wc_get_template( 'checkout/terms.php' ); ?>
 
 		<?php do_action( 'woocommerce_review_order_before_submit' ); ?>
-        <div class="max-lg:fixed transition-all duration-300 bg-white/95 max-lg:backdrop-blur-md max-lg:inset-x-0 w-full p-3 max-lg:z-[55] bottom-12 rounded-none max-lg:border-t max-lg:border-slate-200 max-lg:shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
+        <div class="max-lg:fixed transition-all duration-300 bg-white/95 max-lg:backdrop-blur-md max-lg:inset-x-0 w-full p-3 max-lg:z-[55] bottom-12 rounded-none max-lg:border-t max-lg:border-slate-200">
             <?php echo apply_filters( 'woocommerce_order_button_html', '
-            <button type="submit" class=" alt bg-blue-700 hover:bg-blue-800 py-3.5 text-base font-bold cursor-pointer transition-all !mb-0 w-full rounded-xl text-white shadow-md' . esc_attr( wc_wp_theme_get_element_class_name( 'button' ) ? ' ' . wc_wp_theme_get_element_class_name( 'button' ) : '' ) . '" 
+            <button type="submit" class=" alt bg-primary-700 hover:bg-primary-700 py-3.5 text-base font-bold cursor-pointer transition-all !mb-0 w-full rounded-card text-white' . esc_attr( wc_wp_theme_get_element_class_name( 'button' ) ? ' ' . wc_wp_theme_get_element_class_name( 'button' ) : '' ) . '" 
             name="woocommerce_checkout_place_order" 
             id="place_order" 
             value="' . esc_attr( $order_button_text ) . '" 

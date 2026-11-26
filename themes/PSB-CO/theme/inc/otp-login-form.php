@@ -1,5 +1,56 @@
 <?php
 
+/**
+ * Strict OTP check (security fix 2026-11-26).
+ * The old code compared `$saved != $otp`; with no pending code get_transient() is false
+ * and PHP 8 treats false == "" as true, so an empty OTP logged in any user by phone.
+ * Now: exact match only, 5 wrong tries per phone burns the code, plus a per-IP cap.
+ */
+function psb_otp_digits( $v ) {
+	return preg_replace( '/\D+/', '', strtr( (string) $v, array( '۰'=>'0','۱'=>'1','۲'=>'2','۳'=>'3','۴'=>'4','۵'=>'5','۶'=>'6','۷'=>'7','۸'=>'8','۹'=>'9' ) ) );
+}
+function psb_otp_verify( $phone, $otp ) {
+	$phone = psb_otp_digits( $phone );
+	$otp   = psb_otp_digits( $otp );
+	if ( ! preg_match( '/^09\d{9}$/', $phone ) || ! preg_match( '/^\d{5}$/', $otp ) ) {
+		return false;
+	}
+	$ip     = isset( $_SERVER['REMOTE_ADDR'] ) ? (string) $_SERVER['REMOTE_ADDR'] : '';
+	$ip_key = 'otp_vfail_ip_' . md5( $ip );
+	if ( (int) get_transient( $ip_key ) >= 20 ) {
+		return false;
+	}
+	$saved = get_transient( 'otp_' . $phone );
+	if ( false === $saved || '' === (string) $saved || ! hash_equals( (string) $saved, $otp ) ) {
+		$fail_key = 'otp_vfail_' . $phone;
+		$fails    = (int) get_transient( $fail_key ) + 1;
+		set_transient( $fail_key, $fails, 10 * MINUTE_IN_SECONDS );
+		set_transient( $ip_key, (int) get_transient( $ip_key ) + 1, HOUR_IN_SECONDS );
+		if ( $fails >= 5 ) {
+			delete_transient( 'otp_' . $phone );
+		}
+		return false;
+	}
+	delete_transient( 'otp_vfail_' . $phone );
+	return true;
+}
+
+/**
+ * Fresh `my-nonce` for forms on page-cached HTML (security review M3). GET admin-ajax.php?action=psb_my_nonce
+ * Works for guests (user 0 nonce) and logged-in users (their own session-bound nonce). Never cacheable.
+ */
+add_action('wp_ajax_psb_my_nonce', 'psb_ajax_my_nonce');
+add_action('wp_ajax_nopriv_psb_my_nonce', 'psb_ajax_my_nonce');
+function psb_ajax_my_nonce() {
+    if (!defined('DONOTCACHEPAGE')) {
+        define('DONOTCACHEPAGE', true);
+    }
+    nocache_headers();
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0, private', true);
+    header('X-PSB-SW: no-store');
+    wp_send_json_success(['nonce' => wp_create_nonce('my-nonce')]);
+}
+
 // ==========================================
 // PLAN A: ورود و ثبت‌نام پیامکی (OTP)
 // ==========================================
@@ -19,13 +70,13 @@ function handle_kavenegar_send_otp() {
     $ip = $_SERVER['REMOTE_ADDR'] ?? '';
     $ip_attempts = get_transient('otp_ip_attempts_' . $ip) ?: 0;
     if ($ip_attempts >= 5) {
-        wp_send_json_error(['message' => 'تعداد درخواست‌های شما از این آی‌پی بیش از حد مجاز است. لطفا ۱۰ دقیقه دیگر دوباره تلاش کنید.']);
+        wp_send_json_error(['message' => 'تعداد درخواست‌های شما از این آی‌پی بیش از حد مجاز است. لطفاً ۱۰ دقیقه دیگر دوباره تلاش کنید.']);
     }
 
     // 2. Phone Number Rate Limiting (Max 1 attempt per 60 seconds)
     $last_sent = get_transient('otp_sent_time_' . $phone);
     if ($last_sent) {
-        wp_send_json_error(['message' => 'لطفا پس از اتمام زمان تایمر (یک دقیقه) دوباره تلاش کنید.']);
+        wp_send_json_error(['message' => 'لطفاً پس از اتمام زمان تایمر (یک دقیقه) دوباره تلاش کنید.']);
     }
 
     $otp = wp_rand(10000, 99999);
@@ -61,12 +112,11 @@ add_action('wp_ajax_nopriv_kavenegar_verify_otp', 'handle_kavenegar_verify_otp')
 function handle_kavenegar_verify_otp() {
     check_ajax_referer('my-nonce', 'security');
 
-    $phone = sanitize_text_field($_POST['phone']);
-    $otp = sanitize_text_field($_POST['otp']);
+    $phone = psb_otp_digits($_POST['phone'] ?? '');
+    $otp = sanitize_text_field($_POST['otp'] ?? '');
 
-    $saved_otp = get_transient('otp_' . $phone);
-    if ($saved_otp != $otp) {
-        wp_send_json_error(['message' => 'کد تایید اشتباه است یا منقضی شده.']);
+    if (!psb_otp_verify($phone, $otp)) {
+        wp_send_json_error(['message' => 'کد تأیید اشتباه است یا منقضی شده.']);
     }
 
     $users = get_users([
@@ -78,8 +128,11 @@ function handle_kavenegar_verify_otp() {
     if (!empty($users)) {
         // کاربر وجود دارد -> لاگین
         $user_id = $users[0]->ID;
+        if (user_can($user_id, 'manage_options')) {
+            wp_send_json_error(['message' => 'ورود پیامکی برای حساب مدیر فعال نیست؛ لطفاً با نام کاربری و رمز وارد شوید.']);
+        }
 
-        // **جدید: چون کاربر با OTP وارد شده، شماره‌اش قطعا تایید شده است**
+        // **جدید: چون کاربر با OTP وارد شده، شماره‌اش قطعا تأیید شده است**
         update_user_meta($user_id, 'is_phone_verified', '1');
 
         clean_user_cache($user_id);
@@ -99,12 +152,11 @@ add_action('wp_ajax_nopriv_kavenegar_register_user', 'handle_kavenegar_register_
 function handle_kavenegar_register_user() {
     check_ajax_referer('my-nonce', 'security');
 
-    $phone = sanitize_text_field($_POST['phone']);
-    $otp = sanitize_text_field($_POST['otp']);
+    $phone = psb_otp_digits($_POST['phone'] ?? '');
+    $otp = sanitize_text_field($_POST['otp'] ?? '');
 
-    $saved_otp = get_transient('otp_' . $phone);
-    if ($saved_otp != $otp) {
-        wp_send_json_error(['message' => 'نشست شما منقضی شده است. لطفا دوباره تلاش کنید.']);
+    if (!psb_otp_verify($phone, $otp)) {
+        wp_send_json_error(['message' => 'نشست شما منقضی شده است. لطفاً دوباره تلاش کنید.']);
     }
 
     $name = sanitize_text_field($_POST['name']);
@@ -131,7 +183,7 @@ function handle_kavenegar_register_user() {
     update_user_meta($user_id, 'shipping_first_name', $name);
     update_user_meta($user_id, 'billing_email', $email);
 
-    // **جدید: ثبت وضعیت تایید شده**
+    // **جدید: ثبت وضعیت تأیید شده**
     update_user_meta($user_id, 'is_phone_verified', '1');
 
     clean_user_cache($user_id);
@@ -202,7 +254,7 @@ function handle_classic_register() {
     update_user_meta($user_id, 'shipping_first_name', $name);
     update_user_meta($user_id, 'billing_email', $email);
 
-    // **جدید: ثبت وضعیت تایید نشده چون فقط تایپ شده است**
+    // **جدید: ثبت وضعیت تأیید نشده چون فقط تایپ شده است**
     update_user_meta($user_id, 'is_phone_verified', '0');
 
     clean_user_cache($user_id);
@@ -231,10 +283,10 @@ function show_phone_data_in_users_table($val, $column_name, $user_id) {
 
         if (!$phone) return 'ندارد';
 
-        // نمایش وضعیت تایید در لیست کاربران ادمین
+        // نمایش وضعیت تأیید در لیست کاربران ادمین
         $badge = $is_verified === '1'
-            ? '<span style="color:green; font-weight:bold; font-size:11px;">(تایید شده)</span>'
-            : '<span style="color:red; font-weight:bold; font-size:11px;">(تایید نشده)</span>';
+            ? '<span style="color:green; font-weight:bold; font-size:11px;">(تأیید شده)</span>'
+            : '<span style="color:red; font-weight:bold; font-size:11px;">(تأیید نشده)</span>';
 
         return $phone . ' ' . $badge;
     }
@@ -250,15 +302,14 @@ function handle_update_user_phone_with_otp() {
     check_ajax_referer('my-nonce', 'security');
 
     if (!is_user_logged_in()) {
-        wp_send_json_error(['message' => 'لطفا ابتدا وارد حساب خود شوید.']);
+        wp_send_json_error(['message' => 'لطفاً ابتدا وارد حساب خود شوید.']);
     }
 
-    $phone = sanitize_text_field($_POST['phone']);
-    $otp = sanitize_text_field($_POST['otp']);
+    $phone = psb_otp_digits($_POST['phone'] ?? '');
+    $otp = sanitize_text_field($_POST['otp'] ?? '');
 
-    $saved_otp = get_transient('otp_' . $phone);
-    if ($saved_otp != $otp) {
-        wp_send_json_error(['message' => 'کد تایید اشتباه است یا منقضی شده.']);
+    if (!psb_otp_verify($phone, $otp)) {
+        wp_send_json_error(['message' => 'کد تأیید اشتباه است یا منقضی شده.']);
     }
 
     $current_user_id = get_current_user_id();
@@ -275,11 +326,11 @@ function handle_update_user_phone_with_otp() {
     update_user_meta($current_user_id, 'billing_phone', $phone);
     update_user_meta($current_user_id, 'shipping_phone', $phone);
 
-    // **جدید: ثبت شماره به عنوان تایید شده پس از ویرایش موفق**
+    // **جدید: ثبت شماره به عنوان تأیید شده پس از ویرایش موفق**
     update_user_meta($current_user_id, 'is_phone_verified', '1');
     delete_transient('otp_' . $phone);
 
-    wp_send_json_success(['message' => 'شماره موبایل با موفقیت بروزرسانی و تایید شد.']);
+    wp_send_json_success(['message' => 'شماره موبایل با موفقیت به‌روزرسانی و تأیید شد.']);
 }
 
 add_action('woocommerce_edit_account_form', 'render_otp_phone_updater_in_my_account');
@@ -294,11 +345,11 @@ function render_otp_phone_updater_in_my_account() {
     $status_html = '';
     if ($current_phone) {
         if ($is_verified === '1') {
-            $status_html = '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 mr-2">تایید شده</span>';
+            $status_html = '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 mr-2">تأیید شده</span>';
             $btn_text = 'تغییر شماره';
         } else {
-            $status_html = '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 mr-2">تایید نشده</span>';
-            $btn_text = 'تایید یا تغییر شماره';
+            $status_html = '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 mr-2">تأیید نشده</span>';
+            $btn_text = 'تأیید یا تغییر شماره';
         }
     } else {
         $btn_text = 'ثبت شماره موبایل';
@@ -326,24 +377,24 @@ function render_otp_phone_updater_in_my_account() {
             </template>
 
             <div x-show="step === 1">
-                <label class="block text-gray-700 text-sm font-bold mb-2">شماره موبایل جدید جهت تایید</label>
+                <label class="block text-gray-700 text-sm font-bold mb-2">شماره موبایل جدید جهت تأیید</label>
                 <div class="flex gap-2">
                     <input type="tel" x-model="newPhone" placeholder="09123456789" class="w-full px-4 py-2 rounded-lg border border-gray-300 text-left dir-ltr focus:ring-2 focus:ring-blue-500">
                     <button type="button" @click="sendUpdateOtp()" :disabled="isLoading" class="whitespace-nowrap px-4 py-2 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition disabled:opacity-50">
                         <span x-show="!isLoading">ارسال کد</span>
-                        <span x-show="isLoading">کمی صبر...</span>
+                        <span x-show="isLoading">لطفاً صبر کنید…</span>
                     </button>
                 </div>
                 <button type="button" @click="cancelEdit()" class="mt-3 text-sm text-gray-500 hover:text-gray-800">انصراف</button>
             </div>
 
             <div x-show="step === 2" style="display: none;">
-                <label class="block text-gray-700 text-sm font-bold mb-2">کد تایید پیامک شده</label>
+                <label class="block text-gray-700 text-sm font-bold mb-2">کد تأیید پیامک شده</label>
                 <input type="text" x-model="otp" autocomplete="one-time-code" inputmode="numeric" placeholder="- - - -" class="w-full px-4 py-3 rounded-lg border border-gray-300 text-center tracking-widest text-xl mb-3 focus:ring-2 focus:ring-blue-500">
 
                 <div class="flex gap-2">
                     <button type="button" @click="verifyUpdateOtp()" :disabled="isLoading" class="w-full px-4 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition disabled:opacity-50">
-                        <span x-show="!isLoading">تایید و ذخیره</span>
+                        <span x-show="!isLoading">تأیید و ذخیره</span>
                         <span x-show="isLoading">در حال بررسی...</span>
                     </button>
                     <button type="button" @click="step = 1" class="w-1/3 px-4 py-3 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300 transition">
@@ -386,9 +437,9 @@ function render_otp_phone_updater_in_my_account() {
                     let formData = new FormData();
                     formData.append('action', 'kavenegar_send_otp');
                     formData.append('phone', this.newPhone);
-                    if (typeof jsData !== 'undefined' && jsData.nonce) {
-                        formData.append('security', jsData.nonce);
-                    }
+                    let nonce = (typeof jsData !== 'undefined' && jsData.nonce) ? jsData.nonce : '';
+                    if (typeof window.psbFreshNonce === 'function') nonce = await window.psbFreshNonce(nonce);
+                    if (nonce) formData.append('security', nonce);
 
                     try {
                         let response = await fetch(this.ajaxUrl, { method: 'POST', body: formData });
@@ -398,7 +449,7 @@ function render_otp_phone_updater_in_my_account() {
                         if (result.success) {
                             this.step = 2;
                             this.isError = false;
-                            this.message = 'کد تایید ارسال شد.';
+                            this.message = 'کد تأیید ارسال شد.';
                         } else {
                             this.isError = true;
                             this.message = result.data.message || 'خطا در ارسال پیامک';
@@ -419,9 +470,9 @@ function render_otp_phone_updater_in_my_account() {
                     formData.append('action', 'update_user_phone_with_otp');
                     formData.append('phone', this.newPhone);
                     formData.append('otp', this.otp);
-                    if (typeof jsData !== 'undefined' && jsData.nonce) {
-                        formData.append('security', jsData.nonce);
-                    }
+                    let nonce = (typeof jsData !== 'undefined' && jsData.nonce) ? jsData.nonce : '';
+                    if (typeof window.psbFreshNonce === 'function') nonce = await window.psbFreshNonce(nonce);
+                    if (nonce) formData.append('security', nonce);
 
                     try {
                         let response = await fetch(this.ajaxUrl, { method: 'POST', body: formData });
@@ -431,7 +482,7 @@ function render_otp_phone_updater_in_my_account() {
                         if (result.success) {
                             this.isError = false;
                             this.message = result.data.message;
-                            // رفرش صفحه برای آپدیت شدن ویژوال وضعیت به "تایید شده"
+                            // رفرش صفحه برای آپدیت شدن ویژوال وضعیت به "تأیید شده"
                             setTimeout(() => { window.location.reload(); }, 1500);
                         } else {
                             this.isError = true;

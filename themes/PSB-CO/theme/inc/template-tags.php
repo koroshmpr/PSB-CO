@@ -40,9 +40,9 @@ if ( ! function_exists( 'bluebox_posted_by' ) ) :
 	function bluebox_posted_by() {
 		printf(
 		/* translators: 1: posted by label, only visible to screen readers. 2: author link. 3: post author. */
-			'<span class="sr-only">%1$s</span><span class="author vcard"><a class="url fn n" href="%2$s">%3$s</a></span>',
-			esc_html__( 'Posted by', 'bluebox' ),
-			esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ),
+			// No link: author archives redirect on this site.
+			'<span class="sr-only">%1$s</span><span class="author vcard"><span class="fn n">%2$s</span></span>',
+			'نویسنده',
 			esc_html( get_the_author() )
 		);
 	}

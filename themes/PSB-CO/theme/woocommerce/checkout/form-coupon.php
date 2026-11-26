@@ -36,7 +36,7 @@ if ( ! wc_coupons_enabled() ) { // @codingStandardsIgnoreLine.
     ?>
 </div>
 
-<form class="checkout_coupon woocommerce-form-coupon w-full bg-white shadow-sm lg:w-1/3 flex flex-col items-center !my-0 !p-1 !rounded-t-0 !border-t-transparent !mx-auto" method="post" style="display:none" id="woocommerce-checkout-form-coupon">
+<form class="checkout_coupon woocommerce-form-coupon w-full bg-white lg:w-1/3 flex flex-col items-center !my-0 !p-1 !rounded-t-0 !border-t-transparent !mx-auto" method="post" style="display:none" id="woocommerce-checkout-form-coupon">
 
     <p class="form-row form-row-first !w-full !mb-0">
         <label for="coupon_code" class="screen-reader-text"><?php esc_html_e( 'Coupon:', 'woocommerce' ); ?></label>

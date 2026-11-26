@@ -10,19 +10,19 @@ function render_inline_ad_shortcode($atts)
 
     ob_start();
     ?>
-    <div class="not-prose relative my-5 w-full h-24 lg:h-32 rounded-xl overflow-hidden p-1 text-secondary drop-shadow-sm group">
+    <div class="not-prose relative my-5 w-full h-24 lg:h-32 rounded-card overflow-hidden p-1 text-secondary group">
         <!-- Spinning border animation (inherits your 'secondary' color automatically) -->
         <div class="absolute top-1/2 left-1/2 w-[200%] h-[200%] -translate-x-1/2 -translate-y-1/2 animate-[spin_2.5s_linear_infinite] bg-[conic-gradient(transparent_270deg,currentColor)]"></div>
 
         <!-- Inner container (masks the center, leaving a 4px animated border) -->
-        <div class="relative w-full h-full bg-neutral-50 rounded-xl flex items-center justify-end overflow-hidden">
+        <div class="relative w-full h-full bg-neutral-50 rounded-card flex items-center justify-end overflow-hidden">
             <?php if ($a['image']): ?>
                 <!-- Alt tag dynamically uses the button text for better accessibility and SEO -->
                 <img src="<?= esc_url($a['image']); ?>" alt="<?= esc_attr($a['text'] ? $a['text'] : 'تبلیغ'); ?>" class="absolute inset-0 w-full h-full object-cover">
             <?php endif; ?>
 
             <a href="<?= esc_url($a['link']); ?>" target="_blank" rel="noopener nofollow"
-               class="absolute w-fit max-lg:py-3 p-4 end-5 bg-secondary min-w-28 lg:min-w-32 text-white text-sm text-center rounded-xl font-semibold hover:brightness-125 hover:scale-105 transition-all duration-300 shadow-md">
+               class="absolute w-fit max-lg:py-3 p-4 end-5 bg-secondary min-w-28 lg:min-w-32 text-white text-sm text-center rounded-card font-semibold hover:brightness-125 hover:scale-105 transition-all duration-300">
                 <?= esc_html($a['text']); ?>
             </a>
         </div>

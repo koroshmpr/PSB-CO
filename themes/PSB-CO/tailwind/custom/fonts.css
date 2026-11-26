@@ -1,41 +1,37 @@
 /**
- * Custom `@font-face` rules
- *
- * These will be added immediately before Tailwind’s `base` layer.
+ * Peyda (Persian digits) — local woff2, font-display: swap.
+ * Only three files are ever downloaded. Weight ranges map every Tailwind
+ * weight onto them so `font-black` / `font-extrabold` reuse the Bold file
+ * instead of triggering faux-bold or an extra download.
+ *   Regular  -> 100–400
+ *   Medium   -> 500–600
+ *   Bold     -> 700–900
+ * Regular + Bold are preloaded in functions.php (above-the-fold weights).
  */
-
-/* 1. WE REMOVED 300 (Light) TO SAVE SPACE */
-
-/* 2. REGULAR (400) - MUST BE ACTIVE */
 @font-face {
 	font-family: Peyda;
 	font-style: normal;
 	font-display: swap;
-	font-weight: 400;
-	src: url('../../../theme/fonts/Peyda/fonts/woff2/PeydaWebFaNum-Regular.woff2') format('woff2');
+	font-weight: 100 400;
+	src: url('../../fonts/Peyda/fonts/woff2/PeydaWebFaNum-Regular.woff2') format('woff2');
 }
 
-/* 3. MEDIUM (500) - Optional, but good to keep if you use it for subheadings */
 @font-face {
 	font-family: Peyda;
 	font-style: normal;
 	font-display: swap;
-	font-weight: 500;
-	src: url('../../../theme/fonts/Peyda/fonts/woff2/PeydaWebFaNum-Medium.woff2') format('woff2');
+	font-weight: 500 600;
+	src: url('../../fonts/Peyda/fonts/woff2/PeydaWebFaNum-Medium.woff2') format('woff2');
 }
 
-/* 4. BOLD (700) - MUST BE ACTIVE */
 @font-face {
 	font-family: Peyda;
 	font-style: normal;
 	font-display: swap;
-	font-weight: 700;
-	src: url('../../../theme/fonts/Peyda/fonts/woff2/PeydaWebFaNum-Bold.woff2') format('woff2');
+	font-weight: 700 900;
+	src: url('../../fonts/Peyda/fonts/woff2/PeydaWebFaNum-Bold.woff2') format('woff2');
 }
-
-/* 5. WE REMOVED 900 (Black) TO SAVE SPACE */
 
 .font-peyda {
-	/* Changed fallback to sans-serif, as Peyda is a sans-serif font */
-	font-family: Peyda, sans-serif;
+	font-family: var(--font-sans);
 }

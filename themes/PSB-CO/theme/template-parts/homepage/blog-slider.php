@@ -1,93 +1,76 @@
 <?php
 /**
- * Minimal Corporate Blog & News Slider Component - Light Theme
- * PSB-CO High & Medium Voltage Theme
+ * Articles (spec v2 §5.8): white, 3 article cards (16:9, kicker = category, H3 ≤ 2 lines,
+ * date · read time; no excerpt). Featured images flagged as AI renders are never shown —
+ * those cards get the steel placeholder with the PSB mark. Filter: psb_blocked_image_ids.
  */
-
-$postSlider = get_field('post_title');
-$first_part = $postSlider['first_part'] ?? 'مقالات و اخبار';
-$underline_word = $postSlider['underline_word'] ?? 'تخصصی صنعت برق';
-$short_desc = $postSlider['short_description'] ?? 'جدیدترین مقالات آموزشی، استانداردها و اخبار تجهیزات فشار قوی و پست‌های برق';
+$psb_q = new WP_Query(
+	array(
+		'post_type'           => 'post',
+		'post_status'         => 'publish',
+		'posts_per_page'      => $args['count'] ?? 3,
+		'ignore_sticky_posts' => true,
+		'no_found_rows'       => true,
+	)
+);
+if ( ! $psb_q->have_posts() ) {
+	return;
+}
+$psb_blocked = (array) apply_filters( 'psb_blocked_image_ids', array( 1777, 1841, 1752, 1842, 1703, 1775, 1776, 1838, 1750, 1837, 1694, 1705, 1836, 1388, 1336 ) );
+$psb_blog    = (int) get_option( 'page_for_posts' );
 ?>
-
-<section class="py-12 bg-slate-50/70 text-slate-900 border-t border-slate-200 select-none relative overflow-hidden" data-aos="fade-up">
-    <!-- Subtle Background Dot Pattern -->
-    <div class="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:24px_24px] opacity-40 pointer-events-none"></div>
-
-    <div class="container mx-auto px-4 md:px-8 relative z-10">
-        <!-- Section Header -->
-        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 border-b border-slate-200 pb-6">
-            <div class="space-y-3 max-w-2xl">
-                <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 shadow-sm">
-                    <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-                    <span>مجله تخصصی تابلوسازی & پست‌های برق</span>
-                </div>
-                <h2 class="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight leading-snug">
-                    <?= esc_html($first_part); ?>
-                    <span class="text-blue-700 border-b-4 border-blue-600 pb-0.5">
-                        <?= esc_html($underline_word); ?>
-                    </span>
-                </h2>
-                <p class="text-slate-600 text-sm md:text-base leading-relaxed">
-                    <?= esc_html($short_desc); ?>
-                </p>
-            </div>
-
-            <!-- View All Blog Archive Link -->
-            <a href="<?= esc_url(get_permalink(get_option('page_for_posts')) ?: site_url('/blog')); ?>" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 shadow-sm hover:shadow transition-all text-sm whitespace-nowrap self-start md:self-auto group shrink-0">
-                <span>مشاهده وبلاگ و تمام مقالات</span>
-                <svg class="w-4 h-4 rtl:rotate-180 text-blue-700 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                </svg>
-            </a>
-        </div>
-
-        <!-- Post Swiper Container -->
-        <div class="post_swiper swiper !pb-10" 
-            data-perpage="4.5" 
-            data-laptop="3.5" 
-            data-tablet="1.5" 
-            data-mobile="1.1"
-            data-perfix="post"
-            data-direction="horizontal"
-        >
-            <div class="swiper-wrapper">
-                <?php
-                $args = array(
-                    'post_type' => 'post',
-                    'post_status' => 'publish',
-                    'order' => 'DESC',
-                    'posts_per_page' => 8,
-                    'ignore_sticky_posts' => true
-                );
-                $loop = new WP_Query($args);
-                if ($loop->have_posts()) :
-                    while ($loop->have_posts()) :
-                        $loop->the_post(); ?>
-                        <div class="swiper-slide h-auto">
-                            <?php get_template_part('template-parts/blog/archive-card'); ?>
-                        </div>
-                    <?php
-                    endwhile;
-                else : ?>
-                    <div class="col-span-full py-12 text-center text-slate-500 text-sm bg-white rounded-2xl border border-slate-200 shadow-sm">
-                        مقاله‌ای ثبت نشده است.
-                    </div>
-                <?php
-                endif;
-                wp_reset_postdata(); ?>
-            </div>
-
-            <!-- Custom Swiper Controls Bar -->
-            <div class="flex items-center justify-center gap-3 mt-4">
-                <button class="swiper-button-prev post__nav !static !w-9 !h-9 !m-0 after:!content-none bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 rounded-xl flex items-center justify-center border border-slate-300 transition-all shadow-sm cursor-pointer">
-                    <svg class="w-4 h-4 !transform-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                </button>
-                <div class="swiper-pagination !static !w-auto text-blue-700 font-mono text-xs px-2 font-bold translate-x-1/2"></div>
-                <button class="swiper-button-next post__nav !static !w-9 !h-9 !m-0 after:!content-none bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 rounded-xl flex items-center justify-center border border-slate-300 transition-all shadow-sm cursor-pointer">
-                    <svg class="w-4 h-4 !transform-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                </button>
-            </div>
-        </div>
-    </div>
+<section class="bg-white py-section" aria-labelledby="home-blog-title">
+	<div class="container">
+		<?php
+		get_template_part(
+			'template-parts/global/section-head',
+			null,
+			array(
+				'id'      => 'home-blog-title',
+				'eyebrow' => 'مقالات',
+				'title'   => 'مقالات آموزشی تابلو برق',
+				'link'    => array(
+					'url'   => $psb_blog ? get_permalink( $psb_blog ) : home_url( '/blog/' ),
+					'label' => 'همه مقالات',
+				),
+			)
+		);
+		?>
+		<div class="-mx-[var(--spacing-gutter)] flex snap-x snap-mandatory gap-4 overflow-x-auto px-[var(--spacing-gutter)] [scrollbar-width:none] md:mx-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0">
+			<?php
+			while ( $psb_q->have_posts() ) :
+				$psb_q->the_post();
+				$psb_cats  = get_the_category();
+				$psb_thumb = get_post_thumbnail_id();
+				$psb_ok    = $psb_thumb && ! in_array( (int) $psb_thumb, array_map( 'intval', $psb_blocked ), true );
+				$psb_words = count( preg_split( '/\s+/u', wp_strip_all_tags( get_the_content() ), -1, PREG_SPLIT_NO_EMPTY ) );
+				$psb_mins  = max( 1, (int) ceil( $psb_words / 200 ) );
+				?>
+				<article class="card card-hover w-[84%] shrink-0 snap-start md:w-auto" data-reveal>
+					<?php
+					$psb_bimg = '';
+					if ( function_exists( 'psb_best_image' ) ) {
+						// Sharp photo or the topic illustration («تصویر نمایشی»).
+						$psb_bimg = psb_best_image( $psb_ok ? $psb_thumb : 0, 400, '16 / 9', array( 'key' => psb_placeholder_key( get_the_ID() ), 'attr' => array( 'alt' => get_the_title(), 'sizes' => '(min-width: 768px) 33vw, 84vw' ) ) );
+					} elseif ( $psb_ok ) {
+						$psb_bimg = psb_image( $psb_thumb, 'medium_large', array( 'alt' => get_the_title(), 'sizes' => '(min-width: 768px) 33vw, 84vw' ) );
+					}
+					?>
+					<div class="card-media <?php echo $psb_bimg ? '' : 'media-placeholder'; ?>" style="--card-ratio:16/9">
+						<?php echo $psb_bimg; // phpcs:ignore ?>
+					</div>
+					<div class="card-body">
+						<?php if ( $psb_cats ) : ?>
+							<span class="card-eyebrow"><?php echo esc_html( $psb_cats[0]->name ); ?></span>
+						<?php endif; ?>
+						<h3 class="card-title line-clamp-2"><a class="card-link" href="<?php the_permalink(); ?>"><?php echo psb_lat( get_the_title() ); // phpcs:ignore ?></a></h3>
+						<p class="card-meta mt-auto"><?php echo esc_html( get_the_date() ); ?> · <?php echo esc_html( psb_fa_num( $psb_mins ) . ' دقیقه مطالعه' ); ?></p>
+					</div>
+				</article>
+				<?php
+			endwhile;
+			wp_reset_postdata();
+			?>
+		</div>
+	</div>
 </section>

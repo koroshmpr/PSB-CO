@@ -1,5 +1,11 @@
 <?php
 global $product;
+if ( ! is_a( $product, 'WC_Product' ) && function_exists( 'wc_get_product' ) ) {
+    $product = wc_get_product( get_the_ID() );
+}
+if ( ! $product ) {
+    return;
+}
 $thumbnail_id = get_post_thumbnail_id();
 $gallery_ids = $product->get_gallery_image_ids();
 

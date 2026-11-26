@@ -22,3 +22,41 @@ add_filter('rank_math/snippet/rich_snippet_product_entity', function ($entity) {
     }
     return $entity;
 }, 5, 1);
+
+/**
+ * Declare WooCommerce support so WooCommerce uses the theme templates (single-product.php,
+ * woocommerce/archive-product.php). Without it WooCommerce runs in "unsupported theme" mode and
+ * injects its own summary (price, add to cart, related products) into the_content.
+ * No zoom/lightbox/slider scripts: the catalogue gallery is plain markup + the theme lightbox.
+ */
+add_action(
+	'after_setup_theme',
+	function () {
+		add_theme_support( 'woocommerce' );
+	}
+);
+
+/**
+ * Catalogue mode (B2B, prices on request): products cannot be purchased and no price HTML is shown.
+ * Turn off with add_filter( 'psb_catalogue_mode', '__return_false' ).
+ */
+add_action(
+	'init',
+	function () {
+		if ( ! apply_filters( 'psb_catalogue_mode', true ) ) {
+			return;
+		}
+		add_filter( 'woocommerce_is_purchasable', '__return_false' );
+		add_filter( 'woocommerce_get_price_html', '__return_empty_string' );
+	}
+);
+
+/** No product reviews tab / form (B2B catalogue). */
+add_filter(
+	'woocommerce_product_tabs',
+	function ( $tabs ) {
+		unset( $tabs['reviews'] );
+		return $tabs;
+	},
+	98
+);

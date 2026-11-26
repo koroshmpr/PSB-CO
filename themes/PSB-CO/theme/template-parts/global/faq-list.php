@@ -1,101 +1,61 @@
 <?php
 /**
- * Simplified Reusable FAQ List
- * @param array $args ['items'] The repeater array containing 'question' and 'answer'
+ * FAQ accordion (native <details>, no JS) + FAQPage JSON-LD.
+ *
+ * $args:
+ * - items          array of array( 'question' => '', 'answer' => '' ) (default: ACF "faq_list" of the current post)
+ * - title          optional heading text (rendered as h2)
+ * - class          extra wrapper classes
+ * - open_first     bool, open the first item
+ * - disable_schema bool
  */
-$items = !empty($args['items']) ? $args['items'] : get_field('faq_list');
-$title = !empty($args['title']) ? $args['title'] : null;
-
-if (empty($items)) return;
+$psb_items = ! empty( $args['items'] ) ? $args['items'] : psb_field( 'faq_list', array(), null );
+if ( empty( $psb_items ) || ! is_array( $psb_items ) ) {
+	return;
+}
+$psb_items = array_values(
+	array_filter(
+		$psb_items,
+		function ( $item ) {
+			return is_array( $item ) && ! empty( $item['question'] ) && ! empty( $item['answer'] );
+		}
+	)
+);
+if ( ! $psb_items ) {
+	return;
+}
+$psb_title = $args['title'] ?? '';
 ?>
-
-<section class="py-5 grid gap-2 bg-white relative <?= $args['class'] ?? ''; ?>">
-    <?php
-    if ($title):?>
-        <div class="border-b border-black/10 flex mb-6 w-full">
-            <p class="pb-3 border-b-2 border-primary text-center text-black text-2xl fw-bold">
-                <?= $title; ?>
-            </p>
-        </div>
-    <?php endif;?>
-
-	<?php foreach ($items as $index => $item) :
-		$question = $item['question'] ?? '';
-		$answer = $item['answer'] ?? '';
-		if (empty($question) || empty($answer)) continue;
-		?>
-
-		<div x-data="{ expanded: false }"
-             :class="expanded ? 'border-s-2 bg-gray-100 border-s-primary/70' : 'bg-gray-50/50 border-s-primary/50'"
-			 class="border border-gray-200 rounded-md transition-all duration-300">
-
-			<button
-				type="button"
-				class="flex items-center justify-between w-full p-5 cursor-pointer text-start"
-				@click="expanded = !expanded"
-				:aria-expanded="expanded">
-
-                <span class="text-gray-900 text-sm lg:text-base leading-tight">
-                    <?= esc_html($question); ?>
-                </span>
-
-				<span class="shrink-0 ms-3 text-primary transition-transform duration-300">
-					<svg x-show="!expanded" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-						<path
-							d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-					</svg>
-					<svg x-show="expanded" width="24" height="24" fill="currentColor" viewBox="0 0 16 16" x-cloak>
-						<path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
-					</svg>
-				</span>
-			</button>
-
-			<div
-				class="grid text-sm text-gray-600 overflow-hidden px-5 transition-all border-dashed duration-300 ease-in-out"
-				:class="expanded ? 'grid-rows-[1fr] opacity-100 py-5 border-t border-gray-200' : 'grid-rows-[0fr] opacity-0'"
-			>
-					<div class="text-justify leading-[1.7] prose-a:bg-primary/10 prose-a:hover:bg-primary/20 prose-a:mx-0.5 prose-a:rounded-md prose-a:p-1 prose overflow-hidden opacity-75">
-						<?= wp_kses_post($answer); ?>
-					</div>
-			</div>
-		</div>
-	<?php endforeach; ?>
-
-</section>
-
+<div class="<?php echo esc_attr( $args['class'] ?? '' ); ?>">
+	<?php if ( $psb_title ) : ?>
+		<h2 class="mb-6 text-h3 font-bold text-dark"><?php echo esc_html( $psb_title ); ?></h2>
+	<?php endif; ?>
+	<div class="accordion">
+		<?php foreach ( $psb_items as $psb_i => $psb_item ) : ?>
+			<details class="accordion-item" <?php echo ( 0 === $psb_i && ! empty( $args['open_first'] ) ) ? 'open' : ''; ?>>
+				<summary><?php echo esc_html( $psb_item['question'] ); ?></summary>
+				<div class="accordion-panel"><?php echo wp_kses_post( wpautop( $psb_item['answer'] ) ); ?></div>
+			</details>
+		<?php endforeach; ?>
+	</div>
+</div>
 <?php
-//$args = array(
-//    'title' => '',
-//    'class' => '',
-//    'items' '',
-//);
-//get_template_part('template-parts/svg/faq-list', null, $args);
-?>
-<?php if (!empty($items) && empty($args['disable_schema'])) : ?>
-    <script type="application/ld+json">
-        <?php
-        $faq_schema = [
-            '@context' => 'https://schema.org',
-            '@type' => 'FAQPage',
-            'mainEntity' => []
-        ];
-
-        foreach ($items as $item) {
-            $question = $item['question'] ?? '';
-            $answer = $item['answer'] ?? '';
-            if (empty($question) || empty($answer)) continue;
-
-            $faq_schema['mainEntity'][] = [
-                '@type' => 'Question',
-                'name' => wp_strip_all_tags($question),
-                'acceptedAnswer' => [
-                    '@type' => 'Answer',
-                    'text' => wp_strip_all_tags($answer),
-                ]
-            ];
-        }
-
-        echo wp_json_encode($faq_schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
-        ?>
-    </script>
+if ( empty( $args['disable_schema'] ) ) :
+	$psb_schema = array(
+		'@context'   => 'https://schema.org',
+		'@type'      => 'FAQPage',
+		'mainEntity' => array(),
+	);
+	foreach ( $psb_items as $psb_item ) {
+		$psb_schema['mainEntity'][] = array(
+			'@type'          => 'Question',
+			'name'           => wp_strip_all_tags( $psb_item['question'] ),
+			'acceptedAnswer' => array(
+				'@type' => 'Answer',
+				'text'  => wp_strip_all_tags( $psb_item['answer'] ),
+			),
+		);
+	}
+	?>
+	<script type="application/ld+json"><?php echo wp_json_encode( $psb_schema, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); ?></script>
 <?php endif; ?>

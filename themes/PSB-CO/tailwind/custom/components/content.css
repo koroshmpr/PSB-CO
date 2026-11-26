@@ -1,0 +1,405 @@
+/**
+ * Content components (spec v2): spec table, spec list, register rows, timeline, logo wall,
+ * CTA band, breadcrumb, accordion, media frame, article prose, search highlight.
+ */
+@layer components {
+	/* ---------------- Spec table (§4.6) ---------------- */
+	.spec-table {
+		@apply w-full text-sm;
+		border-collapse: collapse;
+		border-top: 2px solid var(--color-foreground);
+	}
+
+	.spec-table caption {
+		@apply pb-3 text-start text-[0.8125rem] font-semibold text-slate-600;
+		caption-side: top;
+	}
+
+	.spec-table th,
+	.spec-table td {
+		@apply border-b border-line py-3 text-start align-top;
+	}
+
+	.spec-table td {
+		@apply ps-4;
+	}
+
+	.spec-table thead th {
+		@apply text-xs font-semibold text-slate-600;
+	}
+
+	.spec-table tbody th {
+		@apply w-2/5 text-sm font-medium text-slate-600;
+	}
+
+	.spec-table td {
+		@apply text-[0.9375rem] font-semibold text-foreground;
+	}
+
+	.spec-table-wrap {
+		@apply overflow-x-auto;
+	}
+
+	/* Compact definition list (inside cards): hairline rows, label start / value end */
+	.spec-list {
+		@apply grid border-t border-line text-sm;
+	}
+
+	.spec-list > div {
+		@apply flex items-baseline justify-between gap-4 border-b border-line py-2.5 leading-[1.6];
+	}
+
+	.spec-list dt {
+		@apply text-slate-600;
+	}
+
+	.spec-list dd {
+		@apply text-end font-semibold text-foreground;
+	}
+
+	/* ---------------- Register (documents: approvals, type tests) §4.3 ---------------- */
+	.register-title {
+		@apply mb-2 flex justify-between text-[0.8125rem] font-semibold text-slate-600;
+	}
+
+	.register {
+		@apply m-0 list-none p-0;
+		border-top: 2px solid var(--color-foreground);
+	}
+
+	.register > li {
+		@apply relative grid items-center gap-x-5 gap-y-1 border-b border-line py-4 transition-colors hover:bg-slate-50;
+		grid-template-columns: 56px 1fr auto;
+	}
+
+	.register-logo {
+		@apply grid size-14 place-items-center rounded-control border border-line bg-white;
+	}
+
+	.register-logo img {
+		@apply max-h-10 max-w-10 opacity-85 grayscale;
+		mix-blend-mode: multiply;
+	}
+
+	.register-logo .lat {
+		@apply text-xs font-bold tracking-[0.04em] text-slate-700;
+	}
+
+	.register-name {
+		@apply block text-base font-bold leading-[1.6] text-foreground;
+	}
+
+	.register-meta {
+		@apply mt-0.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.8125rem] leading-[1.7] text-slate-600;
+	}
+
+	.register-doc {
+		@apply relative z-10 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 hover:text-primary-800;
+	}
+
+	.register-doc svg {
+		@apply size-4;
+	}
+
+	@media (width < 48rem) {
+		.register > li {
+			grid-template-columns: 44px 1fr;
+			gap: 0.25rem 0.875rem;
+		}
+
+		.register-logo {
+			@apply size-11;
+		}
+
+		.register-doc {
+			grid-column: 2;
+			justify-self: start;
+		}
+	}
+
+	/* ---------------- Timeline §5.7 ---------------- */
+	.timeline {
+		@apply relative m-0 grid list-none gap-6 p-0 ps-7;
+	}
+
+	.timeline::before {
+		content: "";
+		@apply absolute inset-y-1 start-[0.25rem] w-px bg-line-strong;
+	}
+
+	.timeline-item {
+		@apply relative;
+	}
+
+	.timeline-item::before {
+		content: "";
+		@apply absolute -start-7 top-[0.45rem] size-[9px] rounded-full bg-foreground;
+	}
+
+	.timeline-item.is-current::before {
+		@apply bg-primary-600;
+	}
+
+	.timeline-year {
+		@apply mb-0.5 block text-[0.8125rem] font-bold tabular-nums text-foreground;
+	}
+
+	.timeline-title {
+		@apply text-[0.9375rem] font-semibold text-foreground;
+	}
+
+	.timeline-text {
+		@apply mt-0.5 text-sm leading-7 text-slate-600;
+	}
+
+	/* ---------------- Logo wall (greyscale issuers) ---------------- */
+	.logo-wall {
+		@apply grid grid-cols-2 gap-px overflow-hidden rounded-card border border-line bg-line sm:grid-cols-3 lg:grid-cols-6;
+	}
+
+	.logo-wall-item {
+		@apply relative flex min-h-32 flex-col items-center justify-center gap-3 bg-surface p-4 text-center;
+	}
+
+	.logo-wall-item img {
+		@apply h-10 w-auto max-w-[7.5rem] object-contain opacity-85 grayscale;
+		mix-blend-mode: multiply;
+	}
+
+	.logo-wall-item span {
+		@apply line-clamp-2 text-xs font-medium leading-6 text-slate-700;
+	}
+
+	/* ---------------- CTA band §4.8 (full bleed red) ---------------- */
+	.cta-band {
+		@apply bg-primary-700 py-9 text-white md:py-12;
+	}
+
+	.cta-band-inner {
+		@apply flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between;
+	}
+
+	.cta-band-title {
+		@apply text-[clamp(1.375rem,1.1rem+1.1vw,2rem)] font-bold leading-[1.4] text-white;
+	}
+
+	.cta-band-text {
+		@apply mt-2 max-w-2xl text-primary-100;
+	}
+
+	.cta-band-actions {
+		@apply flex flex-wrap gap-3;
+	}
+
+	.cta-band .btn:focus-visible {
+		outline-color: #fff;
+	}
+
+	/* ---------------- Breadcrumb §4.15 ---------------- */
+	.breadcrumb {
+		@apply overflow-x-auto text-[0.8125rem] text-slate-600;
+		scrollbar-width: none;
+	}
+
+	.breadcrumb ol {
+		@apply m-0 flex list-none items-center gap-2 whitespace-nowrap p-0;
+	}
+
+	.breadcrumb li {
+		@apply inline-flex items-center gap-2;
+	}
+
+	.breadcrumb li + li::before {
+		content: "/";
+		@apply text-slate-300;
+	}
+
+	.breadcrumb a {
+		@apply text-slate-600 transition-colors hover:text-primary-700;
+	}
+
+	.breadcrumb [aria-current="page"] {
+		@apply max-w-[18rem] truncate text-foreground;
+	}
+
+	/* Mobile: wrap instead of clipping at the screen edge; the current title truncates within the line */
+	@media (width < 48rem) {
+		.breadcrumb ol {
+			@apply flex-wrap gap-y-1 whitespace-normal;
+		}
+
+		.breadcrumb li {
+			@apply min-w-0 max-w-full;
+		}
+
+		.breadcrumb [aria-current="page"] {
+			@apply max-w-[calc(100vw-3rem)];
+		}
+	}
+
+	.breadcrumb--invert,
+	.breadcrumb--invert a {
+		@apply text-slate-300 hover:text-white;
+	}
+
+	.breadcrumb--invert [aria-current="page"] {
+		@apply text-white;
+	}
+
+	/* ---------------- Accordion / FAQ §5.9 (hairline rows, + / −) ---------------- */
+	.accordion {
+		@apply border-t border-line;
+	}
+
+	.accordion-item {
+		@apply border-b border-line;
+	}
+
+	.accordion-item summary {
+		@apply flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-4 text-start text-[1.0625rem] font-semibold leading-[1.6] text-foreground transition-colors hover:text-primary-700;
+	}
+
+	.accordion-item summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.accordion-item summary::after {
+		content: "+";
+		@apply flex size-6 shrink-0 items-center justify-center text-2xl font-normal leading-none text-slate-600;
+	}
+
+	.accordion-item[open] summary::after {
+		content: "−";
+	}
+
+	.accordion-panel {
+		@apply pb-5 text-[0.9375rem] leading-8 text-slate-600;
+		max-width: 46rem;
+	}
+
+	.accordion-panel a {
+		@apply font-semibold text-primary-700 underline-offset-4 hover:underline;
+	}
+
+	/* ---------------- Media frame (no offset frame: radius + hairline only) ---------------- */
+	.media-frame img {
+		@apply w-full rounded-card border border-line object-cover;
+	}
+
+	/* ---------------- Article prose §6.4 ---------------- */
+	.article-prose {
+		@apply text-[1.0625rem] leading-[1.95] text-foreground;
+		max-width: var(--container-prose);
+	}
+
+	.article-prose > * + * {
+		margin-top: 1.25em;
+	}
+
+	.article-prose h2 {
+		@apply mt-12 scroll-mt-24 border-s-[3px] border-primary-600 ps-3 text-2xl font-bold text-foreground;
+	}
+
+	.article-prose h3 {
+		@apply mt-9 text-xl font-bold text-foreground;
+	}
+
+	.article-prose h4 {
+		@apply mt-7 text-lg font-bold text-foreground;
+	}
+
+	.article-prose a {
+		@apply font-medium text-primary-700 underline decoration-primary-200 underline-offset-4 hover:decoration-primary-700;
+		text-decoration-line: underline !important;
+	}
+
+	.article-prose strong {
+		@apply font-bold text-foreground;
+	}
+
+	.article-prose ul,
+	.article-prose ol {
+		@apply ps-6;
+	}
+
+	.article-prose ul {
+		@apply list-disc;
+	}
+
+	.article-prose ol {
+		@apply list-decimal;
+	}
+
+	.article-prose li {
+		@apply my-1.5 ps-1 marker:text-slate-400;
+	}
+
+	.article-prose img,
+	.article-prose figure {
+		@apply rounded-card;
+	}
+
+	.article-prose figcaption {
+		@apply mt-2 text-center text-xs text-slate-600;
+	}
+
+	.article-prose table {
+		@apply block w-full overflow-x-auto text-sm;
+		border-collapse: collapse;
+		border-top: 2px solid var(--color-foreground);
+	}
+
+	.article-prose th,
+	.article-prose td {
+		@apply border-b border-line px-3 py-2.5 text-start;
+	}
+
+	.article-prose thead th {
+		@apply bg-slate-100 font-semibold text-foreground;
+	}
+
+	.article-prose blockquote {
+		@apply rounded-none border-0 border-s-2 border-line-strong bg-transparent px-5 py-1 text-foreground;
+	}
+
+	.article-prose code {
+		@apply lat rounded-[3px] bg-slate-100 px-1.5 py-0.5 text-[0.85em] text-foreground;
+	}
+
+	.article-prose hr {
+		@apply my-10 border-line;
+	}
+
+	/* ---------------- Search highlight ---------------- */
+	.search-hl mark,
+	mark.search-mark {
+		@apply rounded-[2px] bg-primary-100 px-0.5 text-inherit;
+	}
+}
+
+/* Quote page trust list with line icons (unlayered: overrides rfq.css's check bullet) */
+.rfq-trust li.has-icon {
+	display: flex;
+	gap: 0.625rem;
+	padding-inline-start: 0;
+}
+
+.rfq-trust li.has-icon::before {
+	display: none;
+}
+
+/* Search inputs: hide WebKit's native clear button (the dialog has its own ✕) */
+#psb-search-input::-webkit-search-cancel-button,
+#psb-search-input::-webkit-search-decoration,
+#psb-sr-input::-webkit-search-cancel-button {
+	-webkit-appearance: none;
+	appearance: none;
+	display: none;
+}
+
+/* Search fields never wrap: single line, ellipsis on long placeholders */
+input[type="search"] {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}

@@ -1,0 +1,559 @@
+/**
+ * Global layout (spec v2 §4.9–4.11, §6.1, §9): header, mega menu, drawer, page header,
+ * footer, mobile tab bar, floating actions, skeletons, standalone mode.
+ * z-index stack (§9): drawer 60 · search 55 · tab bar 50 · header 40 · in-page sticky 30 · FAB 20.
+ */
+:root {
+	--app-tabbar-h: 3.5rem; /* 56px pill + 56px round call button */
+	--tabbar-offset: 0px;
+	--header-h: 3.75rem; /* 60px < 1100px (constant spacer height) */
+	--header-live: var(--header-h); /* current bar height (compact on scroll) */
+}
+
+@media (width >= 68.75rem) {
+	:root {
+		--header-h: 5.25rem; /* 84px (mock) */
+	}
+}
+
+/* The bar keeps its height when compact: only the logo scales and a shadow appears. */
+
+@layer components {
+	/* ---------------- Header ----------------
+	   Fixed bar over a constant-height spacer, so compacting on scroll never shifts content. */
+	.site-header-spacer {
+		height: var(--header-h);
+	}
+
+	.site-header {
+		@apply fixed inset-x-0 z-40 border-b border-line bg-white;
+		top: var(--wp-admin--admin-bar--height, 0px);
+		transition:
+			transform var(--header-dur) var(--header-ease),
+			box-shadow 0.2s var(--header-ease);
+	}
+
+	.site-header.is-scrolled,
+	html.is-compact .site-header {
+		box-shadow: var(--shadow-header);
+	}
+
+	.site-header-inner {
+		@apply container flex items-center gap-4 nav:gap-5 xl:gap-8;
+		height: var(--header-h);
+		transition: transform var(--header-dur) var(--header-ease);
+	}
+
+	.site-logo {
+		@apply flex shrink-0 items-center;
+	}
+
+	.site-logo img {
+		@apply block max-w-none;
+	}
+
+	/* Header logo: ONE image per breakpoint (full lockup ≥ 1100px, PSB mark below); compact = scale only.
+	   GPU-friendly: permanent will-change + translateZ(0) so the SVG is not re-rasterised every frame. */
+	.brand-swap img {
+		display: block;
+		width: auto;
+		transform: translateZ(0) scale(1);
+		transform-origin: right center;
+		backface-visibility: hidden;
+		will-change: transform;
+		transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.brand-swap .logo-full {
+		@apply hidden nav:block;
+		height: 68px;
+	}
+
+	.brand-swap .logo-mark {
+		@apply nav:hidden;
+		height: 28px;
+	}
+
+	html.is-compact .brand-swap .logo-full {
+		transform: translateZ(0) scale(0.72);
+	}
+
+	html.is-compact .brand-swap .logo-mark {
+		transform: translateZ(0) scale(0.857);
+	}
+
+	.header-actions {
+		@apply ms-auto flex shrink-0 items-center gap-1 nav:gap-3 xl:gap-5;
+	}
+
+	.header-phone {
+		@apply hidden flex-col items-end leading-[1.3] xl:flex;
+	}
+
+	.header-phone small {
+		@apply text-xs text-slate-600;
+	}
+
+	.header-phone b {
+		@apply text-base font-bold text-foreground;
+	}
+
+	.icon-btn {
+		@apply inline-grid size-11 cursor-pointer place-items-center rounded-control text-slate-700 transition-colors hover:bg-slate-100 hover:text-foreground;
+	}
+
+	.icon-btn svg {
+		@apply size-5;
+	}
+
+	/* ---------------- Desktop nav + mega menu (≥ 1100px) ---------------- */
+	.site-nav {
+		@apply hidden nav:block;
+	}
+
+	.site-nav > ul {
+		@apply m-0 flex list-none flex-nowrap items-center gap-4 p-0 xl:gap-6;
+	}
+
+	/* not positioned: the mega panel (absolute, top:100%) anchors to the fixed header */
+	.mm-item {
+		@apply flex items-center;
+		height: var(--header-h);
+	}
+
+	.mm-top {
+		@apply relative inline-flex h-full cursor-pointer items-center whitespace-nowrap text-[0.9375rem] font-medium text-slate-700 transition-colors duration-150 hover:text-foreground;
+	}
+
+	/* 2px red underline flush with the header's bottom border (follows the compact shift) */
+	.mm-top::after {
+		content: "";
+		@apply pointer-events-none absolute inset-x-0 -bottom-px h-0.5 bg-primary-600;
+		scale: 0 1;
+		transition:
+			scale 0.2s var(--header-ease),
+			translate var(--header-dur) var(--header-ease);
+	}
+
+	/* current page = red underline; an OPEN panel = graphite underline + rotated chevron (never two reds) */
+	.mm-item.is-current .mm-top::after {
+		scale: 1 1;
+	}
+
+	.mm-item:has([aria-expanded="true"]) .mm-top::after {
+		scale: 1 1;
+		background: var(--color-foreground);
+	}
+
+	/* focus ring as a rounded inset box around the label, not the full 84px column */
+	.mm-top:focus-visible {
+		outline: none;
+	}
+
+	.mm-top:focus-visible::before {
+		content: "";
+		@apply pointer-events-none absolute -inset-x-2 inset-y-[calc(50%-1.125rem)] rounded-md border-2 border-primary-600;
+	}
+
+	.mm-item.is-current .mm-top,
+	.mm-item:has([aria-expanded="true"]) .mm-top {
+		@apply text-foreground;
+	}
+
+	/* chevron: 6px, rotated to point DOWN, 55% opacity; flips when open */
+	.mm-toggle {
+		@apply ms-1.5 inline-flex size-6 cursor-pointer items-center justify-center rounded-control text-slate-700 hover:bg-slate-100;
+	}
+
+	.mm-toggle::before {
+		content: "";
+		@apply block size-2 border-current opacity-70 transition-transform duration-200;
+		border-width: 0 1.5px 1.5px 0;
+		transform: translateY(-2px) rotate(45deg);
+	}
+
+	.mm-toggle[aria-expanded="true"]::before {
+		transform: translateY(2px) rotate(225deg);
+	}
+
+	/* Full-width dropdown anchored to the fixed header (never to the nav item), always inside the viewport */
+	.mm-panel {
+		@apply absolute inset-x-0 top-full z-40 overflow-y-auto overscroll-contain border-t border-line bg-white;
+		max-height: calc(100vh - var(--header-h) - var(--wp-admin--admin-bar--height, 0px));
+		max-height: calc(100dvh - var(--header-h) - var(--wp-admin--admin-bar--height, 0px));
+		box-shadow: var(--shadow-panel);
+	}
+
+	/* subtle scrim behind an open panel (does not catch the pointer) */
+	.mm-scrim {
+		@apply pointer-events-none fixed inset-x-0 bottom-0 z-30 bg-dark/20;
+		top: calc(var(--header-h) + var(--wp-admin--admin-bar--height, 0px));
+	}
+
+	/* hover bridge: keeps the pointer «inside» while crossing the header's bottom edge */
+	.mm-panel::before {
+		content: "";
+		@apply absolute inset-x-0 -top-3 h-3;
+	}
+
+	.mm-row {
+		@apply flex items-start gap-3 rounded-control p-3 transition-colors duration-150 hover:bg-slate-50;
+	}
+
+	.mm-row-ico {
+		@apply mt-0.5 size-5 shrink-0 text-slate-600;
+	}
+
+	.mm-row-title {
+		@apply block text-[0.9375rem] font-semibold leading-6 text-foreground;
+	}
+
+	.mm-row-desc {
+		@apply mt-0.5 block text-[0.8125rem] leading-6 text-slate-600;
+	}
+
+	.mm-cat {
+		@apply flex w-full items-center gap-3 rounded-control px-3 py-2.5 text-start text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50;
+	}
+
+	.mm-cat[aria-selected="true"],
+	.mm-cat.is-on {
+		@apply bg-slate-100 font-semibold text-foreground;
+	}
+
+	.mm-head {
+		@apply mb-3 text-xs font-semibold text-slate-600;
+	}
+
+	/* ---------------- Drawer (< 1100px) ---------------- */
+	.drawer-backdrop {
+		@apply fixed inset-0 z-[60] bg-dark/50;
+	}
+
+	.drawer {
+		@apply fixed inset-y-0 start-0 z-[60] flex w-[88vw] max-w-[400px] flex-col bg-white;
+		padding-top: env(safe-area-inset-top);
+	}
+
+	.drawer-head {
+		@apply flex h-[60px] shrink-0 items-center justify-between border-b border-line px-4;
+	}
+
+	.drawer-body {
+		@apply flex-1 overflow-y-auto overscroll-contain px-4 py-2;
+	}
+
+	.drawer-nav ul {
+		@apply m-0 list-none p-0;
+	}
+
+	.drawer-nav > ul > li {
+		@apply border-b border-line;
+	}
+
+	.drawer-nav > ul > li > a,
+	.drawer-acc summary {
+		@apply relative flex min-h-14 cursor-pointer list-none items-center justify-between text-[1.0625rem] font-semibold text-foreground;
+	}
+
+	.drawer-ico {
+		@apply size-5 shrink-0 text-slate-500;
+	}
+
+	.drawer-nav a[aria-current="page"] .drawer-ico,
+	.drawer-nav .is-active > details > summary .drawer-ico {
+		@apply text-foreground;
+	}
+
+	.drawer-acc summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.drawer-acc summary::after {
+		content: "";
+		@apply me-1 block size-2 border-current opacity-55 transition-transform duration-200;
+		border-width: 0 1.5px 1.5px 0;
+		transform: translateY(-2px) rotate(45deg);
+	}
+
+	.drawer-acc[open] summary::after {
+		transform: translateY(2px) rotate(225deg);
+	}
+
+	.drawer-nav .sub-menu {
+		@apply pb-2 ps-4;
+	}
+
+	.drawer-nav .sub-menu a {
+		@apply relative flex min-h-12 items-center gap-3 border-t border-line text-[0.9375rem] font-normal text-foreground;
+	}
+
+	/* current page: bold label, red icon tint and a 3px red bar attached to the row */
+	.drawer-nav a[aria-current="page"] {
+		@apply font-bold text-foreground;
+	}
+
+	.drawer-nav a[aria-current="page"]::before {
+		content: "";
+		@apply absolute start-0 inset-y-3 w-[3px] rounded-full bg-primary-600;
+	}
+
+	.drawer-nav a[aria-current="page"] .drawer-ico {
+		@apply text-primary-600;
+	}
+
+	.drawer-nav a[aria-current="page"] > span,
+	.drawer-nav .sub-menu a[aria-current="page"] {
+		@apply ps-3;
+	}
+
+	.drawer-foot {
+		@apply grid shrink-0 gap-2 border-t border-line bg-white p-4;
+		padding-bottom: max(1rem, env(safe-area-inset-bottom));
+	}
+
+	/* ---------------- Inner-page header §6.1 ---------------- */
+	.page-hero {
+		@apply border-b border-line bg-background pb-7 pt-5 md:pb-10 md:pt-8;
+	}
+
+	.page-hero-title {
+		@apply mt-3 text-h1 font-bold text-foreground;
+	}
+
+	.page-hero-lead {
+		@apply mt-3 text-[1.0625rem] leading-[1.9] text-slate-600;
+		max-width: 44rem;
+	}
+
+	.page-hero-facts {
+		@apply flex flex-wrap gap-x-6 gap-y-2 border-t border-line pt-4 text-sm text-slate-600;
+	}
+
+	/* photo variant (about only): dark photo header */
+	.page-hero--photo {
+		@apply relative isolate flex min-h-[420px] items-end overflow-hidden border-0 bg-dark pb-12 text-white;
+	}
+
+	.page-hero--photo .page-hero-title {
+		@apply text-white;
+	}
+
+	.page-hero--photo .page-hero-lead {
+		@apply text-slate-200;
+	}
+
+	/* ---------------- Footer §4.10 ---------------- */
+	.site-footer {
+		@apply bg-dark pb-6 pt-16 text-[0.9375rem] text-slate-300;
+	}
+
+	.footer-title {
+		@apply mb-4 text-sm font-semibold text-white;
+	}
+
+	.footer-links {
+		@apply m-0 grid list-none p-0;
+	}
+
+	.footer-links a {
+		@apply flex min-h-9 items-center text-slate-200 transition-colors hover:text-white;
+	}
+
+	.footer-fact {
+		@apply flex items-center gap-2.5 text-sm text-slate-200;
+	}
+
+	.footer-fact::before {
+		content: "";
+		@apply size-1 shrink-0 bg-primary-600;
+	}
+
+	.footer-bottom {
+		@apply mt-12 border-t border-white/12 pt-6 text-xs text-slate-400;
+	}
+
+	.social-btn {
+		@apply inline-flex size-10 items-center justify-center text-slate-400 transition-colors hover:text-white;
+	}
+
+	.social-btn svg {
+		@apply size-5;
+	}
+
+	/* ---------------- Mobile bottom nav (< 768px): minimal, icon-first ----------------
+	   White floating pill (4 links + menu) and ONE separate round call button at the inline end.
+	   The only exception to the no-shadow rule: it floats over content. */
+	.app-dock {
+		@apply fixed z-50 flex items-center gap-2 md:hidden;
+		inset-inline: 10px;
+		bottom: calc(10px + env(safe-area-inset-bottom));
+	}
+
+	.app-tabbar {
+		@apply grid flex-1 grid-cols-5 items-center rounded-full border border-line bg-white px-1.5;
+		height: var(--app-tabbar-h);
+		box-shadow: 0 10px 28px -14px rgb(17 20 24 / 0.35), 0 2px 6px -3px rgb(17 20 24 / 0.1);
+	}
+
+	.app-tab {
+		@apply relative flex h-full min-w-11 cursor-pointer select-none items-center justify-center text-slate-600;
+		-webkit-tap-highlight-color: transparent;
+		transition: transform 0.15s var(--ease-out-quart), color 0.15s;
+	}
+
+	.app-tab-ico {
+		@apply flex size-11 items-center justify-center rounded-full transition-colors duration-150;
+	}
+
+	.app-tab-ico svg {
+		@apply size-6;
+	}
+
+	.app-tab[aria-current="page"],
+	.app-tab[aria-expanded="true"] {
+		@apply text-foreground;
+	}
+
+	.app-tab[aria-current="page"] .app-tab-ico {
+		background: #EEF1F4;
+	}
+
+	/* the single accent: one round call button outside the pill (graphite, calm) */
+	.app-call {
+		@apply inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-foreground text-white ring-2 ring-white;
+		width: var(--app-tabbar-h);
+		height: var(--app-tabbar-h);
+		-webkit-tap-highlight-color: transparent;
+		box-shadow: 0 10px 24px -12px rgb(17 20 24 / 0.55);
+		transition: transform 0.15s var(--ease-out-quart);
+	}
+
+	.app-call:focus-visible,
+	.app-tab:focus-visible {
+		outline: 2px solid var(--color-primary-600);
+		outline-offset: 2px;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.app-tab:active,
+		.app-call:active {
+			transform: scale(0.96);
+		}
+	}
+
+	/* Call sheet (bottom dialog) */
+	.call-sheet-backdrop {
+		@apply fixed inset-0 z-[60] bg-dark/50;
+	}
+
+	.call-sheet {
+		@apply fixed inset-x-0 bottom-0 z-[61] rounded-t-2xl bg-white px-4 pt-2;
+		padding-bottom: max(1rem, env(safe-area-inset-bottom));
+		transition: transform 0.12s linear;
+	}
+
+	.call-sheet-grip {
+		@apply mx-auto mb-2 block h-1 w-10 rounded-full bg-slate-300;
+	}
+
+	.call-row {
+		@apply flex min-h-14 items-center gap-3 border-t border-line text-[0.9375rem] font-medium text-foreground;
+	}
+
+	.call-row-ico {
+		@apply size-[22px] shrink-0 text-slate-600;
+	}
+
+	/* ---------------- Floating back-to-top §9 ---------------- */
+	.fab {
+		@apply fixed z-20 inline-flex size-11 items-center justify-center rounded-full border border-line bg-white text-foreground transition-opacity duration-200;
+		bottom: calc(1rem + var(--tabbar-offset));
+		inset-inline-end: 1rem;
+	}
+
+	/* ---------------- Skeleton / media boxes ---------------- */
+	.skeleton {
+		@apply relative overflow-hidden rounded-control bg-slate-100;
+	}
+
+	.skeleton-text {
+		@apply relative h-3.5 w-full overflow-hidden rounded-control bg-slate-100;
+	}
+
+	.media-box {
+		@apply overflow-hidden bg-slate-100;
+		aspect-ratio: var(--ratio, 16 / 9);
+	}
+
+	.media-box > img,
+	.media-box > video,
+	.media-box > iframe {
+		@apply size-full object-cover;
+	}
+}
+
+/* Home hero overlay (spec §5.1): graphite only, no tint */
+.hero-overlay {
+	background:
+		linear-gradient(to left, rgb(17 20 24 / 0.94) 0%, rgb(17 20 24 / 0.86) 38%, rgb(17 20 24 / 0.45) 68%, rgb(17 20 24 / 0.25) 100%),
+		linear-gradient(to top, rgb(17 20 24 / 0.9) 0%, rgb(17 20 24 / 0) 34%);
+}
+
+@media (width < 48rem) {
+	.hero-overlay {
+		background: linear-gradient(to top, rgb(17 20 24 / 0.97) 0%, rgb(17 20 24 / 0.9) 45%, rgb(17 20 24 / 0.55) 100%);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.site-header,
+	.site-header-inner,
+	.mm-top::after,
+	.brand-swap img {
+		transition: none !important;
+	}
+}
+
+/* Body padding for the tab bar (mobile) */
+@media (width < 48rem) {
+	body.has-tabbar {
+		/* bar height + 10px float margin + 10px breathing room + safe area */
+		--tabbar-offset: calc(var(--app-tabbar-h) + 20px + env(safe-area-inset-bottom));
+		padding-bottom: var(--tabbar-offset);
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.skeleton::after,
+	.skeleton-text::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		transform: translateX(100%);
+		background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.6), transparent);
+		animation: psb-shimmer 1.4s infinite;
+	}
+}
+
+@keyframes psb-shimmer {
+	to {
+		transform: translateX(-100%);
+	}
+}
+
+/* Installed PWA (standalone) */
+@media (display-mode: standalone) {
+	.site-header {
+		padding-top: env(safe-area-inset-top);
+	}
+
+	body {
+		overscroll-behavior-y: none;
+	}
+
+	.browser-only,
+	[data-install-hint] {
+		display: none !important;
+	}
+}

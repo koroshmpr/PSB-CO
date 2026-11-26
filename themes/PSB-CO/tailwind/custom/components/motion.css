@@ -1,0 +1,181 @@
+/**
+ * Scroll reveal — replaces AOS (no library, ~0.5KB JS in javascript/modules/reveal.js).
+ * Works with legacy `data-aos="fade-up|fade-down|fade-left|fade-right|zoom-in"` attributes
+ * (and the optional data-aos-delay) as well as the new `data-reveal` attribute.
+ * Content is only hidden when <html> has the `js` class (set inline in <head>),
+ * and never for users who prefer reduced motion.
+ */
+@media (prefers-reduced-motion: no-preference) {
+	.js [data-aos],
+	.js [data-reveal] {
+		opacity: 0;
+		transform: translate3d(0, 18px, 0);
+		transition:
+			opacity 0.6s var(--ease-out-quart),
+			transform 0.6s var(--ease-out-quart);
+		transition-delay: var(--reveal-delay, 0ms);
+	}
+
+	.js [data-aos="fade-down"] {
+		transform: translate3d(0, -18px, 0);
+	}
+
+	.js [data-aos="fade-left"] {
+		transform: translate3d(24px, 0, 0);
+	}
+
+	.js [data-aos="fade-right"] {
+		transform: translate3d(-24px, 0, 0);
+	}
+
+	.js [data-aos="zoom-in"] {
+		transform: scale(0.96);
+	}
+
+	.js [data-aos].aos-animate,
+	.js [data-reveal].is-revealed {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+/* ------------------------------------------------------------------
+ * Cross-document View Transitions (Chrome/Edge 126+, Safari 18.2+).
+ * Header, tab bar and logo persist; only <main> cross-fades / slides.
+ * Pure progressive enhancement — other browsers navigate normally.
+ * ------------------------------------------------------------------ */
+@view-transition {
+	navigation: auto;
+}
+
+.site-header {
+	view-transition-name: site-header;
+}
+
+.app-dock {
+	view-transition-name: app-tabbar;
+}
+
+.site-header .brand-swap {
+	view-transition-name: site-logo;
+}
+
+#main {
+	view-transition-name: main;
+}
+
+::view-transition-group(site-header),
+::view-transition-group(app-tabbar),
+::view-transition-group(site-logo),
+::view-transition-old(site-header),
+::view-transition-new(site-header),
+::view-transition-old(app-tabbar),
+::view-transition-new(app-tabbar),
+::view-transition-old(site-logo),
+::view-transition-new(site-logo) {
+	animation: none;
+}
+
+/* RTL reading direction: new content arrives from the right (+12px → 0), old leaves to the left.
+   Back/forward (traverse) reverses it — html.vt-back is set in <head> on pagereveal/pageswap. */
+::view-transition-old(main) {
+	animation: 200ms ease both psb-vt-out;
+}
+
+::view-transition-new(main) {
+	animation: 260ms var(--ease-out-quart) both psb-vt-in;
+}
+
+html.vt-back::view-transition-old(main) {
+	animation-name: psb-vt-out-back;
+}
+
+html.vt-back::view-transition-new(main) {
+	animation-name: psb-vt-in-back;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: 200ms;
+}
+
+@keyframes psb-vt-out {
+	to {
+		opacity: 0;
+		transform: translateX(-8px);
+	}
+}
+
+@keyframes psb-vt-in {
+	from {
+		opacity: 0;
+		transform: translateX(8px);
+	}
+}
+
+@keyframes psb-vt-out-back {
+	to {
+		opacity: 0;
+		transform: translateX(8px);
+	}
+}
+
+@keyframes psb-vt-in-back {
+	from {
+		opacity: 0;
+		transform: translateX(-8px);
+	}
+}
+
+/* Instant feedback: top progress bar + pressed states */
+.nav-progress {
+	position: fixed;
+	inset-inline: 0;
+	top: 0;
+	z-index: 300;
+	height: 2px;
+	background: var(--color-primary-600);
+	transform-origin: right center;
+	transform: scaleX(0);
+	opacity: 0;
+	pointer-events: none;
+}
+
+.nav-progress.is-active {
+	opacity: 1;
+	animation: psb-progress 8s cubic-bezier(0.1, 0.7, 0.2, 1) forwards;
+}
+
+@keyframes psb-progress {
+	0% {
+		transform: scaleX(0);
+	}
+	10% {
+		transform: scaleX(0.35);
+	}
+	100% {
+		transform: scaleX(0.92);
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.btn:active,
+	.chip:active,
+	.app-tab:active,
+	.mm-top:active,
+	.card-hover:active {
+		scale: 0.98;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	@view-transition {
+		navigation: none;
+	}
+
+	::view-transition-group(*),
+	::view-transition-old(*),
+	::view-transition-new(*) {
+		animation: none !important;
+	}
+}

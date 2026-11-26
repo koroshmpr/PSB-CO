@@ -15,7 +15,7 @@ if ( ! defined( 'BLUEBOX_VERSION' ) ) {
 	 * to create your production build, the value below will be replaced in the
 	 * generated zip file with a timestamp, converted to base 36.
 	 */
-	define( 'BLUEBOX_VERSION', '0.1.0' );
+	define( 'BLUEBOX_VERSION', '1.0.0' );
 }
 
 if ( ! defined( 'BLUEBOX_TYPOGRAPHY_CLASSES' ) ) {
@@ -145,47 +145,93 @@ function bluebox_widgets_init() {
 add_action( 'widgets_init', 'bluebox_widgets_init' );
 
 /**
+ * Asset version: theme version + build time of the compiled file, so every
+ * `npm run production` busts caches automatically.
+ */
+function psb_asset_ver( $relative ) {
+	$path = get_template_directory() . '/' . ltrim( $relative, '/' );
+	return BLUEBOX_VERSION . ( file_exists( $path ) ? '.' . filemtime( $path ) : '' );
+}
+
+/**
  * Enqueue scripts and styles.
+ *
+ * - style.css: single render-blocking stylesheet (tokens + components + utilities).
+ * - script.min.js: Alpine + reveal + Swiper loader, deferred, in footer.
+ * - swiper.min.js / swiper.min.css: NOT enqueued; loaded on demand by script.min.js
+ *   only when a slider is near the viewport.
  */
 function bluebox_scripts() {
-    // 1. Load your main stylesheet and compiled JS styles (AOS, Swiper)
-    wp_enqueue_style( 'bluebox-style', get_stylesheet_uri(), array(), BLUEBOX_VERSION );
-    wp_enqueue_style( 'bluebox-bundle-style', get_template_directory_uri() . '/js/script.css', array(), BLUEBOX_VERSION );
+	wp_enqueue_style( 'bluebox-style', get_stylesheet_uri(), array(), psb_asset_ver( 'style.css' ) );
 
-    // 2. Load script with the modern 'defer' strategy
-    wp_enqueue_script( 'bluebox-script', get_template_directory_uri() . '/js/script.min.js', array(), BLUEBOX_VERSION, array(
-        'in_footer' => true,
-        'strategy'  => 'defer'
-    ));
+	wp_enqueue_script(
+		'bluebox-script',
+		get_template_directory_uri() . '/js/script.min.js',
+		array(),
+		psb_asset_ver( 'js/script.min.js' ),
+		array(
+			'in_footer' => true,
+			'strategy'  => 'defer',
+		)
+	);
 
-    // 3. BUG FIX: Changed 'main-js' to 'bluebox-script' so the data attaches to your actual script
-    wp_localize_script('bluebox-script', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php')));
-    wp_localize_script('bluebox-script', 'jsData', array('root_url' => get_site_url(), 'nonce' => wp_create_nonce('my-nonce')));
+	wp_localize_script( 'bluebox-script', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+	wp_localize_script( 'bluebox-script', 'jsData', array( 'root_url' => get_site_url(), 'nonce' => wp_create_nonce( 'my-nonce' ) ) );
+	// Page-cached HTML (Cache Enabler, never expires) carries a stale `my-nonce`: the login/OTP/register forms ask
+	// admin-ajax for a fresh one right before submitting and fall back to the inline value (security review M3).
+	wp_add_inline_script(
+		'bluebox-script',
+		'window.psbFreshNonce=function(f){return fetch(' . wp_json_encode( admin_url( 'admin-ajax.php?action=psb_my_nonce' ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES ) . ',{credentials:"same-origin",cache:"no-store"}).then(function(r){return r.json()}).then(function(j){return j&&j.success&&j.data&&j.data.nonce?j.data.nonce:f}).catch(function(){return f})};',
+		'before'
+	);
+	wp_localize_script(
+		'bluebox-script',
+		'psbTheme',
+		array(
+			'jsBase' => get_template_directory_uri() . '/js/',
+			'ver'    => psb_asset_ver( 'js/swiper.min.js' ),
+		)
+	);
 
-    // 4. Defer conditional scripts
-    if (is_product()) {
-        wp_enqueue_script('single-product', get_template_directory_uri() . '/js/single-product.js', array('jquery'), BLUEBOX_VERSION, array(
-            'in_footer' => true,
-            'strategy'  => 'defer'
-        ));
-    }
+	// Legacy variation helper: only for variable products (catalogue products are simple, so normally not loaded).
+	$psb_product = ( function_exists( 'is_product' ) && is_product() && function_exists( 'wc_get_product' ) ) ? wc_get_product( get_queried_object_id() ) : null;
+	if ( $psb_product && $psb_product->is_type( 'variable' ) ) {
+		wp_enqueue_script(
+			'single-product',
+			get_template_directory_uri() . '/js/single-product.js',
+			array( 'jquery' ),
+			psb_asset_ver( 'js/single-product.js' ),
+			array(
+				'in_footer' => true,
+				'strategy'  => 'defer',
+			)
+		);
+	}
 
-    if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
-        wp_enqueue_script( 'comment-reply' );
-    }
+	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
+		wp_enqueue_script( 'comment-reply' );
+	}
 }
 add_action( 'wp_enqueue_scripts', 'bluebox_scripts' );
 
-
-// 5. Programmatically preload your main font to break the CSS chain
+/**
+ * <head> essentials printed before anything else:
+ * - `js` class on <html> (enables reveal animations only when JS runs)
+ * - preload of the two above-the-fold font weights (Regular, Bold)
+ */
 function bluebox_preload_fonts() {
-    $font_dir = get_template_directory_uri() . '/fonts/Peyda/fonts/woff2/';
-    echo '<link rel="preload" href="' . $font_dir . 'PeydaWebFaNum-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">' . "\n";
-    echo '<link rel="preload" href="' . $font_dir . 'PeydaWebFaNum-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">' . "\n";
-    echo '<link rel="preload" href="' . $font_dir . 'PeydaWebFaNum-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">' . "\n";
+	echo "<script>document.documentElement.classList.add('js')</script>\n";
+	// View-transition direction for back/forward (must run before first render of the new page).
+	echo "<script>(function(){var d=document.documentElement,b=function(t){d.classList.toggle('vt-back',t==='traverse')};addEventListener('pageswap',function(e){if(e.viewTransition&&e.activation)b(e.activation.navigationType)});addEventListener('pagereveal',function(e){if(e.viewTransition&&window.navigation&&navigation.activation){b(navigation.activation.navigationType);e.viewTransition.finished.finally(function(){d.classList.remove('vt-back')})}})})()</script>\n";
+	$font_dir = get_template_directory_uri() . '/fonts/Peyda/fonts/woff2/';
+	foreach ( array( 'Regular', 'Bold' ) as $weight ) {
+		printf(
+			'<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin>' . "\n",
+			esc_url( $font_dir . 'PeydaWebFaNum-' . $weight . '.woff2' )
+		);
+	}
 }
-// Using priority 5 to ensure it loads high up in the <head>
-add_action( 'wp_head', 'bluebox_preload_fonts', 5 );
+add_action( 'wp_head', 'bluebox_preload_fonts', 1 );
 
 /**
  * Enqueue the block editor script.
@@ -219,6 +265,30 @@ function bluebox_tinymce_add_class( $settings ) {
 }
 add_filter( 'tiny_mce_before_init', 'bluebox_tinymce_add_class' );
 
+/**
+ * Null-safe WooCommerce cart accessors.
+ * WC()->cart is null on REST, feeds, cron, bots, admin-ajax and early hooks.
+ */
+if ( ! function_exists( 'psb_wc_cart' ) ) {
+	function psb_wc_cart() {
+		if ( ! function_exists( 'WC' ) ) {
+			return null;
+		}
+		$wc = WC();
+		return ( $wc && isset( $wc->cart ) && is_object( $wc->cart ) ) ? $wc->cart : null;
+	}
+}
+if ( ! function_exists( 'psb_cart_count' ) ) {
+	function psb_cart_count() {
+		$cart = psb_wc_cart();
+		return $cart ? (int) $cart->get_cart_contents_count() : 0;
+	}
+}
+
+// Design-system helpers (phones, socials, icons, images …)
+require get_template_directory() . '/inc/design-helpers.php';
+require get_template_directory() . '/inc/nav.php';
+
 //post types functions
 require get_template_directory() . '/inc/post-type-functions/persian-date.php';
 require get_template_directory() . '/inc/post-type-functions/reading-time.php';
@@ -236,7 +306,7 @@ require get_template_directory() . '/inc/product/product-filters.php';
 //require get_template_directory() . '/inc/product/variation-function.php';
 require get_template_directory() . '/inc/product/out-stock-product.php';
 require get_template_directory() . '/inc/product/filter-search-query.php';
-require get_template_directory() . '/inc/product/return-policy-schema.php';
+// return-policy-schema.php intentionally not loaded (wrong brand + fake shipping/return data in product schema; schema lives in inc/seo.php).
 require get_template_directory() . '/inc/product/shop-actions.php';
 require get_template_directory() . '/inc/product/cart-fragments.php';
 remove_action( 'woocommerce_before_shop_loop', 'woocommerce_result_count', 20 );
@@ -248,7 +318,29 @@ require get_template_directory() . '/inc/walker.php';
 require get_template_directory() . '/inc/custom-post-type.php';
 require get_template_directory() . '/inc/gravity-form.php';
 require get_template_directory() . '/inc/optimize.php';
+require get_template_directory() . '/inc/performance.php';  // Perfmatters replacement (asset trims, DB cleanup).
+require get_template_directory() . '/inc/login-guard.php';  // Custom login URL (/secret-door/); inactive while Perfmatters owns it.
+require get_template_directory() . '/inc/antispam.php';     // Honeypot + time token + content rules for Gravity Forms and comments.
 require get_template_directory() . '/inc/otp-login-form.php';
+
+/**
+ * Feature modules (each is self-contained; missing files are skipped).
+ */
+foreach ( array(
+	'/inc/placeholders.php',                   // Type-matched fallback illustrations.
+	'/inc/stability.php',                      // HTTP circuit breaker, cache exclusions, cron.
+	'/inc/seo.php',                            // JSON-LD on top of Rank Math.
+	'/inc/ai-visibility/ai-visibility.php',    // llms.txt, robots AI rules, dashboard.
+	'/inc/rfq/rfq.php',                        // Quote requests + bot notifications.
+	'/inc/pwa/pwa.php',                        // Manifest, service worker, install prompt.
+	'/inc/owner-panel/owner-panel.php',        // Mobile admin panel.
+	'/inc/project-records/project-records.php', // «سوابق اجرایی» CPT, importer, page.
+) as $psb_module ) {
+	if ( is_readable( get_template_directory() . $psb_module ) ) {
+		require_once get_template_directory() . $psb_module;
+	}
+}
+unset( $psb_module );
 include_once get_template_directory() . '/inc/search-route.php';
 include_once get_template_directory() . '/inc/ajax-search.php';
 

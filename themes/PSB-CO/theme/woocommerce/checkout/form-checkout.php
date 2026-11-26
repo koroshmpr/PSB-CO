@@ -35,7 +35,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 
         <div class="lg:col-span-3"><?php do_action( 'woocommerce_checkout_before_customer_details' ); ?></div>
 
-        <div class="lg:col-span-2 bg-gray-50 p-3 lg:p-5 rounded-lg border border-gray-200" id="customer_details">
+        <div class="lg:col-span-2 bg-slate-50 p-3 lg:p-5 rounded-lg border border-slate-200" id="customer_details">
             <div class="col-1">
                 <?php do_action( 'woocommerce_checkout_billing' ); ?>
             </div>

@@ -1,41 +1,110 @@
 /**
- * Custom styles to immediately follow Tailwind’s `base` layer
+ * Base layer — element defaults for the PSB-CO design system.
+ * Swiper CSS is NOT bundled here any more; it ships with the lazily loaded
+ * swiper bundle (theme/js/swiper.min.css) only on pages that contain a slider.
  */
 
-/**
- * This uses the background and foreground colors declared in the `theme.json`
- * file and is applied both to the front end and in the block editor.
- */
-@import 'swiper/swiper-bundle.css';
+@layer base {
+	html {
+		-webkit-text-size-adjust: 100%;
+		-webkit-tap-highlight-color: transparent;
+		text-rendering: optimizeLegibility;
+		scroll-padding-top: calc(var(--spacing-header) + 1rem);
+	}
 
-/* Define the style for the scrollbar thumb */
+	@media (prefers-reduced-motion: no-preference) {
+		html {
+			scroll-behavior: smooth;
+		}
+	}
+
+	body {
+		@apply bg-surface text-foreground font-sans antialiased;
+		line-height: 1.9;
+	}
+
+	h1, h2, h3, h4, h5, h6 {
+		@apply text-foreground font-bold;
+		line-height: 1.4;
+		letter-spacing: 0;
+		text-wrap: balance;
+	}
+
+	p {
+		text-wrap: pretty;
+	}
+
+	a, button, summary, label, input, select, textarea, [role="button"] {
+		touch-action: manipulation;
+	}
+
+	img, video, iframe {
+		max-width: 100%;
+	}
+
+	img {
+		height: auto;
+	}
+
+	::selection {
+		@apply bg-primary-100 text-foreground;
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--color-primary-600);
+		outline-offset: 2px;
+	}
+
+	.on-dark :focus-visible,
+	.site-footer :focus-visible {
+		outline-color: #fff;
+	}
+
+	/* Alpine: hide until initialised */
+	[x-cloak] {
+		display: none !important;
+	}
+
+	/* Skip link */
+	.skip-link {
+		@apply sr-only;
+	}
+
+	.skip-link:focus {
+		@apply not-sr-only fixed top-3 start-3 z-[200] rounded-control bg-foreground px-4 py-2 text-sm font-bold text-white;
+	}
+}
+
+/* ------------------------------------------------------------------
+ * Legacy element styles kept for existing inner templates / plugins
+ * ------------------------------------------------------------------ */
+
 ::-webkit-scrollbar {
-	width: 7px;
+	width: 8px;
 	height: 0;
 }
 
 ::-webkit-scrollbar-thumb {
-	@apply bg-gradient-to-b via-primary;
+	background: var(--color-line-strong);
+	border-radius: 8px;
 }
 
 ::-webkit-scrollbar-track {
 	background: transparent;
 }
 
-
 .ltr {
 	direction: ltr;
 }
 
 .page-item {
-
 	&.next a,
 	&.prev a,
 	.page-numbers {
-		@apply bg-primary/90 hover:bg-primary rounded-md size-10 flex items-center justify-center aspect-square text-white cursor-pointer;
+		@apply flex size-10 items-center justify-center rounded-control border border-line bg-white text-sm font-bold text-slate-700 transition-colors hover:border-primary hover:text-primary;
 
 		&.current {
-			@apply bg-primary/50 cursor-default
+			@apply cursor-default border-primary bg-primary text-white;
 		}
 	}
 }
@@ -43,12 +112,6 @@
 a {
 	@apply !no-underline;
 }
-
-* {
-	scroll-margin-top: 150px;
-	scroll-behavior: smooth;
-}
-
 
 .swiper-pagination-vertical {
 	@apply flex-col !w-4 !h-fit;
@@ -66,7 +129,7 @@ a {
 	@apply !h-4 !w-fit;
 
 	.swiper-pagination-bullet {
-		@apply bg-white !w-2 !h-full transform !scale-100 !rounded-[1px] !m-0 opacity-100 !static !transition-all !duration-500;
+		@apply bg-slate-300 !w-2 !h-full transform !scale-100 !rounded-[1px] !m-0 opacity-100 !static !transition-all !duration-500;
 
 		&.swiper-pagination-bullet-active {
 			@apply bg-primary !w-6;
@@ -80,11 +143,10 @@ a {
 
 .wc-block-checkout__contact-fields,
 .wc-block-components-address-form-wrapper {
-
 	input,
 	textarea,
 	select {
-		@apply !border-gray-200 border
+		@apply !border-gray-200 border;
 	}
 }
 
@@ -93,18 +155,22 @@ blockquote {
 }
 
 .term-description {
-	@apply p-5 rounded-lg mb-5 border border-gray-200 bg-gray-50 text-black/70
+	@apply p-5 rounded-lg mb-5 border border-gray-200 bg-gray-50 text-black/70;
 }
 
-.screen-reader-text, #photoswipe-fullscreen-dialog {
-	@apply hidden
+.screen-reader-text {
+	@apply sr-only;
+}
+
+#photoswipe-fullscreen-dialog {
+	@apply hidden;
 }
 
 .woocommerce-Input,
 #reg_billing_first_name {
-	@apply w-full bg-white !px-5 !py-4 !rounded-2xl border border-gray-200 focus:border-primary focus:!ring-4 focus:!ring-primary/10 outline-none transition-all placeholder:text-gray-300
+	@apply w-full bg-white !px-5 !py-4 !rounded-2xl border border-gray-200 focus:border-primary focus:!ring-4 focus:!ring-primary/10 outline-none transition-all placeholder:text-gray-300;
 }
 
 .digits-form_submit-btn {
-	@apply w-full !py-4 !bg-primary cursor-pointer !text-white !rounded-2xl font-black !text-lg transition-all duration-300
+	@apply w-full !py-4 !bg-primary cursor-pointer !text-white !rounded-2xl font-black !text-lg transition-all duration-300;
 }

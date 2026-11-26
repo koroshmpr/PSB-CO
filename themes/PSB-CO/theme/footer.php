@@ -1,50 +1,48 @@
+<?php
+/**
+ * Closes <main>, prints the quote CTA band, footer, floating UI and modals.
+ *
+ * @package bluebox
+ */
+
+global $woo_active;
+
+$psb_is_account  = $woo_active && function_exists( 'is_account_page' ) && is_account_page();
+$psb_is_checkout = $woo_active && function_exists( 'is_cart' ) && ( is_cart() || is_checkout() || $psb_is_account );
+$psb_is_product  = $woo_active && function_exists( 'is_product' ) && is_product();
+$psb_is_contact  = is_page( array( 'contact-us', 'login', 'request-quote' ) ) || is_page_template( array( 'contact-us.php', 'page-request-quote.php' ) );
+?>
 </main>
 
 <?php
-global $woo_active;
+if ( ! $psb_is_checkout && ! $psb_is_contact && apply_filters( 'psb_show_cta_band', true ) ) {
+	get_template_part( 'template-parts/global/cta-band' );
+}
 
-$is_woo_account = $woo_active && function_exists('is_account_page') && is_account_page();
+if ( ! $psb_is_account && ! is_page( 'login' ) ) {
+	get_template_part( 'template-parts/layout/footer-content' );
+}
 
-if ( ! $is_woo_account && !is_page('login') ) :
-    get_template_part('template-parts/layout/footer-content');
-endif;
+// Mobile app tab bar (see psb_show_tabbar(): hidden on product / cart / checkout / account / login).
+if ( psb_show_tabbar() ) {
+	get_template_part( 'template-parts/layout/sticky-social' );
+}
 
-if ( is_front_page() ) :
-    get_template_part('template-parts/layout/sticky-social');
-endif;
+if ( ! $psb_is_checkout ) {
+	get_template_part( 'template-parts/global/backToTop' );
+}
 
-$is_woo_checkout_flow = $woo_active && ( is_cart() || is_checkout() || is_account_page() );
-if ( ! $is_woo_checkout_flow ) :
-    get_template_part('template-parts/global/backToTop');
-endif;
+// Dialogs.
+get_template_part( 'template-parts/layout/header/menu-modal' );
+get_template_part( 'template-parts/layout/header/search-modal' );
+// Contact modal only where a «shopContact = true» trigger exists (products, services, projects).
+if ( ( function_exists( 'is_woocommerce' ) && is_woocommerce() ) || is_singular( array( 'product', 'services', 'portfolio' ) ) || apply_filters( 'psb_contact_modal', false ) ) {
+	get_template_part( 'template-parts/shop/shop-contact-modal' );
+}
+// Category & cart modals are not rendered: catalogue mode has no cart and the header has no category trigger.
 
-
-// ۳. مدال‌ها (Modals)
-get_template_part('template-parts/layout/header/menu-modal');
-get_template_part('template-parts/layout/header/search-modal');
-get_template_part('template-parts/shop/shop-contact-modal');
-// get_template_part('template-parts/global/popup');
-
-if ( $woo_active ) :
-    get_template_part('template-parts/product/category-modal');
-    get_template_part('template-parts/layout/cart-modal');
-endif;
-
-if ( function_exists('get_field') ) :
-
-    $catMode = get_field('catalogue_mode', 'option');
-    if ( $catMode ) :
-        get_template_part('template-parts/shop/shop-contact-modal');
-    endif;
-    $preloader = get_field('preloader', 'option');
-    if ( $preloader ) :
-        get_template_part('template-parts/global/preloader');
-    endif;
-
-endif;
 
 wp_footer();
 ?>
-
 </body>
 </html>

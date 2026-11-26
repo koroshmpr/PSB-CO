@@ -1,173 +1,71 @@
 <?php
-global $woo_active;
-$activeClass = 'max-lg:!bg-primary/15 border max-lg:!border-primary/20 max-lg:rounded-[20px] max-lg:!text-primary max-lg:[&>svg]:fill-primary';
+/**
+ * Sticky site header (spec v2 §4.9). CSS-responsive (page-cache safe).
+ * ≥ 1100px: full logo · mega-menu nav · search · phone block (≥ 1280) · «استعلام قیمت».
+ * < 1100px: logo · search · phone icon · menu (drawer).
+ * Fixed bar over a constant-height spacer; html.is-compact (set by javascript/modules/header-compact.js
+ * from an IntersectionObserver sentinel) shrinks the bar 84→64px (60→52 mobile) without moving content.
+ */
+$psb_phone = psb_primary_phone();
 ?>
+<div class="site-header-spacer" aria-hidden="true"></div>
+<header id="header" class="site-header" :class="{ 'is-scrolled': scrolled }"
+	x-data="{ open: null, t: null,
+		enter(id) { clearTimeout(this.t); if (this.open === id) return; this.t = setTimeout(() => this.open = id, 150); },
+		leave() { clearTimeout(this.t); this.t = setTimeout(() => this.open = null, 300); },
+		toggle(id, kbd) { clearTimeout(this.t); this.open = this.open === id ? null : id; if (kbd && this.open === id) this.$nextTick(() => document.querySelector('#mm-panel-' + id + ' a')?.focus()); },
+		panelTab(e, id) {
+			/* Tab out of a panel continues with the next top-level item; Shift+Tab off the first link returns to its chevron. */
+			const links = [...e.currentTarget.querySelectorAll('a[href]')].filter(a => a.offsetParent !== null);
+			if (!links.length) return;
+			const btn = document.getElementById('mm-btn-' + id);
+			if (e.shiftKey && document.activeElement === links[0]) { e.preventDefault(); btn?.focus(); }
+			else if (!e.shiftKey && document.activeElement === links[links.length - 1]) {
+				e.preventDefault(); this.open = null;
+				const tops = [...document.querySelectorAll('.site-nav .mm-top')]; const li = btn?.closest('.mm-item');
+				const next = li?.nextElementSibling?.querySelector('.mm-top');
+				(next || document.querySelector('.header-actions button, .header-actions a'))?.focus();
+			}
+		},
+		close(focus) { const id = this.open; this.open = null; if (focus && id) this.$nextTick(() => document.getElementById('mm-btn-' + id)?.focus()); } }"
+	@keydown.escape.window="open && close(true)"
+	@click.outside="open = null"
+	@focusout="if (open && !$el.contains($event.relatedTarget)) open = null">
+	<div class="site-header-inner">
+		<?php
+		// One link, two images: full lockup ≥ 1100px, PSB mark below and in the compact (scrolled) header —
+		// at 44px the full logo would be < 120px wide (brand minimum), so compact swaps to the mark.
+		get_template_part( 'template-parts/global/logo', null, array( 'variant' => 'swap' ) );
+		get_template_part( 'template-parts/layout/header/mega-menu', null, array( 'part' => 'nav' ) );
+		?>
 
-    <header id="header"
-            :class="[scrolled ? 'lg:shadow-sm <?= current_user_can('administrator') ? '!lg:top-0' : ''; ?>' : '']"
-            class="fixed <?= current_user_can('administrator') ? 'lg:top-8' : 'lg:top-0'; ?> shadow-[0_-4px_20px_rgba(0,0,0,0.08)] max-lg:bottom-0 max-lg:inset-x-0 left-0 w-full max-lg:rounded-none max-lg:border-t max-lg:border-x-0 max-lg:border-b-0 border-slate-200 bg-white/95 backdrop-blur-md lg:bg-white transition-all duration-300 z-50">
-        <nav class="container <?= is_admin() ? 'lg:pt-12' : '' ?> flex items-center lg:h-14 max-lg:p-[3px] lg:py-4 justify-between">
-            <div class="flex items-center gap-5 max-lg:hidden">
-                <?php get_template_part('template-parts/global/logo', null, [
-                    'logoSize' => 'max-h-12 w-auto',
-                    'width' => '80',
-                    'height' => '47'
-                ]);
-                wp_nav_menu(
-                    array(
-                        'theme_location' => 'menu-1',
-                        'menu_id' => 'primary-menu',
-                        'menu_class' => 'max-lg:hidden flex gap-x-3 justify-center lg:justify-start',
-                        'show_submenus' => true,
-                        'walker' => new Footer_Walker_Nav_Menu(),
-                    )
-                );
-                ?>
-            </div>
+		<div class="header-actions">
+			<?php if ( ! is_search() ) : ?>
+				<button type="button" class="icon-btn" @click="searchOpen = true" aria-label="جستجو در سایت" aria-haspopup="dialog" :aria-expanded="searchOpen">
+					<?php echo psb_icon( 'search' ); // phpcs:ignore ?>
+				</button>
+			<?php endif; ?>
 
-            <div class="flex items-center max-lg:justify-between max-lg:w-full gap-1 lg:gap-3">
-                <?php
-                if (!wp_is_mobile()):
-                    // Get the current post type
-                    $post_type = get_post_type();
+			<?php if ( $psb_phone ) : ?>
+				<a class="header-phone" href="<?php echo esc_url( $psb_phone['href'] ); ?>">
+					<small>مشاوره فنی و فروش</small>
+					<b dir="ltr"><?php echo esc_html( psb_fa_num( psb_format_phone( $psb_phone['number'] ) ) ); ?></b>
+				</a>
+				<a class="icon-btn nav:hidden max-md:hidden" href="<?php echo esc_url( $psb_phone['href'] ); ?>" aria-label="تماس تلفنی">
+					<?php echo psb_icon( 'phone' ); // phpcs:ignore ?>
+				</a>
+			<?php endif; ?>
 
-                    if ('post' === $post_type) {
-                        // Shows on single blog posts and the blog archive
-                        get_template_part('template-parts/global/channel-btn', null, ['type' => 'blog']);
+			<?php $psb_on_quote = is_page( 'request-quote' ) || is_page_template( 'page-request-quote.php' ); ?>
+			<a class="btn <?php echo $psb_on_quote ? 'btn-secondary' : 'btn-primary'; ?> hidden nav:inline-flex" href="<?php echo esc_url( psb_quote_url() ); ?>" <?php echo $psb_on_quote ? 'aria-current="page"' : ''; ?>>استعلام قیمت</a>
 
-                    } elseif ($woo_active && ('product' === $post_type || is_shop())) {
-                        // Shows on single products and the shop archive (assuming WooCommerce)
-                        get_template_part('template-parts/global/channel-btn', null, ['type' => 'shop']);
-                    }
-                endif;
-
-                $baseClass = 'relative lg:bg-gray-50 justify-center lg:border border-gray-300 p-2 max-lg:py-3 max-lg:flex-1 hover:bg-primary hover:text-white flex items-center gap-3 cursor-pointer lg:rounded-sm transition-all duration-300';
-                $baseSvgClass = 'max-lg:size-5.5 duration-300 transition-all';
-                $svgSize = '18';
-
-                if ($woo_active) :
-                    $cart_count = WC()->cart->get_cart_contents_count() ?? 0;
-                    $is_empty = $cart_count == 0;
-                    $accClass = $baseClass . (is_account_page() || is_page('login') ? " $activeClass" : "");
-
-                    get_template_part('template-parts/layout/my-account-button', null, [
-                        'active' => is_account_page(),
-                        'class' => $accClass,
-                        'svgClass' => $baseSvgClass,
-                        'svgSize' => $svgSize,
-                    ]);
-                    ?>
-                    <button @click="cart = true" aria-label="open cart modal"
-                            class="<?= $baseClass; ?> <?= is_cart() ? $activeClass : ''; ?> relative cursor-pointer">
-                        <?php get_template_part('template-parts/svg/cart', null, ['size' => $svgSize, 'class' => $baseSvgClass]); ?>
-                        <span class="header-cart-count absolute top-0 start-2 lg:start-0 lg:translate-x-1/2 lg:-translate-y-1/2 translate-y-1 bg-secondary/80 text-white flex leading-auto justify-center items-center pt-1 p-0.5 rounded-sm text-xs size-4">
-                             <?= $cart_count; ?>
-                        </span>
-                    </button>
-                <?php endif;
-
-                $showLogo = get_field('show_logo_in_navbar', 'option');
-                if ($showLogo) :
-                    $logoClass = 'relative z-10 flex items-center justify-center aspect-square lg:hidden bg-primary rounded-2xl p-1 mx-2 border border-secondary transition-all' . ($is_home ? ' ring-2 ring-primary/60 shadow-lg scale-105' : '');
-                    ?>
-                    <a aria-label="go to home page" href="<?= home_url(); ?>" class="<?= $logoClass; ?>">
-                        <?php $logo = get_field('footer_logo', 'option') ?? ''; ?>
-                        <img fetchpriority="high" decoding="sync" width="<?= esc_attr($logo['width'] ?? '98') ?>"
-                             height="<?= esc_attr($logo['height'] ?? '59') ?>" class="w-12 h-12 object-contain"
-                             src="<?= esc_url($logo['sizes']['thumbnail'] ?? $logo['sizes']['medium'] ?? $logo['url'] ?? '') ?>"
-                             alt="<?= esc_attr($logo['title'] ?? get_bloginfo('name')) ?>">
-                    </a>
-                <?php else :
-                    ?>
-                    <a aria-label="go to home page" href="<?= home_url(); ?>"
-                       class="<?= $baseClass; ?> lg:hidden <?= is_front_page() ? $activeClass : ''; ?>">
-                        <?php get_template_part('template-parts/svg/home', null, ['size' => $svgSize, 'class' => $baseSvgClass]); ?>
-                    </a>
-                <?php endif;
-                if ($woo_active) :
-                    ?>
-                    <a aria-label="go to compare page" href="<?= home_url('/compare'); ?>"
-                       class="<?= $baseClass; ?> <?= is_page('compare') ? $activeClass : ''; ?>"
-                       x-data="{ compareCount: 0 }"
-                       x-init="compareCount = JSON.parse(localStorage.getItem('compare_products') || '[]').length;">
-                        <?php get_template_part('template-parts/svg/compare', null, ['size' => $svgSize, 'class' => $baseSvgClass]); ?>
-                        <span :class="compareCount === 0 ? 'hidden' : '!opacity-100'"
-                              class="absolute top-0 start-2 lg:start-0 opacity-0 lg:translate-x-1/2 text-white lg:-translate-y-1/2 translate-y-1 bg-secondary/80 flex leading-auto justify-center items-center pt-1 p-0.5 rounded-sm text-xs size-4"
-                              x-text="compareCount">
-                    </span>
-                    </a>
-                <?php endif;
-                if (!is_search()) : ?>
-                    <button aria-label="open search modal" @click="searchOpen = true"
-                            class="<?= $baseClass; ?> max-lg:hidden group">
-                        <?php get_template_part('template-parts/svg/search', null, ['size' => $svgSize, 'class' => $baseSvgClass]); ?>
-                    </button>
-                <?php endif;
-                if ($woo_active) : ?>
-                    <button aria-label="open category list" @click="categoryOpen = true"
-                            class="<?= $baseClass; ?> max-lg:hidden text-xs group">
-                        <?php get_template_part('template-parts/svg/tag', null, ['size' => $svgSize, 'class' => $baseSvgClass]); ?>
-                        <span class="max-lg:hidden">دسته بندی‌ها</span>
-                    </button>
-                    <a href="<?= home_url('/shop'); ?>" aria-label="go to shop page"
-                       class="<?= $baseClass; ?> <?= is_shop() ? $activeClass : ''; ?> lg:hidden">
-                        <?php get_template_part('template-parts/svg/shop', null, ['size' => $svgSize, 'class' => $baseSvgClass]); ?>
-                    </a>
-                <?php endif; ?>
-            </div>
-        </nav>
-    </header>
-
-<?php
-// --- Mobile Top Header ---
-if (wp_is_mobile()):
-    $mobileBaseClass = 'justify-center flex items-center p-2.5 shrink-0 cursor-pointer transition-all group';
-    ?>
-    <nav class="flex sticky lg:hidden top-0 z-50 bg-white p-2 justify-between items-center">
-
-        <div class="flex items-center">
-            <button class="<?= $mobileBaseClass; ?>"
-                    :class="menuOpen ? 'max-lg:!bg-primary/10 max-lg:!text-primary is-active shadow-inner' : ''"
-                    aria-label="open mobileMenu" @click="menuOpen = true">
-                <?php get_template_part('template-parts/svg/menu', null, ['size' => 20, 'class' => $baseSvgClass]); ?>
-            </button>
-            <button class="<?= $mobileBaseClass; ?>"
-                    :class="searchOpen ? 'max-lg:!bg-primary/10 max-lg:!text-primary is-active shadow-inner' : ''"
-                    @click="searchOpen = true" aria-label="open search modal">
-                <?php get_template_part('template-parts/svg/search', null, ['size' => 18, 'class' => '']); ?>
-            </button>
-        </div>
-        <?php get_template_part('template-parts/global/logo', null, [
-                'logoSize' => 'max-h-8 w-auto',
-                'class' => 'absolute top-1/2 start-1/2 translate-x-1/2 -translate-y-1/2 ',
-        ]); ?>
-        <div class="flex gap-1 items-center">
-            <?php
-            // Get the current post type
-            $post_type = get_post_type();
-
-            if ('post' === $post_type) {
-                // Shows on single blog posts and the blog archive
-                get_template_part('template-parts/global/channel-btn', null, ['type' => 'blog']);
-
-            } elseif ($woo_active && ('product' === $post_type || is_shop())) {
-
-                // Shows on single products and the shop archive (assuming WooCommerce)
-                get_template_part('template-parts/global/channel-btn', null, ['type' => 'shop']);
-            }
-            ?>
-            <?php
-            if(is_singular('post')):
-
-                get_template_part('template-parts/global/back-to-archive', null, ['type' => 'blog']);
-            endif;
-            if(is_singular('product')):
-
-                get_template_part('template-parts/global/back-to-archive', null, ['type' => 'shop']);
-            endif;
-
-            ?>
-        </div>
-
-    </nav>
-<?php endif; ?>
+			<button type="button" class="icon-btn nav:hidden" @click="menuOpen = true" aria-label="باز کردن منو" aria-controls="mobileMenu" aria-haspopup="dialog" :aria-expanded="menuOpen">
+				<?php echo psb_icon( 'menu' ); // phpcs:ignore ?>
+			</button>
+		</div>
+	</div>
+	<?php get_template_part( 'template-parts/layout/header/mega-menu', null, array( 'part' => 'panels' ) ); ?>
+	<div class="mm-scrim max-nav:hidden" x-show="open" x-cloak aria-hidden="true"
+		x-transition:enter="transition-opacity duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+		x-transition:leave="transition-opacity duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
+</header>

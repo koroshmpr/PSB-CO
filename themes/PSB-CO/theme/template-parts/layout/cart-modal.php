@@ -1,8 +1,8 @@
 <?php
 global $woo_active;
 $svgSize = '18';
-if ($woo_active) :
-    $cart_count = WC()->cart->get_cart_contents_count() ?? 0;
+if ($woo_active && psb_wc_cart()) :
+    $cart_count = psb_cart_count();
     $is_empty = $cart_count == 0;
     ?>
     <div x-show="cart"
@@ -49,7 +49,7 @@ if ($woo_active) :
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                             </svg>
                         </div>
-                        <p class="text-sm font-medium text-gray-500">سبد خرید شما خالی است!</p>
+                        <p class="text-sm font-medium text-gray-500">سبد خرید شما خالی است.</p>
                     </div>
                 <?php else : ?>
                     <div class="flex flex-col gap-3">

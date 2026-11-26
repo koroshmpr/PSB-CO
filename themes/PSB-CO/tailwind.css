@@ -15,7 +15,9 @@
 /**
  * Add Tailwind’s Preflight styles followed by your custom base styles.
  */
-@import "tailwindcss/preflight";
+/* Preflight must live in the base layer, otherwise its `h1…h6 { font-size: inherit }`
+   (unlayered) overrides every component class such as .section-title / .card-title. */
+@import "tailwindcss/preflight" layer(base);
 @import "./tailwind/custom/base.css";
 
 /**

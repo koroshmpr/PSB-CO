@@ -84,7 +84,7 @@ if ($woo_active && $show):
                 <?php else : ?>
                     <div>
                         <span class="block text-4xl font-black mb-2 leading-tight">پیشنهاد</span>
-                        <span class="block text-2xl font-light tracking-[0.2em] opacity-90">شگفت‌انگیز</span>
+                        <span class="block text-2xl font-light tracking-[0.2em] opacity-90">ویژه</span>
                     </div>
                 <?php endif;
 

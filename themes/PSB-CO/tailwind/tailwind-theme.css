@@ -1,34 +1,119 @@
 /**
- * Design tokens and theme variables for PSB-CO High-Voltage Theme
- * https://tailwindcss.com/docs/theme
+ * PSB design tokens — design spec v2 (SCRATCH/design-spec.md §1–4).
+ * Red-and-graphite engineering brand, light-dominant. Red (#D60F1A) has one job:
+ * primary action + small accents. The logo itself stays #FF0000 (--color-brand-logo).
+ * Token names are kept from v1 (primary, cta, dark, slate …) so existing templates
+ * re-skin automatically; Tailwind's slate scale is overridden with the steel scale.
+ * Documentation: themes/PSB-CO/DESIGN.md
  */
 
 @import "tailwindcss/theme";
 
 @theme {
-	/* WordPress Preset Mapping with Solid Fallbacks */
-	--color-background: var(--wp--preset--color--background, #F8FAFC);
-	--color-foreground: var(--wp--preset--color--foreground, #0F172A);
+	/* ---------- Surfaces ---------- */
+	--color-background: #F4F5F7;
+	--color-foreground: #14171C;
+	--color-surface: #FFFFFF;
+	--color-line: #D9DEE5;
+	--color-line-strong: #BAC2CD;
 
-	/* Primary Corporate Color - High Voltage Royal Industrial Blue */
-	--color-primary: var(--wp--preset--color--primary, #1D4ED8);
+	/* ---------- Primary = brand red (UI) ---------- */
+	--color-primary-50: #FFF1F1;
+	--color-primary-100: #FFE0E1;
+	--color-primary-200: #FFC5C7;
+	--color-primary-300: #FF9A9E;
+	--color-primary-400: #FF5C63; /* red text/links on dark only */
+	--color-primary-500: #F2232D; /* decorative only */
+	--color-primary-600: #D60F1A; /* CTA bg, accents, focus */
+	--color-primary-700: #B30C16; /* hover, red text on light, CTA band */
+	--color-primary-800: #940F17;
+	--color-primary-900: #7A1218;
+	--color-primary-950: #43060A;
+	--color-primary: #D60F1A;
+	--color-brand-logo: #FF0000;
 
-	/* Secondary Color - Electrical Engineering Tech Blue */
-	--color-secondary: var(--wp--preset--color--secondary, #0284C7);
+	/* Secondary = steel */
+	--color-secondary: #3E4653;
+	--color-tertiary: #525C6B;
 
-	/* CTA Color - Electric Energy Amber Gold */
-	--color-cta: var(--wp--preset--color--cta, #F59E0B);
+	/* Tailwind slate → steel (existing slate-* utilities move to steel) */
+	--color-slate-50: #F5F7F9;
+	--color-slate-100: #EBEEF2;
+	--color-slate-200: #D9DEE5;
+	--color-slate-300: #BAC2CD;
+	--color-slate-400: #8E99A8; /* icons/decoration only on light */
+	--color-slate-500: #6A7585; /* text only on pure white, ≥14px */
+	--color-slate-600: #525C6B; /* default muted text */
+	--color-slate-700: #3E4653;
+	--color-slate-800: #2A3039;
+	--color-slate-900: #1B1F26;
+	--color-slate-950: #111418;
 
-	/* Contrast Dark Slate */
-	--color-dark: #0F172A;
+	/* Dark = graphite (hero overlay, factory band, footer) */
+	--color-dark: #111418;
+	--color-dark-900: #111418;
+	--color-dark-800: #1B1F26;
+	--color-dark-700: #2A3039;
+	--color-dark-600: #3E4653;
 
-	--container-content: var(--wp--style--global--content-size);
-	--container-wide: var(--wp--style--global--wide-size);
+	/* CTA = brand red, text on CTA is WHITE */
+	--color-cta-300: #FF9A9E;
+	--color-cta-400: #FF5C63;
+	--color-cta-500: #F2232D;
+	--color-cta-600: #D60F1A;
+	--color-cta-700: #B30C16;
+	--color-cta: #D60F1A;
 
-	/* Typography Tokens */
-	--font-sans: Payda, system-ui, sans-serif, "Apple Color Emoji",
-		"Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-	--font-serif: Payda, Georgia, Cambria, "Times New Roman", Times, serif;
-	--font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-		"Liberation Mono", "Courier New", monospace;
+	/* Status */
+	--color-success: #15803D;
+	--color-warning: #B45309;
+	--color-danger: #B91C1C;
+	--color-icon: #525C6B;
+	--color-focus: #D60F1A;
+
+	/* ---------- Layout ---------- */
+	--breakpoint-nav: 68.75rem; /* 1100px: desktop nav ↔ drawer */
+	--container-content: 60rem;
+	--container-wide: 76rem;
+	--container-site: 76rem;
+	--container-prose: 46rem;
+
+	--spacing-section: clamp(4rem, 2.5rem + 4vw, 7rem);
+	--spacing-section-sm: clamp(2rem, 1.6rem + 1.5vw, 2.75rem);
+	--spacing-gutter: clamp(1rem, 0.6rem + 1.6vw, 2rem);
+	--spacing-header: 5.25rem; /* 84px ≥ 1100px; 60px below (layout.css --header-h) */
+
+	/* ---------- Radii ---------- */
+	--radius-control: 4px;
+	--radius-card: 6px;
+	--radius-panel: 8px;
+
+	/* ---------- Shadows (none at rest) ---------- */
+	--shadow-card: 0 0 0 0 transparent;
+	--shadow-lift: 0 12px 32px -16px rgb(17 20 24 / 0.25);
+	--shadow-header: 0 1px 0 #D9DEE5, 0 8px 24px -20px rgb(17 20 24 / 0.3);
+	--shadow-panel: 0 24px 48px -24px rgb(17 20 24 / 0.28);
+
+	/* ---------- Fluid type scale ---------- */
+	--text-display: clamp(1.875rem, 1.3rem + 2.6vw, 3.25rem);
+	--text-display--line-height: 1.35;
+	--text-h1: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
+	--text-h1--line-height: 1.4;
+	--text-h2: clamp(1.625rem, 1.2rem + 1.5vw, 2.5rem);
+	--text-h2--line-height: 1.4;
+	--text-h3: clamp(1.125rem, 1.05rem + 0.35vw, 1.3125rem);
+	--text-h3--line-height: 1.5;
+	--text-lead: clamp(1rem, 0.95rem + 0.3vw, 1.1875rem);
+	--text-lead--line-height: 1.95;
+	--text-eyebrow: 0.8125rem;
+	--text-eyebrow--line-height: 1.4;
+
+	/* ---------- Motion ---------- */
+	--ease-out-quart: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+	/* ---------- Typography ---------- */
+	--font-sans: Peyda, Tahoma, system-ui, sans-serif;
+	--font-serif: Peyda, Tahoma, serif;
+	--font-latin: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	--font-mono: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* no monospace for standards */
 }

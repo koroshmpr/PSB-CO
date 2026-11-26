@@ -22,11 +22,12 @@ module.exports = {
 		'../theme/woocommerce/*.php'
 	],
 	theme: {
-		maxWidth: {
-			'content': '60rem', // Matches "contentSize" from theme.json
-			'wide': '60rem', // Matches "wideSize" from theme.json
-		},
 		extend: {
+			// Kept in `extend` so Tailwind's default max-w-* scale stays available.
+			maxWidth: {
+				'content': '60rem', // Matches "contentSize" from theme.json
+				'wide': '80rem', // Matches "wideSize" from theme.json
+			},
 			color: {
 				icon: "#f7e0c7",
 				title: "#a56433",

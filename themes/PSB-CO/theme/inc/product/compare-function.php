@@ -35,7 +35,7 @@ function get_compare_products() {
 			'id'     => get_the_ID(),
 			'name'   => get_the_title(),
 			'image'  => get_the_post_thumbnail_url(get_the_ID(), 'medium'),
-			'price' => wp_kses_post($product->get_price_html()),
+			'price' => $product ? wp_kses_post($product->get_price_html()) : '',
 			'url'    => get_permalink(),
 			'weight' => $product ? $product->get_weight() : '',
 			'dims'   => $product ? wc_format_dimensions($product->get_dimensions(false)) : '',

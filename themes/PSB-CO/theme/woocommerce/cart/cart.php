@@ -16,6 +16,9 @@
  */
 
 defined('ABSPATH') || exit;
+if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+	return;
+}
 
 do_action('woocommerce_before_cart'); ?>
 <div class="grid lg:grid-cols-3 gap-5 items-start">
@@ -56,7 +59,7 @@ do_action('woocommerce_before_cart'); ?>
                 if ($_product && $_product->exists() && $cart_item['quantity'] > 0 && apply_filters('woocommerce_cart_item_visible', true, $cart_item, $cart_item_key)) {
                     $product_permalink = apply_filters('woocommerce_cart_item_permalink', $_product->is_visible() ? $_product->get_permalink($cart_item) : '', $cart_item, $cart_item_key);
                     ?>
-                    <tr class="woocommerce-cart-form__cart-item max-lg:mb-2 max-lg:border border-black/10 bg-primary/10 lg:bg-gray-50 <?php echo esc_attr(apply_filters('woocommerce_cart_item_class', 'cart_item', $cart_item, $cart_item_key)); ?>">
+                    <tr class="woocommerce-cart-form__cart-item max-lg:mb-2 max-lg:border border-black/10 bg-primary/10 lg:bg-slate-50 <?php echo esc_attr(apply_filters('woocommerce_cart_item_class', 'cart_item', $cart_item, $cart_item_key)); ?>">
 
                         <td class="product-remove">
                             <?php
@@ -95,7 +98,7 @@ do_action('woocommerce_before_cart'); ?>
                             if (!$product_permalink) {
                                 echo $thumbnail; // PHPCS: XSS ok.
                             } else {
-                                printf('<a class="[&>img]:!size-16 [&>img]:border-2 [&>img]:p-0.5 [&>img]:border-icon [&>img]:rounded-xl " href="%s">%s</a>', esc_url($product_permalink), $thumbnail); // PHPCS: XSS ok.
+                                printf('<a class="[&>img]:!size-16 [&>img]:border-2 [&>img]:p-0.5 [&>img]:border-icon [&>img]:rounded-card " href="%s">%s</a>', esc_url($product_permalink), $thumbnail); // PHPCS: XSS ok.
                             }
                             ?>
                         </td>
@@ -212,7 +215,7 @@ do_action('woocommerce_before_cart'); ?>
                             <input type="text" name="coupon_code" class="input-text flex-1" id="coupon_code" value=""
                                    placeholder="<?php esc_attr_e('Coupon code', 'woocommerce'); ?>"/>
                             <button type="submit"
-                                    class="text-nowrap button flex-1 !bg-icon rounded-lg grow-0 <?php echo esc_attr(wc_wp_theme_get_element_class_name('button') ? ' ' . wc_wp_theme_get_element_class_name('button') : ''); ?>"
+                                    class="text-nowrap button flex-1 !bg-icon rounded-control grow-0 <?php echo esc_attr(wc_wp_theme_get_element_class_name('button') ? ' ' . wc_wp_theme_get_element_class_name('button') : ''); ?>"
                                     name="apply_coupon"
                                     value="<?php esc_attr_e('Apply coupon', 'woocommerce'); ?>"><?php esc_html_e('Apply coupon', 'woocommerce'); ?></button>
                             <?php do_action('woocommerce_cart_coupon'); ?>

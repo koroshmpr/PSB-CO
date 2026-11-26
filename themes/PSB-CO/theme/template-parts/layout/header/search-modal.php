@@ -1,195 +1,141 @@
 <?php
 /**
- * Advanced Multi-CPT Live Search Modal
- * PSB-CO High-Voltage Electrical Panel Theme
+ * Instant site search (combobox dialog). Engine + REST endpoint: inc/search-route.php.
+ *
+ * Open: searchOpen = true (header button, tab bar, drawer), Ctrl/Cmd+K or "/".
+ * Keys: ↑/↓ move, Enter opens (or goes to the results page), Esc closes.
+ * Mobile: full-screen sheet sized to window.visualViewport so it stays above the keyboard.
  */
+$psb_phone   = psb_primary_phone();
+$psb_popular = psb_search_popular();
+$psb_icons   = array();
+foreach ( psb_search_types() as $psb_type => $psb_info ) {
+	$psb_icons[ $psb_type ] = $psb_info[1];
+}
+$psb_cfg = array(
+	'endpoint' => esc_url_raw( rest_url( 'psb/v1/search' ) ),
+	'results'  => esc_url_raw( home_url( '/' ) ),
+	'quote'    => esc_url_raw( psb_quote_url() ),
+);
 ?>
-<section id="searchModal"
-    x-show="searchOpen"
-    x-data="{
-        query: '',
-        activeTab: 'all',
-        isSearching: false,
-        counts: { all: 0, services: 0, portfolio: 0, certificates: 0, confirmation: 0, 'type-test': 0, post: 0 },
-        htmlResults: '',
-        searchDebounceTimer: null,
-        performSearch() {
-            clearTimeout(this.searchDebounceTimer);
-            if (this.query.trim().length < 2) {
-                this.htmlResults = '';
-                this.isSearching = false;
-                return;
-            }
-            this.isSearching = true;
-            this.searchDebounceTimer = setTimeout(() => {
-                let formData = new URLSearchParams();
-                formData.append('action', 'custom_ajax_search');
-                formData.append('keyword', this.query.trim());
-                formData.append('post_type', this.activeTab);
+<section id="searchModal" role="dialog" aria-modal="true" aria-labelledby="psb-search-label"
+	x-show="searchOpen"
+	x-cloak
+	x-data="psbSearch(<?php echo esc_attr( wp_json_encode( $psb_cfg ) ); ?>)"
+	x-init="init()"
+	@keydown.window="hotkey($event)"
+	x-transition:enter="transition duration-150 ease-out" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+	x-transition:leave="transition duration-100 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+	@click.self="close()"
+	class="search-sheet fixed inset-x-0 top-0 z-[55] flex items-start justify-center bg-dark/50 sm:p-6 sm:pt-[8vh]"
+	:style="vh ? `height:${vh}px` : 'height:100dvh'">
 
-                fetch('<?= admin_url("admin-ajax.php") ?>', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: formData.toString()
-                })
-                .then(res => res.json())
-                .then(res => {
-                    this.isSearching = false;
-                    if (res.success) {
-                        this.htmlResults = res.data.html;
-                        this.counts = res.data.counts;
-                    }
-                })
-                .catch(err => {
-                    this.isSearching = false;
-                });
-            }, 180);
-        },
-        setTab(tab) {
-            this.activeTab = tab;
-            this.performSearch();
-        },
-        clearQuery() {
-            this.query = '';
-            this.htmlResults = '';
-            this.counts = { all: 0, services: 0, portfolio: 0, certificates: 0, confirmation: 0, 'type-test': 0, post: 0 };
-        }
-    }"
-    x-transition:enter="transition ease-out duration-300"
-    x-transition:enter-start="opacity-0 scale-95"
-    x-transition:enter-end="opacity-100 scale-100"
-    x-transition:leave="transition ease-in duration-200"
-    x-transition:leave-start="opacity-100 scale-100"
-    x-transition:leave-end="opacity-0 scale-95"
-    @keydown.escape.window="searchOpen = false"
-    @click.self="searchOpen = false"
-    class="fixed inset-0 z-[110] bg-slate-950/85 backdrop-blur-xl flex flex-col justify-start select-none overflow-hidden"
-    style="display: none;">
+	<div class="flex h-full w-full max-w-3xl flex-col overflow-hidden bg-white shadow-lift sm:h-auto sm:max-h-[80vh] sm:rounded-panel sm:border sm:border-line">
+		<form role="search" action="<?php echo esc_url( home_url( '/' ) ); ?>" method="get" class="flex shrink-0 items-center gap-2 border-b border-line p-3 sm:p-4" @submit="onSubmit($event)">
+			<span class="text-slate-400"><?php echo psb_icon( 'search', 'size-5' ); // phpcs:ignore ?></span>
+			<label id="psb-search-label" for="psb-search-input" class="sr-only">جستجو در سایت</label>
+			<input id="psb-search-input" x-ref="q" type="search" name="s" autocomplete="off" enterkeyhint="search" spellcheck="false"
+				role="combobox" aria-autocomplete="list" aria-controls="psb-search-list"
+				:aria-expanded="flat.length > 0" :aria-activedescendant="active >= 0 ? 'psb-opt-' + active : null"
+				x-model="query" @input="onInput()" @keydown="onKey($event)"
+				placeholder="جستجوی محصول یا تأییدیه…"
+				class="min-h-11 min-w-0 flex-1 bg-transparent text-base text-dark placeholder:text-slate-500 focus:outline-none">
+			<svg x-show="loading" class="size-5 animate-spin text-slate-600" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" opacity=".2"/><path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+			<button type="button" x-show="query.length && !loading" @click="clear()" class="icon-btn" aria-label="پاک کردن عبارت">
+				<?php echo psb_icon( 'close', 'size-4' ); // phpcs:ignore ?>
+			</button>
+			<button type="button" @click="close()" class="btn btn-ghost btn-sm shrink-0">بستن</button>
+		</form>
 
-    <div class="bg-white  w-screen mx-auto overflow-hidden flex flex-col h-screen max-h-screen">
-        
-        <!-- 1. Search Header Bar -->
-        <div class="p-4 bg-slate-950 pt-16 text-white border-b border-slate-800 shrink-0 space-y-4">
-            <div class="flex items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-blue-600/30 text-blue-400 border border-blue-500/30 flex items-center justify-center text-lg shrink-0">
-                        🔍
-                    </div>
-                    <div>
-                        <h3 class="font-black text-base sm:text-lg text-white">جستجوی پیشرفته صنعتی</h3>
-                        <p class="text-xs text-slate-400">جستجوی آنی در محصولات، خدمات مهندسی، پروژه‌ها و گواهی‌نامه‌ها</p>
-                    </div>
-                </div>
+		<div class="flex-1 overflow-y-auto overscroll-contain" x-ref="scroller">
+			<p class="sr-only" aria-live="polite" x-text="status"></p>
 
-                <!-- Close Button -->
-                <button @click="searchOpen = false" aria-label="بستن جستجو" class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 hover:bg-red-600 hover:border-red-500 text-slate-400 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-md shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
-            </div>
+			<!-- Empty state -->
+			<div x-show="query.trim().length < 2" class="grid gap-6 p-4 sm:p-6">
+				<div x-show="recent.length">
+					<div class="mb-2 flex items-center justify-between">
+						<p class="text-xs font-semibold text-slate-600">جستجوهای اخیر</p>
+						<button type="button" class="text-xs text-slate-600 hover:text-primary-700" @click="clearRecent()">پاک کردن</button>
+					</div>
+					<div class="flex flex-wrap gap-2">
+						<template x-for="r in recent" :key="r">
+							<button type="button" class="chip" @click="pick(r)" x-text="r"></button>
+						</template>
+					</div>
+				</div>
+				<div>
+					<p class="mb-2 text-xs font-bold text-slate-500">جستجوهای پرتکرار</p>
+					<div class="flex flex-wrap gap-2">
+						<?php foreach ( $psb_popular as $psb_term ) : ?>
+							<button type="button" class="chip" @click="pick(<?php echo esc_attr( wp_json_encode( $psb_term ) ); ?>)"><?php echo esc_html( $psb_term ); ?></button>
+						<?php endforeach; ?>
+					</div>
+				</div>
+				<a class="flex items-center gap-3 rounded-card border border-line bg-slate-50 p-4 transition-colors hover:border-line-strong" href="<?php echo esc_url( psb_quote_url() ); ?>">
+					<span class="icon-tile"><?php echo psb_icon( 'quote' ); // phpcs:ignore ?></span>
+					<span class="flex-1"><strong class="block text-sm text-dark">استعلام قیمت</strong><span class="text-xs text-slate-600">مشخصات پروژه را ارسال کنید تا کارشناسان فروش با شما تماس بگیرند</span></span>
+					<?php echo psb_icon( 'arrow', 'btn-arrow size-4 text-primary-700' ); // phpcs:ignore ?>
+				</a>
+			</div>
 
-            <!-- Main Input Field -->
-            <div class="relative flex items-center">
-                <input type="text"
-                       x-model="query"
-                       @input="performSearch()"
-                       placeholder="نام کالا، سطح ولتاژ، استاندارد یا خدمات مورد نظر را تایپ کنید..."
-                       class="w-full bg-slate-900 border border-slate-700/80 rounded-2xl py-3.5 px-12 text-sm sm:text-base text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all font-sans"
-                       autofocus />
+			<!-- Results (combobox listbox) -->
+			<div x-show="query.trim().length >= 2 && groups.length" role="listbox" id="psb-search-list" aria-label="نتایج جستجو" class="p-2 sm:p-3">
+				<template x-for="g in groups" :key="g.type">
+					<div role="group" :aria-labelledby="'psb-g-' + g.type" class="mb-2">
+						<div class="flex items-center justify-between px-3 pb-1 pt-3">
+							<p class="text-xs font-semibold text-slate-600" :id="'psb-g-' + g.type"><span x-text="g.label"></span> <span class="text-slate-600" x-text="'(' + faNum(g.count) + ')'"></span></p>
+							<a x-show="g.count > g.items.length" :href="g.more" class="text-xs font-semibold text-primary-700 hover:underline" tabindex="-1">همه</a>
+						</div>
+						<template x-for="it in g.items" :key="it.id">
+							<a role="option" :id="'psb-opt-' + it.idx" :href="it.url" :aria-selected="active === it.idx"
+								@mouseenter="active = it.idx" @click="remember()"
+								class="flex items-start gap-3 rounded-control px-3 py-2.5 outline-none transition-colors aria-selected:bg-slate-100"
+								tabindex="-1">
+								<span class="icon-tile !size-10 shrink-0 overflow-hidden !p-0">
+									<template x-if="it.thumb"><img :src="it.thumb" alt="" width="40" height="40" loading="eager" decoding="async" class="size-full object-cover"></template>
+									<template x-if="!it.thumb"><svg class="size-5" aria-hidden="true"><use :href="'#i-' + (icons[it.type] || 'doc')"></use></svg></template>
+								</span>
+								<span class="min-w-0 flex-1">
+									<span class="search-hl block truncate text-sm font-bold text-dark" x-html="it.title"></span>
+									<span x-show="it.meta" class="block truncate text-xs font-medium text-slate-600" x-text="it.meta"></span>
+									<span class="search-hl mt-0.5 line-clamp-2 text-xs leading-6 text-slate-600" x-html="it.snippet"></span>
+								</span>
+							</a>
+						</template>
+					</div>
+				</template>
+				<a :href="resultsUrl()" class="mx-1 mt-1 flex items-center justify-between rounded-control border border-line px-3 py-3 text-sm font-semibold text-foreground hover:bg-slate-50">
+					<span x-text="'مشاهده همه ' + faNum(total) + ' نتیجه برای «' + query.trim() + '»'"></span>
+					<?php echo psb_icon( 'arrow', 'btn-arrow size-4' ); // phpcs:ignore ?>
+				</a>
+			</div>
 
-                <!-- Search Icon Left -->
-                <div class="absolute right-4 text-slate-400 pointer-events-none">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                </div>
+			<!-- No results -->
+			<div x-show="query.trim().length >= 2 && !loading && searched && !groups.length" class="p-6 text-center">
+				<p class="text-base font-bold text-dark">نتیجه‌ای برای «<span x-text="query.trim()"></span>» پیدا نشد</p>
+				<p class="mt-1 text-sm text-slate-500">املای عبارت را بررسی کنید یا یکی از این جستجوها را امتحان کنید:</p>
+				<div class="mt-4 flex flex-wrap justify-center gap-2">
+					<template x-for="s in suggest" :key="s">
+						<button type="button" class="chip" @click="pick(s)" x-text="s"></button>
+					</template>
+				</div>
+				<div class="mt-6 flex flex-wrap justify-center gap-3">
+					<a class="btn btn-primary" href="<?php echo esc_url( psb_quote_url() ); ?>">ثبت درخواست استعلام قیمت</a>
+					<?php if ( $psb_phone ) : ?>
+						<a class="btn btn-secondary" href="<?php echo esc_url( $psb_phone['href'] ); ?>"><?php echo psb_icon( 'phone' ); // phpcs:ignore ?><span class="ltr-num"><?php echo esc_html( psb_fa_num( psb_format_phone( $psb_phone['number'] ) ) ); ?></span></a>
+					<?php endif; ?>
+				</div>
+			</div>
+		</div>
 
-                <!-- Loader or Clear Button Right -->
-                <div class="absolute left-4 flex items-center gap-2">
-                    <template x-if="isSearching">
-                        <svg class="w-5 h-5 animate-spin text-blue-400" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                    </template>
-                    <template x-if="query.length > 0 && !isSearching">
-                        <button @click="clearQuery()" class="text-slate-400 hover:text-white transition-colors cursor-pointer">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                        </button>
-                    </template>
-                </div>
-            </div>
-        </div>
-
-        <!-- 2. Multi-CPT Tab Bar -->
-        <div x-show="query.length >= 2" class="p-3 bg-slate-100 border-b border-slate-200 flex items-center gap-2 overflow-x-auto custom-scrollbar shrink-0">
-            <button @click="setTab('all')"
-                    :class="activeTab === 'all' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-200'"
-                    class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
-                <span>همه نتایج</span>
-                <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-black/20" x-text="counts.all || 0"></span>
-            </button>
-
-            <button @click="setTab('services')"
-                    :class="activeTab === 'services' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-200'"
-                    class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
-                <span>⚡ خدمات مهندسی</span>
-                <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-black/20" x-text="counts.services || 0"></span>
-            </button>
-
-            <button @click="setTab('portfolio')"
-                    :class="activeTab === 'portfolio' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-200'"
-                    class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
-                <span>🏢 نمونه کارها</span>
-                <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-black/20" x-text="counts.portfolio || 0"></span>
-            </button>
-
-            <button @click="setTab('certificates')"
-                    :class="activeTab === 'certificates' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-200'"
-                    class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
-                <span>🏆 گواهی‌نامه‌ها</span>
-                <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-black/20" x-text="counts.certificates || 0"></span>
-            </button>
-
-            <button @click="setTab('confirmation')"
-                    :class="activeTab === 'confirmation' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-200'"
-                    class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
-                <span>🏛️ تأییدیه‌ها</span>
-                <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-black/20" x-text="counts.confirmation || 0"></span>
-            </button>
-
-            <button @click="setTab('type-test')"
-                    :class="activeTab === 'type-test' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-200'"
-                    class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
-                <span>🔬 تایپ‌تست‌ها</span>
-                <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-black/20" x-text="counts['type-test'] || 0"></span>
-            </button>
-
-            <button @click="setTab('post')"
-                    :class="activeTab === 'post' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-200'"
-                    class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
-                <span>📰 مقالات & اخبار</span>
-                <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-black/20" x-text="counts.post || 0"></span>
-            </button>
-        </div>
-
-        <!-- 3. Results Container -->
-        <div class="p-6 overflow-y-auto flex-1 bg-slate-50/50">
-            <!-- Initial State (Before search) -->
-            <template x-if="query.length < 2">
-                <div class="py-8 text-center space-y-4">
-                    <span class="text-xs font-bold text-slate-500 block">عبارات پیشنهادی برای جستجوی سریع:</span>
-                    <div class="flex flex-wrap items-center justify-center gap-2 max-w-xl mx-auto">
-                        <button @click="query = 'تابلو کشویی'; performSearch()" class="px-3 py-1.5 rounded-xl bg-white hover:bg-blue-50 border border-slate-200 text-xs font-medium text-slate-700 hover:text-blue-700 transition-all shadow-sm cursor-pointer">⚡ تابلو کشویی</button>
-                        <button @click="query = 'توانیر'; performSearch()" class="px-3 py-1.5 rounded-xl bg-white hover:bg-blue-50 border border-slate-200 text-xs font-medium text-slate-700 hover:text-blue-700 transition-all shadow-sm cursor-pointer">🏛️ تأییدیه توانیر</button>
-                        <button @click="query = 'تست'; performSearch()" class="px-3 py-1.5 rounded-xl bg-white hover:bg-blue-50 border border-slate-200 text-xs font-medium text-slate-700 hover:text-blue-700 transition-all shadow-sm cursor-pointer">🔬 تست‌های آزمایشگاهی</button>
-                        <button @click="query = 'ISO 9001'; performSearch()" class="px-3 py-1.5 rounded-xl bg-white hover:bg-blue-50 border border-slate-200 text-xs font-medium text-slate-700 hover:text-blue-700 transition-all shadow-sm cursor-pointer">🏆 استاندارد ISO 9001</button>
-                        <button @click="query = 'فشار متوسط'; performSearch()" class="px-3 py-1.5 rounded-xl bg-white hover:bg-blue-50 border border-slate-200 text-xs font-medium text-slate-700 hover:text-blue-700 transition-all shadow-sm cursor-pointer">⚡ تابلو فشار متوسط</button>
-                    </div>
-                </div>
-            </template>
-
-            <!-- Results Grid -->
-            <div x-show="query.length >= 2" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" x-html="htmlResults">
-            </div>
-        </div>
-
-    </div>
+		<p class="hidden shrink-0 items-center gap-4 border-t border-line bg-slate-50 px-4 py-2 text-[0.7rem] text-slate-500 sm:flex">
+			<span><kbd class="rounded border border-line bg-white px-1.5 font-mono">↑↓</kbd> حرکت</span>
+			<span><kbd class="rounded border border-line bg-white px-1.5 font-mono">Enter</kbd> باز کردن</span>
+			<span><kbd class="rounded border border-line bg-white px-1.5 font-mono">Esc</kbd> بستن</span>
+			<span class="ms-auto"><kbd class="rounded border border-line bg-white px-1.5 font-mono" dir="ltr">Ctrl K</kbd> یا <kbd class="rounded border border-line bg-white px-1.5 font-mono">/</kbd> برای جستجو</span>
+		</p>
+	</div>
 </section>
+<script>
+window.psbSearchIcons = <?php echo wp_json_encode( $psb_icons, JSON_HEX_TAG | JSON_HEX_AMP ); ?>;
+</script>

@@ -2,43 +2,31 @@
 	"$schema": "https://schemas.wp.org/trunk/theme.json",
 	"version": 3,
 	"settings": {
+		"appearanceTools": false,
 		"color": {
+			"defaultPalette": false,
+			"defaultGradients": false,
 			"palette": [
-				{
-					"slug": "background",
-					"color": "#F8FAFC",
-					"name": "Background"
-				},
-				{
-					"slug": "foreground",
-					"color": "#0F172A",
-					"name": "Foreground"
-				},
-				{
-					"slug": "primary",
-					"color": "#1D4ED8",
-					"name": "Primary"
-				},
-				{
-					"slug": "secondary",
-					"color": "#0284C7",
-					"name": "Secondary"
-				},
-				{
-					"slug": "cta",
-					"color": "#F59E0B",
-					"name": "CTA"
-				},
-				{
-					"slug": "tertiary",
-					"color": "#0369a1",
-					"name": "Tertiary"
-				}
+				{ "slug": "background", "color": "#F8FAFC", "name": "Background" },
+				{ "slug": "foreground", "color": "#0F172A", "name": "Foreground" },
+				{ "slug": "primary", "color": "#1A3DA3", "name": "Primary (navy-blue 700)" },
+				{ "slug": "primary-50", "color": "#EEF4FF", "name": "Primary 50" },
+				{ "slug": "primary-900", "color": "#1A2F69", "name": "Primary 900" },
+				{ "slug": "secondary", "color": "#0284C7", "name": "Secondary" },
+				{ "slug": "dark", "color": "#0B1220", "name": "Dark" },
+				{ "slug": "cta", "color": "#F59E0B", "name": "CTA amber" },
+				{ "slug": "tertiary", "color": "#0369A1", "name": "Tertiary" }
+			]
+		},
+		"typography": {
+			"defaultFontSizes": false,
+			"fontFamilies": [
+				{ "slug": "peyda", "name": "Peyda", "fontFamily": "Peyda, Tahoma, system-ui, sans-serif" }
 			]
 		},
 		"layout": {
-			"contentSize": "80rem",
-			"wideSize": "60rem"
+			"contentSize": "60rem",
+			"wideSize": "80rem"
 		}
 	}
 }

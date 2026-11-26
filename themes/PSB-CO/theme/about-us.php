@@ -1,202 +1,314 @@
 <?php
 /**
- * Template Name: About Us Page
- * PSB-CO High-Voltage Electrical Panel Manufacturing Theme
- * Ultra-Minimal Light Corporate UI
+ * Template Name: درباره ما
+ *
+ * About: hero, verified stats (ACF about_stats), story (page content), timeline from ۱۳۵۵
+ * (facts verified from documents on the site), values (ACF), capabilities, credentials teaser,
+ * team and factory gallery (when filled), FAQ.
+ *
+ * @package bluebox
  */
 
 get_header();
 
-$hero_badge = get_field('about_hero_badge') ?: 'نزدیک به نیم قرن سابقه در صنعت تابلوسازی برق';
-$hero_subtitle = get_field('about_hero_subtitle') ?: 'طراحی، تولید و مونتاژ انواع تابلوهای برق فشار ضعیف، متوسط، کشویی و پست‌های پاساژ بر اساس استانداردهای بین‌المللی';
-$stats = get_field('about_stats');
-$values = get_field('about_values');
-$owners = get_field('owners');
-$factory_gallery = get_field('about_factory_gallery');
-$thumbnail = get_the_post_thumbnail_url(get_the_ID(), 'full');
-?>
+while ( have_posts() ) :
+	the_post();
+	$psb_id      = get_the_ID();
+	$psb_badge   = psb_field( 'about_hero_badge', 'فعال در صنعت تابلوسازی برق از سال ' . psb_fa_num( PSB_FOUNDED_JALALI ), $psb_id );
+	$psb_sub     = psb_field( 'about_hero_subtitle', '', $psb_id );
+	$psb_stats   = psb_field( 'about_stats', array(), $psb_id );
+	$psb_values  = psb_field( 'about_values', array(), $psb_id );
+	$psb_owners  = psb_field( 'owners', array(), $psb_id );
+	$psb_gallery = psb_field( 'about_factory_gallery', array(), $psb_id );
 
-<article class="bg-slate-50/70 text-slate-900 min-h-screen py-8 md:py-12 select-none">
-    <div class="container mx-auto px-4 md:px-8 max-w-6xl space-y-12">
-        
-        <!-- 1. Hero & Breadcrumb Box -->
-        <header class="bg-white p-6 md:p-10 rounded-2xl border border-slate-200/80 shadow-sm space-y-4 text-center max-w-4xl mx-auto" data-aos="fade-up">
-            <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-                <?= esc_html($hero_badge); ?>
-            </span>
-            <h1 class="text-3xl sm:text-5xl font-black text-slate-900 leading-tight tracking-tight">
-                <?php the_title(); ?>
-            </h1>
-            <p class="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
-                <?= esc_html($hero_subtitle); ?>
-            </p>
-        </header>
+	get_template_part(
+		'template-parts/global/page-hero',
+		null,
+		array(
+			'eyebrow' => $psb_badge,
+			'lead'    => $psb_sub,
+			'image'   => get_post_thumbnail_id(),
+			'actions' => '<a class="btn btn-primary" href="' . esc_url( psb_quote_url() ) . '">استعلام قیمت ' . psb_icon( 'arrow', 'btn-arrow' ) . '</a><a class="btn btn-outline" href="' . esc_url( psb_shop_url() ) . '">محصولات</a>',
+		)
+	);
+	?>
 
-        <!-- 2. Main Featured Image & Key Stats Grid -->
-        <section class="space-y-8" data-aos="fade-up">
-            <?php if ($thumbnail) : ?>
-                <div class="relative rounded-2xl overflow-hidden border border-slate-200 bg-white p-2 shadow-sm">
-                    <div class="overflow-hidden w-full rounded-xl bg-slate-100 aspect-[21/9] max-h-[460px]">
-                        <img src="<?= esc_url($thumbnail); ?>" alt="<?php the_title_attribute(); ?>" class="w-full h-full object-cover" fetchpriority="high" />
-                    </div>
-                </div>
-            <?php endif; ?>
+	<?php if ( is_array( $psb_stats ) && $psb_stats ) : ?>
+		<section class="border-b border-line bg-white py-section-sm" aria-label="آمار کلیدی">
+			<div class="container">
+				<dl class="stats">
+					<?php foreach ( $psb_stats as $psb_s ) : ?>
+						<?php if ( ! empty( $psb_s['number'] ) && ! empty( $psb_s['label'] ) ) : ?>
+							<div class="stat">
+								<dt class="stat-label order-last"><?php echo esc_html( $psb_s['label'] ); ?></dt>
+								<dd class="stat-value"><?php echo esc_html( psb_fa_num( $psb_s['number'] ) ); ?></dd>
+							</div>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				</dl>
+			</div>
+		</section>
+	<?php endif; ?>
 
-            <!-- Key Stats Counter Cards -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <?php if ($stats) : 
-                    foreach ($stats as $st) : ?>
-                        <div class="p-5 rounded-2xl bg-white border border-slate-200/80 text-center shadow-sm space-y-1">
-                            <strong class="block text-2xl sm:text-4xl font-black text-blue-700 font-mono"><?= esc_html($st['number']); ?></strong>
-                            <span class="text-xs sm:text-sm text-slate-600 font-medium"><?= esc_html($st['label']); ?></span>
-                        </div>
-                    <?php endforeach;
-                else : ?>
-                    <!-- Default Electrical Panel Industry Stats -->
-                    <div class="p-5 rounded-2xl bg-white border border-slate-200/80 text-center shadow-sm space-y-1">
-                        <strong class="block text-2xl sm:text-4xl font-black text-blue-700 font-mono">50+</strong>
-                        <span class="text-xs sm:text-sm text-slate-600 font-medium">سال سابقه تخصصی</span>
-                    </div>
-                    <div class="p-5 rounded-2xl bg-white border border-slate-200/80 text-center shadow-sm space-y-1">
-                        <strong class="block text-2xl sm:text-4xl font-black text-blue-700 font-mono">500+</strong>
-                        <span class="text-xs sm:text-sm text-slate-600 font-medium">پروژه کلید در دست</span>
-                    </div>
-                    <div class="p-5 rounded-2xl bg-white border border-slate-200/80 text-center shadow-sm space-y-1">
-                        <strong class="block text-2xl sm:text-4xl font-black text-blue-700 font-mono">500m²</strong>
-                        <span class="text-xs sm:text-sm text-slate-600 font-medium">مساحت خطوط تولید</span>
-                    </div>
-                    <div class="p-5 rounded-2xl bg-white border border-slate-200/80 text-center shadow-sm space-y-1">
-                        <strong class="block text-2xl sm:text-4xl font-black text-emerald-600 font-mono">100%</strong>
-                        <span class="text-xs sm:text-sm text-slate-600 font-medium">رعایت استانداردهای IEC</span>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </section>
+	<section class="py-section" aria-labelledby="about-story-title">
+		<?php
+		// Intro photo (spec 6.5): factory gallery first image, else the approved factory photos (1410 test lab, 1726 interior, 1442 CNC).
+		$psb_intro_img = ( is_array( $psb_gallery ) && $psb_gallery ) ? $psb_gallery[0] : 0;
+		if ( ! $psb_intro_img ) {
+			foreach ( array( 1410, 1726, 1442 ) as $psb_try ) {
+				if ( wp_attachment_is_image( $psb_try ) && (int) $psb_try !== (int) get_post_thumbnail_id() ) {
+					$psb_intro_img = $psb_try;
+					break;
+				}
+			}
+		}
+		?>
+		<div class="container grid items-start gap-10 lg:grid-cols-12 lg:gap-6">
+			<div class="min-w-0 lg:col-span-7 lg:pe-10">
+				<span class="eyebrow">معرفی شرکت</span>
+				<h2 id="about-story-title" class="section-title"><?php echo esc_html( psb_brand_name() ); ?>؛ <?php echo esc_html( psb_fa_num( psb_years_active() ) ); ?> سال تابلوسازی</h2>
+				<div class="article-prose mt-6"><?php the_content(); ?></div>
+			</div>
+			<?php if ( $psb_intro_img ) : ?>
+				<figure class="lg:sticky lg:col-span-5" style="top:calc(var(--header-h,4rem) + 2rem)">
+					<?php echo psb_image( $psb_intro_img, 'large', array( 'alt' => 'کارخانه ' . psb_brand_name(), 'sizes' => '(min-width: 1024px) 30rem, 92vw', 'class' => 'aspect-[4/5] w-full rounded-card object-cover' ) ); // phpcs:ignore ?>
+				</figure>
+			<?php endif; ?>
+		</div>
+	</section>
 
-        <!-- 3. Company History & Story Content -->
-        <section class="bg-white p-6 md:p-10 rounded-2xl border border-slate-200/80 shadow-sm space-y-6" data-aos="fade-up">
-            <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
-                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-center font-bold text-lg">
-                    📜
-                </div>
-                <div>
-                    <h2 class="text-xl font-bold text-slate-900">تاریخچه و معرفی شرکت پارس سویچ برد</h2>
-                    <p class="text-xs text-slate-500">داستان رشد و افتخارات نیم قرن حضور در صنعت برق ایران</p>
-                </div>
-            </div>
+	<?php
+	// Timeline: only facts documented on the site (company-facts.md). Each item links to its source.
+	$psb_link = function ( $type, $slug_or_id ) {
+		$p = is_numeric( $slug_or_id ) ? get_post( (int) $slug_or_id ) : get_page_by_path( $slug_or_id, OBJECT, $type );
+		return ( $p && 'publish' === $p->post_status && $type === $p->post_type ) ? get_permalink( $p ) : psb_archive_url( $type );
+	};
+	$psb_timeline = apply_filters(
+		'psb_about_timeline',
+		array(
+			array( psb_fa_num( PSB_FOUNDED_JALALI ), 'تأسیس شرکت', 'آغاز فعالیت شرکت تولیدی و صنعتی پارس سوئیچ بورد در طراحی و ساخت تابلوهای برق.', '' ),
+			array( '۱۳۶۴', 'پروانه بهره‌برداری از وزارت صنایع', 'صدور کارت شناسایی کارگاه، معادل پروانه بهره‌برداری، برای تولید تابلوهای برق فشار ضعیف.', '' ),
+			array( '۱۳۶۸', 'توسعه ظرفیت تولید', 'اصلاح ظرفیت تولید به ۱۲۰۰ سلول در سال در یک شیفت، شامل تابلوهای فشار متوسط، فشار ضعیف و MCC.', '' ),
+			array( '۱۳۸۰', 'تأمین‌کننده نمونه صنایع شیر ایران', 'انتخاب به‌عنوان تأمین‌کننده نمونه ماشین‌آلات و تجهیزات صنایع شیر ایران (پگاه).', '' ),
+			array( '۱۳۸۲', 'آزمون تابلوهای ۲۴ کیلوولت متال‌کلد', 'قبولی در آزمون استقامت عایقی فرکانس قدرت تابلوهای ۲۴ کیلوولت در آزمایشگاه EPIL.', psb_archive_url( 'type-test' ) ),
+			array( '۱۳۸۳', 'آزمون نوعی باس‌داکت ۴۰۰۰ آمپر', 'گواهی آزمون نوعی باس‌داکت 4000 A / 400 V مطابق IEC 60439-1 و IEC 60439-2 از آزمایشگاه EPIL.', psb_archive_url( 'type-test' ) ),
+			array( '۱۳۸۵', 'ارزیابی سازندگان تابلو برق', 'کسب تأیید کامل در هر شش گروه، شامل تابلوهای فشار ضعیف و فشار متوسط ثابت و کشویی، در ارزیابی انجمن صنفی تولیدکنندگان تابلوهای برق ایران.', '' ),
+			array( '۱۳۹۲', 'ثبت در وندورلیست شرکت ملی مهندسی و ساختمان نفت ایران', 'تابلوهای فشار ضعیف ثابت تا ۴۰۰ ولت.', $psb_link( 'confirmation', 'low-voltage-switchboard-approval-national-iranian-oil-engineering-and-construction-company' ) ),
+			array( '۱۳۹۳', 'گزارش‌های آزمون EPIL و لیسانس SAREL', 'آزمون درجه حفاظت IP54 و IP65 بدنه‌ها و حق ساخت تابلوهای فشار متوسط SYStem6.', psb_archive_url( 'type-test' ) ),
+			array( '۱۳۹۷', 'آزمون تابلو ایزوله بیمارستانی', 'آزمون ایمنی بر اساس IEC 60601-1 در آزمایشگاه EPIL با نتیجه قبول.', psb_archive_url( 'type-test' ) ),
+			array( '۱۳۹۸–۱۳۹۹', 'تأییدیه‌های توانیر و شرکت‌های توزیع نیروی برق', 'درج در فهرست سازندگان تأییدشده توانیر و تأییدیه‌های شرکت‌های توزیع نیروی برق استان تهران و تهران بزرگ.', $psb_link( 'confirmation', 'tavanir-approval' ) ),
+			array( psb_fa_num( psb_jalali_year() ), psb_fa_num( psb_years_active() ) . ' سال فعالیت', 'طراحی، ساخت، آزمون و نصب تابلوهای فشار متوسط، فشار ضعیف و فرمان و کنترل برای شبکه توزیع، صنایع و ساختمان‌ها.', '' ),
+		)
+	);
+	?>
+	<section class="border-y border-line bg-white py-section" aria-labelledby="about-timeline-title">
+		<div class="container grid gap-10 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:gap-16">
+			<?php
+			get_template_part(
+				'template-parts/global/section-head',
+				null,
+				array(
+					'id'      => 'about-timeline-title',
+					'eyebrow' => 'مسیر شرکت',
+					'title'   => 'از ' . psb_fa_num( PSB_FOUNDED_JALALI ) . ' تا امروز',
+					'lead'    => 'مهم‌ترین نقطه‌های مسیر شرکت، بر اساس اسنادی که در همین سایت منتشر شده است.',
+				)
+			);
+			?>
+			<ol class="timeline">
+				<?php
+				$psb_last = count( $psb_timeline ) - 1;
+				foreach ( $psb_timeline as $psb_i => $psb_t ) :
+					?>
+					<li class="timeline-item <?php echo $psb_i === $psb_last ? 'is-current' : ''; ?>">
+						<span class="timeline-year"><?php echo esc_html( $psb_t[0] ); ?></span>
+						<h3 class="timeline-title"><?php echo esc_html( $psb_t[1] ); ?></h3>
+						<p class="timeline-text"><?php echo esc_html( $psb_t[2] ); ?>
+							<?php if ( ! empty( $psb_t[3] ) ) : ?>
+								<a class="link-arrow mt-1" href="<?php echo esc_url( $psb_t[3] ); ?>">مشاهده سند <?php echo psb_icon( 'arrow', 'btn-arrow size-4' ); // phpcs:ignore ?></a>
+							<?php endif; ?>
+						</p>
+					</li>
+				<?php endforeach; ?>
+			</ol>
+		</div>
+	</section>
 
-            <div class="prose prose-slate max-w-none text-slate-700 leading-relaxed text-justify space-y-4">
-                <?php the_content(); ?>
-            </div>
-        </section>
+	<?php if ( is_array( $psb_values ) && $psb_values ) : ?>
+		<section class="py-section" aria-labelledby="about-values-title">
+			<div class="container">
+				<?php
+				get_template_part(
+					'template-parts/global/section-head',
+					null,
+					array(
+						'id'      => 'about-values-title',
+						'eyebrow' => 'ارزش‌ها',
+						'title'   => 'آنچه به آن متعهدیم',
+											)
+				);
+				$psb_icons = array( 'iso', 'shield', 'users', 'target', 'cog', 'eye' );
+				?>
+				<div class="grid gap-gutter md:grid-cols-3">
+					<?php foreach ( $psb_values as $psb_i => $psb_v ) : ?>
+						<?php
+						if ( empty( $psb_v['title'] ) ) {
+							continue;
+						}
+						$psb_icon = ( ! empty( $psb_v['icon'] ) && psb_icon( sanitize_key( $psb_v['icon'] ) ) ) ? sanitize_key( $psb_v['icon'] ) : $psb_icons[ $psb_i % count( $psb_icons ) ];
+						?>
+						<article class="panel">
+							<?php echo psb_icon( $psb_icon, 'mb-4 size-7 text-slate-700' ); // phpcs:ignore ?>
+							<h3 class="text-h3 font-bold text-foreground"><?php echo esc_html( $psb_v['title'] ); ?></h3>
+							<?php if ( ! empty( $psb_v['description'] ) ) : ?>
+								<p class="mt-2 text-sm leading-7 text-slate-600"><?php echo esc_html( $psb_v['description'] ); ?></p>
+							<?php endif; ?>
+						</article>
+					<?php endforeach; ?>
+				</div>
+			</div>
+		</section>
+	<?php endif; ?>
 
-        <!-- 4. Reusable Confirmations & Vendor Approvals Component (Grid Mode) -->
-        <?php get_template_part('template-parts/confirmation/recently-confirmations', null, array('layout' => 'grid', 'postCount' => 4)); ?>
+	<section class="bg-tech-grid-light bg-slate-50 py-section" aria-labelledby="about-cap-title">
+		<div class="container">
+			<?php
+			get_template_part(
+				'template-parts/global/section-head',
+				null,
+				array(
+					'id'      => 'about-cap-title',
+					'eyebrow' => 'توانمندی‌ها',
+					'title'   => 'محصولات و امکانات تولید',
+					'lead'    => 'گروه‌های تابلویی که در فهرست سازندگان توانیر برای شرکت درج شده و امکاناتی که همه مراحل ساخت در آن انجام می‌شود.',
+				)
+			);
+			$psb_products = get_posts( array( 'post_type' => 'product', 'post_status' => 'publish', 'numberposts' => 6 ) );
+			$psb_services = get_posts( array( 'post_type' => 'services', 'post_status' => 'publish', 'numberposts' => 6 ) );
+			$psb_tavanir  = array( 'تابلو سنجش و توزیع', 'تابلو فشار ضعیف ثابت', 'تابلو فشار متوسط سنتی', 'تابلو فشار متوسط کمپکت', 'تابلو کنترل و پروسس', 'تابلو حفاظت و کنترل نیروگاهی' );
+			?>
+			<div class="grid gap-gutter lg:grid-cols-3">
+				<div class="rounded-card border border-line bg-white p-6">
+					<h3 class="text-base font-bold text-dark">گروه‌های درج‌شده در فهرست توانیر</h3>
+					<ul class="mt-4 grid gap-2 text-sm text-slate-700" role="list">
+						<?php foreach ( $psb_tavanir as $psb_t ) : ?>
+							<li class="flex items-center gap-2"><?php echo psb_icon( 'check', 'size-4 text-foreground' ); // phpcs:ignore ?><?php echo esc_html( $psb_t ); ?></li>
+						<?php endforeach; ?>
+					</ul>
+				</div>
+				<?php if ( $psb_products ) : ?>
+					<div class="rounded-card border border-line bg-white p-6 max-lg:hidden">
+						<h3 class="text-base font-bold text-dark">محصولات</h3>
+						<ul class="mt-4 grid gap-1" role="list">
+							<?php foreach ( $psb_products as $psb_p ) : ?>
+								<li><a class="flex min-h-11 items-center justify-between rounded-control px-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-700" href="<?php echo esc_url( get_permalink( $psb_p ) ); ?>"><?php echo esc_html( get_the_title( $psb_p ) ); ?><?php echo psb_icon( 'chevron', 'size-4 text-slate-500' ); // phpcs:ignore ?></a></li>
+							<?php endforeach; ?>
+						</ul>
+					</div>
+				<?php endif; ?>
+				<?php if ( $psb_services ) : ?>
+					<div class="rounded-card border border-line bg-white p-6 max-lg:hidden">
+						<h3 class="text-base font-bold text-dark">کارخانه و آزمایشگاه</h3>
+						<ul class="mt-4 grid gap-1" role="list">
+							<?php foreach ( $psb_services as $psb_p ) : ?>
+								<li><a class="flex min-h-11 items-center justify-between rounded-control px-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-700" href="<?php echo esc_url( get_permalink( $psb_p ) ); ?>"><?php echo esc_html( get_the_title( $psb_p ) ); ?><?php echo psb_icon( 'chevron', 'size-4 text-slate-500' ); // phpcs:ignore ?></a></li>
+							<?php endforeach; ?>
+						</ul>
+					</div>
+				<?php endif; ?>
+			</div>
+		</div>
+	</section>
 
-        <!-- 5. Reusable Certificates & ISO Quality Standards Component (Grid Mode) -->
-        <?php get_template_part('template-parts/certificates/recently-certificates', null, array('layout' => 'grid', 'postCount' => 4)); ?>
+	<section class="py-section" aria-labelledby="about-creds-title">
+		<div class="container">
+			<?php
+			get_template_part(
+				'template-parts/global/section-head',
+				null,
+				array(
+					'id'      => 'about-creds-title',
+					'eyebrow' => 'اعتبارنامه‌ها',
+					'title'   => 'تأییدیه‌ها و گزارش‌های آزمون',
+					'link'    => array(
+						'url'   => psb_archive_url( 'confirmation' ),
+						'label' => 'همه تأییدیه‌ها',
+					),
+				)
+			);
+			?>
+			<?php
+			$psb_docs = get_posts(
+				array(
+					'post_type'   => array_values( array_filter( array( 'confirmation', 'type-test' ), 'post_type_exists' ) ),
+					'post_status' => 'publish',
+					'numberposts' => 6,
+					'orderby'     => 'type',
+					'order'       => 'ASC',
+				)
+			);
+			?>
+			<?php if ( $psb_docs ) : ?>
+				<div class="register border-t-2 border-foreground">
+					<?php
+					foreach ( $psb_docs as $psb_doc ) {
+						get_template_part( 'template-parts/certificates/reg-row', null, array( 'post' => $psb_doc->ID ) );
+					}
+					?>
+				</div>
+			<?php endif; ?>
+			<?php if ( PSB_ISO_9001 ) : ?>
+				<p class="mt-6 text-[0.9375rem] text-slate-700">سیستم مدیریت کیفیت: دارای گواهینامه <span class="lat">ISO 9001</span></p>
+			<?php endif; ?>
+		</div>
+	</section>
 
-        <!-- 6. Reusable Type-Tests & Laboratory Standards Component (Grid Mode) -->
-        <?php get_template_part('template-parts/type-test/recently-type-tests', null, array('layout' => 'grid', 'postCount' => 4)); ?>
+	<?php if ( is_array( $psb_owners ) && $psb_owners ) : ?>
+		<section class="border-t border-line bg-white py-section-sm" aria-labelledby="about-team-title">
+			<div class="container">
+				<?php get_template_part( 'template-parts/global/section-head', null, array( 'id' => 'about-team-title', 'eyebrow' => 'مدیریت', 'title' => 'مدیران شرکت' ) ); ?>
+				<ul class="grid gap-gutter sm:grid-cols-2 lg:grid-cols-4" role="list">
+					<?php foreach ( $psb_owners as $psb_o ) : ?>
+						<?php
+						if ( empty( $psb_o['name'] ) ) {
+							continue;
+						}
+						?>
+						<li class="panel flex items-center gap-4">
+							<?php if ( ! empty( $psb_o['image'] ) ) : ?>
+								<?php echo psb_image( $psb_o['image'], 'thumbnail', array( 'alt' => $psb_o['name'], 'class' => 'size-16 shrink-0 rounded-control object-cover' ) ); // phpcs:ignore ?>
+							<?php else : ?>
+								
+							<?php endif; ?>
+							<div>
+								<h3 class="text-base font-bold text-dark"><?php echo esc_html( $psb_o['name'] ); ?></h3>
+								<?php if ( ! empty( $psb_o['position'] ) ) : ?>
+									<p class="text-xs text-primary-700"><?php echo esc_html( $psb_o['position'] ); ?></p>
+								<?php endif; ?>
+							</div>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+			</div>
+		</section>
+	<?php endif; ?>
 
-        <!-- 6. Mission, Vision & Core Values Section -->
-        <section class="space-y-6" data-aos="fade-up">
-            <div class="text-center space-y-1">
-                <h2 class="text-2xl font-black text-slate-900">بیانیه ارزش‌ها و سرلوحه کاری ما</h2>
-                <p class="text-slate-500 text-sm">ارزش‌های بنیادی که کیفیت محصولات پارس سویچ برد را تضمین می‌کند</p>
-            </div>
+	<?php if ( is_array( $psb_gallery ) && $psb_gallery ) : ?>
+		<div class="container pb-section-sm">
+			<?php get_template_part( 'template-parts/portfolio/gallery-rail', null, array( 'images' => $psb_gallery, 'title' => 'تصاویر کارخانه', 'alt' => 'کارخانه ' . psb_brand_name(), 'id' => 'about-gallery-title' ) ); ?>
+		</div>
+	<?php endif; ?>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <?php if ($values) : 
-                    foreach ($values as $val) : ?>
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-3">
-                            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-center text-xl">
-                                <?= esc_html($val['icon'] ?: '⚡'); ?>
-                            </div>
-                            <h3 class="text-base font-bold text-slate-900"><?= esc_html($val['title']); ?></h3>
-                            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed"><?= esc_html($val['description']); ?></p>
-                        </div>
-                    <?php endforeach;
-                else : ?>
-                    <!-- Default Corporate Values -->
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-3">
-                        <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-center text-xl">
-                            🎯
-                        </div>
-                        <h3 class="text-base font-bold text-slate-900">ماموریت سازمانی (Mission)</h3>
-                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">تولید تابلوهای برق با بالاترین ایمنی و استانداردهای جهانی جهت پایداری شبکه برق صنایع کشور.</p>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-3">
-                        <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-center text-xl">
-                            👁️
-                        </div>
-                        <h3 class="text-base font-bold text-slate-900">چشم‌انداز آینده (Vision)</h3>
-                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">پیشگامی در طراحی تابلوهای برق کشویی هوشمند و صادرات تجهیزات برق به کشورهای منطقه.</p>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-3">
-                        <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-center text-xl">
-                            🛡️
-                        </div>
-                        <h3 class="text-base font-bold text-slate-900">کیفیت و استانداردهای فنی</h3>
-                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">التزام ۱۰۰٪ به ضوابط استانداردهای بین‌المللی IEC 61439، IEC 62271 و سیستم مدیریت کیفیت ISO 9001.</p>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </section>
-
-        <!-- 7. Executive Team & Leadership Section -->
-        <?php if ($owners) : ?>
-            <section class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200/80 shadow-sm space-y-6" data-aos="fade-up">
-                <div class="text-center space-y-1">
-                    <h2 class="text-2xl font-black text-slate-900">تیم مدیریتی و ارشد مهندسی</h2>
-                    <p class="text-slate-500 text-sm">اعضای هیئت مدیره و مدیران متخصص تابلوسازی پارس سویچ برد</p>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    <?php foreach ($owners as $owner) : ?>
-                        <div class="flex items-center gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200/80 shadow-sm hover:border-blue-300 transition-colors">
-                            <?php if (!empty($owner['image']['url'])) : ?>
-                                <img class="w-16 h-16 rounded-xl object-cover border border-slate-200 shrink-0" src="<?= esc_url($owner['image']['url']); ?>" alt="<?= esc_attr($owner['name'] ?? ''); ?>" loading="lazy" />
-                            <?php else : ?>
-                                <div class="w-16 h-16 rounded-xl bg-blue-50 text-blue-700 font-bold flex items-center justify-center border border-blue-200 shrink-0 text-xl">
-                                    👤
-                                </div>
-                            <?php endif; ?>
-                            <div class="space-y-0.5">
-                                <h3 class="font-bold text-slate-900 text-sm sm:text-base"><?= esc_html($owner['name'] ?? ''); ?></h3>
-                                <span class="text-xs text-blue-700 font-medium block"><?= esc_html($owner['position'] ?? ''); ?></span>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            </section>
-        <?php endif; ?>
-
-        <!-- 8. Factory Facilities & Production Line Gallery -->
-        <?php if ($factory_gallery) : ?>
-            <section class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200/80 shadow-sm space-y-4" data-aos="fade-up">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                        <span class="text-blue-700">🏭</span>
-                        تصاویر خطوط تولید و کارخانه تابلوسازی
-                    </h3>
-                    <span class="text-xs text-slate-500 font-mono"><?= count($factory_gallery); ?> تصویر</span>
-                </div>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    <?php foreach ($factory_gallery as $img) : ?>
-                        <a href="<?= esc_url($img['url']); ?>" target="_blank" class="group relative rounded-xl overflow-hidden border border-slate-200 aspect-video bg-slate-100 block">
-                            <img src="<?= esc_url($img['sizes']['medium'] ?? $img['url']); ?>" alt="<?= esc_attr($img['title'] ?? 'کارخانه پارس سویچ برد'); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                            <div class="absolute inset-0 bg-blue-700/0 group-hover:bg-blue-700/10 transition-colors"></div>
-                        </a>
-                    <?php endforeach; ?>
-                </div>
-            </section>
-        <?php endif; ?>
-
-    </div>
-</article>
-
-<?php get_footer(); ?>
+	<?php
+	$psb_faq = psb_field( 'faq_list', array(), $psb_id );
+	if ( is_array( $psb_faq ) && $psb_faq ) :
+		?>
+		<section class="border-t border-line py-section-sm">
+			<div class="container max-w-content">
+				<?php get_template_part( 'template-parts/global/faq-list', null, array( 'items' => $psb_faq, 'title' => 'پرسش‌های متداول' ) ); ?>
+			</div>
+		</section>
+	<?php endif; ?>
+	<?php
+endwhile;
+get_footer();

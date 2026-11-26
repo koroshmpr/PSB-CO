@@ -25,6 +25,9 @@ if ( ! function_exists( 'wc_get_gallery_image_html' ) ) {
 }
 
 global $product;
+if ( ! is_a( $product, 'WC_Product' ) ) {
+	return;
+}
 
 $columns           = apply_filters( 'woocommerce_product_thumbnails_columns', 4 );
 $post_thumbnail_id = $product->get_image_id();

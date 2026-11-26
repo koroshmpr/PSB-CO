@@ -3,7 +3,7 @@
 
 		// Add a button to the editor toolbar
 		editor.addButton('inline_ad_button', {
-			text: '📣 تبلیغ جدید', // Using text and emoji ensures it never breaks like icon fonts do
+			text: 'تبلیغ جدید', // Using text and emoji ensures it never breaks like icon fonts do
 			tooltip: 'افزودن تبلیغ بین محتوا',
 			onclick: function() {
 
@@ -22,7 +22,7 @@
 							spacing: 5,
 							items: [
 								{ type: 'textbox', name: 'link', id: 'inline_ad_link', flex: 1 },
-								{ type: 'button', text: '🔗 جستجوی صفحات سایت', onclick: function() {
+								{ type: 'button', text: 'جستجوی صفحات سایت', onclick: function() {
 										var inputNode = document.getElementById('inline_ad_link');
 
 										if (typeof wpLink !== 'undefined') {
@@ -65,7 +65,7 @@
 							spacing: 5,
 							items: [
 								{ type: 'textbox', name: 'image', id: 'inline_ad_image', flex: 1 },
-								{ type: 'button', text: '🖼️ گالری تصاویر', onclick: function() {
+								{ type: 'button', text: 'گالری تصاویر', onclick: function() {
 										var inputNode = document.getElementById('inline_ad_image');
 
 										var frame = wp.media({
@@ -90,7 +90,7 @@
 							name: 'text',
 							id: 'inline_ad_text',
 							label: 'متن دکمه',
-							value: 'مشاهده و خرید'
+							value: 'مشاهده جزئیات'
 						}
 					],
 					onsubmit: function(e) {

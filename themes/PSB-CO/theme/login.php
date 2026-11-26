@@ -32,7 +32,7 @@ get_header();
                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-left dir-ltr">
                     </div>
                     <button @click="sendOtp()" :disabled="isLoading" class="w-full bg-primary text-white font-bold p-4 rounded-lg hover:bg-primary/90 cursor-pointer transition disabled:opacity-50">
-                        <span x-show="!isLoading">ارسال کد تایید</span>
+                        <span x-show="!isLoading">ارسال کد تأیید</span>
                         <span x-show="isLoading">در حال ارسال...</span>
                     </button>
 
@@ -52,11 +52,11 @@ get_header();
                      x-transition:leave-end="translate-x-full opacity-0"
                      class="w-full">
                     <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">کد تایید پیامک شده</label>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">کد تأیید پیامک شده</label>
                         <input type="text" x-model="otp" @keydown.enter="verifyOtp()" autocomplete="one-time-code" inputmode="numeric" placeholder="- - - -" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-center tracking-widest text-xl">
                     </div>
                     <button @click="verifyOtp()" :disabled="isLoading" class="w-full bg-blue-600 text-white font-bold p-4 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 mb-3">
-                        <span x-show="!isLoading">تایید و ادامه</span>
+                        <span x-show="!isLoading">تأیید و ادامه</span>
                         <span x-show="isLoading">در حال بررسی...</span>
                     </button>
                     <div class="flex items-center justify-between mt-4 px-2 text-sm">
@@ -159,7 +159,7 @@ get_header();
                     </button>
 
                     <div class="mt-5 flex flex-col gap-3 text-center">
-                        <button @click="step = 4; errorMessage = ''" class="text-sm text-blue-600 hover:text-blue-800 transition font-medium">قبلا ثبت‌نام کرده‌اید؟ وارد شوید</button>
+                        <button @click="step = 4; errorMessage = ''" class="text-sm text-blue-600 hover:text-blue-800 transition font-medium">قبلاً ثبت‌نام کرده‌اید؟ وارد شوید</button>
                         <button @click="step = 1; errorMessage = ''" class="text-sm text-gray-500 hover:text-gray-800 transition">بازگشت به ورود با پیامک</button>
                     </div>
                 </div>
@@ -252,9 +252,9 @@ get_header();
                     this.errorMessage = '';
                     const formData = new FormData();
                     formData.append('action', action);
-                    if (typeof jsData !== 'undefined' && jsData.nonce) {
-                        formData.append('security', jsData.nonce);
-                    }
+                    let nonce = (typeof jsData !== 'undefined' && jsData.nonce) ? jsData.nonce : '';
+                    if (typeof window.psbFreshNonce === 'function') nonce = await window.psbFreshNonce(nonce);
+                    if (nonce) formData.append('security', nonce);
                     for (const key in data) formData.append(key, data[key]);
 
                     try {
@@ -302,7 +302,7 @@ get_header();
 
                 async registerUser() {
                     if (!this.name || !this.username || !this.email) {
-                        this.errorMessage = 'لطفا تمام فیلدها را پر کنید.';
+                        this.errorMessage = 'لطفاً تمام فیلدها را پر کنید.';
                         return;
                     }
                     const res = await this.sendRequest('kavenegar_register_user', {
@@ -321,7 +321,7 @@ get_header();
 
                 async loginWithPassword() {
                     if (!this.loginUsername || !this.loginPassword) {
-                        this.errorMessage = 'لطفا نام کاربری و رمز عبور را وارد کنید.';
+                        this.errorMessage = 'لطفاً نام کاربری و رمز عبور را وارد کنید.';
                         return;
                     }
                     const res = await this.sendRequest('classic_login', {
@@ -337,7 +337,7 @@ get_header();
 
                 async registerWithPassword() {
                     if (!this.name || !this.username || !this.email || !this.regPassword || !this.regPhone) {
-                        this.errorMessage = 'لطفا تمام فیلدها را پر کنید.';
+                        this.errorMessage = 'لطفاً تمام فیلدها را پر کنید.';
                         return;
                     }
 
@@ -347,7 +347,7 @@ get_header();
                     }
 
                     if (this.passwordScore < 2) {
-                        this.errorMessage = 'رمز عبور شما بسیار ضعیف است. لطفا از ترکیب قوی‌تری استفاده کنید.';
+                        this.errorMessage = 'رمز عبور شما بسیار ضعیف است. لطفاً از ترکیب قوی‌تری استفاده کنید.';
                         return;
                     }
 

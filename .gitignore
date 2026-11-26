@@ -6,4 +6,17 @@
 /upgrade-temp-backup/
 /uploads/
 /wflogs/
-/themes/PSB-CO/node_modules
+/themes/PSB-CO/node_modules/
+/backups-dup-lite/
+.DS_Store
+**/.DS_Store
+/.idea/
+/index.php
+/themes/index.php
+
+# Local-only helpers (never deploy)
+/mu-plugins/zz-local-*
+.vscode/
+
+# Local working tools/notes/data for Claude (never commit; holds an API key)
+/.dev/

@@ -7,7 +7,7 @@ function save_rating() {
         // --- NEW: Check if user already voted using a cookie ---
         $cookie_name = 'voted_on_post_' . $post_id;
         if (isset($_COOKIE[$cookie_name])) {
-            wp_send_json_error('شما قبلا به این مطلب امتیاز داده‌اید.'); // "You already voted"
+            wp_send_json_error('شما قبلاً به این مطلب امتیاز داده‌اید.'); // "You already voted"
             wp_die();
         }
 

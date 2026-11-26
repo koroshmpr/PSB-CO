@@ -1,77 +1,57 @@
 <?php
 /**
- * Minimal Corporate About Us Homepage Section - Pure White Background
- * PSB-CO High & Medium Voltage Theme
+ * About (spec v2 §5.7): alt background, 6/6. Photo 4:5 (attachment 1364 or ACF about image),
+ * ACF paragraph, verified timeline (company-facts.md), secondary «درباره ما».
  */
-
-$aboutUs = get_field('about_us');
-if ($aboutUs) :
-    $img = $aboutUs['image'] ?? null;
-    $title = $aboutUs['title'] ?? 'درباره شرکت پارس سویچ برد';
-    $content = $aboutUs['content'] ?? '';
-    $btn_text = $aboutUs['btn_text'] ?? 'اطلاعات بیشتر درباره ما';
-    $btn_link = $aboutUs['btn_link']['url'] ?? get_permalink(get_page_by_path('about')) ?: '#';
+$psb_about = psb_field( 'about_us', null, (int) get_option( 'page_on_front' ) ?: null );
+$psb_about = is_array( $psb_about ) ? $psb_about : array();
+$psb_img   = wp_attachment_is_image( 1364 ) ? 1364 : ( is_array( $psb_about['image'] ?? null ) ? (int) ( $psb_about['image']['ID'] ?? 0 ) : (int) ( $psb_about['image'] ?? 0 ) );
+$psb_link  = is_array( $psb_about['btn_link'] ?? null ) ? ( $psb_about['btn_link']['url'] ?? '' ) : '';
+$psb_link  = $psb_link ? $psb_link : home_url( '/about-us/' );
+$psb_brand = psb_brand_name();
+$psb_now   = psb_jalali_year();
+$psb_steps = apply_filters(
+	'psb_home_timeline',
+	array(
+		array( psb_fa_num( PSB_FOUNDED_JALALI ), 'تأسیس شرکت ' . $psb_brand ),
+		array( '۱۳۶۴', 'پروانه بهره‌برداری از وزارت صنایع' ),
+		array( '۱۳۸۲', 'آزمون تابلوهای ۲۴ کیلوولت متال‌کلد در EPIL' ),
+		array( '۱۳۸۵', 'تأیید کامل در ارزیابی سازندگان تابلو برق' ),
+		array( '۱۳۹۲', 'ثبت در وندورلیست شرکت ملی مهندسی و ساختمان نفت' ),
+		array( '۱۳۹۳', 'گزارش‌های آزمون نوعی EPIL و لیسانس SAREL' ),
+		array( '۱۳۹۷', 'آزمون نوعی تابلو ایزوله بیمارستانی' ),
+		array( '۱۳۹۸–۱۳۹۹', 'تأییدیه‌های شرکت‌های توزیع برق و توانیر' ),
+		array( psb_fa_num( $psb_now ), psb_fa_num( psb_years_active() ) . ' سال تابلوسازی' ),
+	)
+);
 ?>
-    <section class="py-16 bg-white border-b border-slate-200/80 text-slate-900 select-none relative overflow-hidden" data-aos="fade-up">
-        <div class="container mx-auto px-4 md:px-8 relative z-10">
-            <div class="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-                
-                <!-- Text Content Column -->
-                <div class="lg:col-span-7 space-y-5" data-aos="fade-up">
-                    <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 shadow-sm">
-                        <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-                        <span>نزدیک به نیم قرن سابقه در تابلوسازی صنعت برق</span>
-                    </div>
+<section class="bg-background py-section" aria-labelledby="home-about-title">
+	<div class="container grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+		<div data-reveal>
+			<span class="eyebrow">درباره <?php echo esc_html( $psb_brand ); ?></span>
+			<h2 id="home-about-title" class="section-title mt-3"><?php echo esc_html( 'نزدیک به ' . psb_fa_num( psb_years_active() ) . ' سال تابلوسازی' ); ?></h2>
+			<?php if ( ! empty( $psb_about['content'] ) ) : ?>
+				<div class="mt-4 max-w-[38rem] text-[1.0625rem] leading-[1.9] text-slate-600 [&_p]:mb-3">
+					<?php echo wp_kses_post( psb_brand_fix( $psb_about['content'] ) ); ?>
+				</div>
+			<?php endif; ?>
 
-                    <h2 class="text-2xl sm:text-4xl font-black text-slate-900 leading-snug tracking-tight">
-                        <?= esc_html($title); ?>
-                    </h2>
+			<ol class="timeline mt-8">
+				<?php foreach ( $psb_steps as $psb_i => $psb_s ) : ?>
+					<li class="timeline-item <?php echo count( $psb_steps ) - 1 === $psb_i ? 'is-current' : ''; ?>">
+						<span class="timeline-year"><?php echo esc_html( $psb_s[0] ); ?></span>
+						<span class="timeline-title"><?php echo wp_kses( preg_replace( '/\b(EPIL|SAREL)\b/', '<span class="lat">$1</span>', esc_html( $psb_s[1] ) ), array( 'span' => array( 'class' => true ) ) ); ?></span>
+					</li>
+				<?php endforeach; ?>
+			</ol>
 
-                    <div class="text-slate-600 text-sm sm:text-base leading-relaxed text-justify prose max-w-none">
-                        <?= wp_kses_post($content); ?>
-                    </div>
+			<a class="btn btn-secondary mt-8" href="<?php echo esc_url( $psb_link ); ?>">درباره شرکت</a>
+		</div>
 
-                    <!-- Key Stats Counter Pills -->
-                    <div class="grid grid-cols-3 gap-3 pt-2">
-                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-center shadow-sm">
-                            <strong class="block text-xl sm:text-3xl font-black text-blue-700 font-mono">50+</strong>
-                            <span class="text-[11px] sm:text-xs text-slate-500 font-medium">سال سابقه تخصصی</span>
-                        </div>
-                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-center shadow-sm">
-                            <strong class="block text-xl sm:text-3xl font-black text-blue-700 font-mono">500+</strong>
-                            <span class="text-[11px] sm:text-xs text-slate-500 font-medium">پروژه کلید در دست</span>
-                        </div>
-                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-center shadow-sm">
-                            <strong class="block text-xl sm:text-3xl font-black text-emerald-600 font-mono">100%</strong>
-                            <span class="text-[11px] sm:text-xs text-slate-500 font-medium">رعایت IEC & ISO</span>
-                        </div>
-                    </div>
-
-                    <!-- Action Button -->
-                    <?php if ($btn_link) : ?>
-                        <div class="pt-2">
-                            <a href="<?= esc_url($btn_link); ?>" class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-bold bg-blue-700 hover:bg-blue-800 text-white shadow-sm hover:shadow transition-all text-sm group">
-                                <span><?= esc_html($btn_text); ?></span>
-                                <svg class="w-4 h-4 rtl:rotate-180 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                            </a>
-                        </div>
-                    <?php endif; ?>
-                </div>
-
-                <!-- Featured Factory Image Frame -->
-                <div class="lg:col-span-5 relative group" data-aos="fade-left">
-                    <div class="relative rounded-3xl overflow-hidden border border-slate-200 bg-slate-50 p-2.5 shadow-lg">
-                        <div class="overflow-hidden rounded-2xl bg-slate-100 aspect-[4/3]">
-                            <?php if (!empty($img['url'])) : ?>
-                                <img src="<?= esc_url($img['url']); ?>" alt="<?= esc_attr($img['title'] ?? $title); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                            <?php else : ?>
-                                <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800&auto=format&fit=crop" alt="PSB Factory" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-<?php endif; ?>
+		<?php if ( $psb_img ) : ?>
+			<div class="mx-auto w-full max-w-md lg:max-w-none" data-reveal>
+				<?php echo psb_image( $psb_img, 'large', array( 'class' => 'aspect-[4/5] w-full rounded-card object-cover', 'alt' => get_post_meta( $psb_img, '_wp_attachment_image_alt', true ) ?: 'کارگاه ' . $psb_brand, 'sizes' => '(min-width: 1024px) 600px, 90vw' ) ); // phpcs:ignore ?>
+			</div>
+		<?php endif; ?>
+	</div>
+</section>

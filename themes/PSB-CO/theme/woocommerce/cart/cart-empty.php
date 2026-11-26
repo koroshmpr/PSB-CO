@@ -33,8 +33,8 @@ if ( wc_get_page_id( 'shop' ) > 0 ) : ?>
         );
         get_template_part('template-parts/svg/cart', null, $args);
         ?>
-        <p class="text-gray-500 text-2xl">سبد شما خالی است!</p>
-        <a class="bg-icon/60 border border-icon hover:bg-icon hover:px-14 px-12 py-3 rounded-lg hover:font-bold hover:rounded-xl transition-all duration-300 wc-backward<?php echo esc_attr( wc_wp_theme_get_element_class_name( 'button' ) ? ' ' . wc_wp_theme_get_element_class_name( 'button' ) : '' ); ?>" href="<?php echo esc_url( apply_filters( 'woocommerce_return_to_shop_redirect', wc_get_page_permalink( 'shop' ) ) ); ?>">
+        <p class="text-slate-500 text-2xl">سبد شما خالی است.</p>
+        <a class="bg-icon/60 border border-icon hover:bg-icon hover:px-14 px-12 py-3 rounded-control hover:font-bold hover:rounded-card transition-all duration-300 wc-backward<?php echo esc_attr( wc_wp_theme_get_element_class_name( 'button' ) ? ' ' . wc_wp_theme_get_element_class_name( 'button' ) : '' ); ?>" href="<?php echo esc_url( apply_filters( 'woocommerce_return_to_shop_redirect', wc_get_page_permalink( 'shop' ) ) ); ?>">
             <?php
             /**
              * Filter "Return To Shop" text.

@@ -10,7 +10,8 @@ Author: korosh mpr
 function auto_id_headings($content)
 {
     // Match only h2 and h3 tags
-    $content = preg_replace_callback('/(<h[2-3](.*?))>(.*?)(<\/h[2-3]>)/i', function ($matches) {
+    static $used = array();
+    $content = preg_replace_callback('/(<h[2-3](.*?))>(.*?)(<\/h[2-3]>)/is', function ($matches) use (&$used) {
         $heading_text = strip_tags($matches[3]);
 
         // 1. Sanitize the title (removes bad punctuation, replaces spaces with dashes)
@@ -19,13 +20,20 @@ function auto_id_headings($content)
 
         // Fallback: If for some reason the ID becomes empty, create a random one
         if (empty($semantic_id)) {
-            $semantic_id = 'heading-' . wp_generate_password(6, false);
+            $semantic_id = 'heading';
         }
+        // Unique ids (two headings with the same text).
+        $base = $semantic_id;
+        $n    = 2;
+        while (isset($used[$semantic_id])) {
+            $semantic_id = $base . '-' . $n++;
+        }
+        $used[$semantic_id] = true;
 
         $q = "'";
 
         if (!stripos($matches[0], 'id=')) {
-            return $matches[1] . $matches[2] . ' x-intersect:enter.margin.-15%.0px.-70%.0px="active = '. $q . esc_js($semantic_id) . $q. '"  id="' . esc_attr($semantic_id) . '">' . $matches[3] . $matches[4];
+            return $matches[1] . ' id="' . esc_attr($semantic_id) . '">' . $matches[3] . $matches[4];
         }
         return $matches[0];
     }, $content);
@@ -99,7 +107,7 @@ function get_toc($content, $levels = [2])
 
                 <button aria-label="link to <?= esc_attr($heading['name']); ?>"
                         class="<?= $textColor; ?> w-full text-start flex justify-start py-0.5 max-w-[90%] lg:text-sm text-xs cursor-pointer transition-all duration-300"
-                        :class="active === '<?= esc_attr($heading['id']); ?>' ? 'text-primary font-bold' : 'text-gray-400 hover:text-gray-600'"
+                        :class="active === '<?= esc_attr($heading['id']); ?>' ? 'text-primary-700 font-bold' : 'text-slate-500 hover:text-slate-600'"
                         @click.prevent="document.getElementById('<?= esc_attr($heading['id']); ?>').scrollIntoView({ behavior: 'smooth' }); toc = false">
                     <?= esc_html($heading['name']); ?>
                 </button>

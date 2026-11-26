@@ -1,120 +1,109 @@
 <?php
-if (is_front_page()) return;
+/**
+ * Breadcrumb (.breadcrumb). Markup only — BreadcrumbList schema is output by inc/seo.php.
+ * Covers: singular (post / CPT / product / page with parents), category, tax, CPT archive, search, 404.
+ *
+ * $args:
+ * - class   extra classes ('breadcrumb--invert' on dark heroes)
+ */
+if ( is_front_page() ) {
+	return;
+}
 
-$currentColor = 'text-gray-700';
-$slashClass = 'text-gray-400 px-1';
-
-// 1. Initialize variables for dynamic JSON-LD Schema
-$schema_items = [];
-$position = 1;
-global $wp;
-$current_url = home_url(add_query_arg(array(), $wp->request));
-
-// Helper function to easily build the schema array
-$add_schema_item = function($name, $url) use (&$schema_items, &$position) {
-    $schema_items[] = [
-        '@type' => 'ListItem',
-        'position' => $position++,
-        'name' => wp_strip_all_tags($name),
-        'item' => esc_url($url)
-    ];
+$psb_items = array(
+	array(
+		'name' => 'خانه',
+		'url'  => home_url( '/' ),
+	),
+);
+$psb_add   = function ( $name, $url = '' ) use ( &$psb_items ) {
+	$psb_items[] = array(
+		'name' => wp_strip_all_tags( (string) $name ),
+		'url'  => $url,
+	);
 };
+
+if ( is_singular() ) {
+	$psb_post = get_post();
+	$psb_type = get_post_type( $psb_post );
+
+	if ( 'post' === $psb_type ) {
+		$psb_blog = (int) get_option( 'page_for_posts' );
+		$psb_add( $psb_blog ? get_the_title( $psb_blog ) : 'مقالات', $psb_blog ? get_permalink( $psb_blog ) : home_url( '/blog/' ) );
+		$psb_cats = get_the_category();
+		if ( ! empty( $psb_cats ) ) {
+			$psb_add( $psb_cats[0]->name, get_category_link( $psb_cats[0]->term_id ) );
+		}
+	} elseif ( 'page' === $psb_type ) {
+		foreach ( array_reverse( get_post_ancestors( $psb_post ) ) as $psb_parent ) {
+			$psb_add( get_the_title( $psb_parent ), get_permalink( $psb_parent ) );
+		}
+	} elseif ( 'product' === $psb_type ) {
+		$psb_add( 'محصولات', psb_shop_url() );
+		// خانه › محصولات › <category> › <product> (most specific category; parent category skipped when it is the only root).
+		$psb_pcat = function_exists( 'psb_product_primary_cat' ) ? psb_product_primary_cat( $psb_post->ID ) : null;
+		if ( $psb_pcat ) {
+			$psb_pcat_link = get_term_link( $psb_pcat );
+			if ( ! is_wp_error( $psb_pcat_link ) ) {
+				$psb_add( $psb_pcat->name, $psb_pcat_link );
+			}
+		}
+	} else {
+		$psb_obj = get_post_type_object( $psb_type );
+		if ( $psb_obj ) {
+			$psb_add( $psb_obj->labels->name, (string) get_post_type_archive_link( $psb_type ) );
+		}
+	}
+	$psb_add( get_the_title( $psb_post ) );
+} elseif ( is_home() ) {
+	$psb_blog = (int) get_option( 'page_for_posts' );
+	$psb_add( $psb_blog ? get_the_title( $psb_blog ) : 'مقالات' );
+} elseif ( is_category() || is_tag() || is_tax() ) {
+	$psb_term = get_queried_object();
+	if ( $psb_term && ! empty( $psb_term->taxonomy ) ) {
+		if ( in_array( $psb_term->taxonomy, array( 'product_cat', 'product_tag' ), true ) ) {
+			$psb_add( 'محصولات', psb_shop_url() );
+		} elseif ( in_array( $psb_term->taxonomy, array( 'category', 'post_tag', 'series' ), true ) ) {
+			$psb_blog = (int) get_option( 'page_for_posts' );
+			if ( $psb_blog ) {
+				$psb_add( get_the_title( $psb_blog ), get_permalink( $psb_blog ) );
+			}
+		}
+		if ( ! empty( $psb_term->parent ) ) {
+			foreach ( array_reverse( get_ancestors( $psb_term->term_id, $psb_term->taxonomy ) ) as $psb_anc ) {
+				$psb_anc_term = get_term( $psb_anc, $psb_term->taxonomy );
+				$psb_anc_link = ( $psb_anc_term && ! is_wp_error( $psb_anc_term ) ) ? get_term_link( $psb_anc_term ) : '';
+				if ( $psb_anc_link && ! is_wp_error( $psb_anc_link ) ) {
+					$psb_add( $psb_anc_term->name, $psb_anc_link );
+				}
+			}
+		}
+		$psb_add( $psb_term->name );
+	}
+} elseif ( function_exists( 'is_shop' ) && is_shop() ) {
+	$psb_add( 'محصولات' );
+} elseif ( is_post_type_archive() ) {
+	$psb_add( post_type_archive_title( '', false ) );
+} elseif ( is_search() ) {
+	$psb_add( 'نتایج جستجو برای «' . get_search_query() . '»' );
+} elseif ( is_404() ) {
+	$psb_add( 'صفحه پیدا نشد' );
+} elseif ( is_author() ) {
+	$psb_add( get_the_author() );
+}
+
+$psb_last = count( $psb_items ) - 1;
 ?>
-
-    <nav class="<?= esc_attr($args['class'] ?? ''); ?> flex text-nowrap items-center text-gray-600 overflow-x-scroll text-sm mb-1" aria-label="breadcrumb">
-        <ol class="flex items-center gap-x-1 m-0 p-0 list-none">
-
-            <?php if (is_single()) : ?>
-                <?php
-                $post_type = get_post_type();
-                $post_type_name = ($post_type === 'post') ? 'مقالات' : get_post_type_object($post_type)->labels->singular_name;
-                $post_type_link = ($post_type === 'post') ? get_permalink(get_option('page_for_posts')) : get_post_type_archive_link($post_type);
-
-                // Add First Item to Schema
-                $add_schema_item($post_type_name, $post_type_link ? $post_type_link : $current_url);
-                ?>
-
-                <li class="flex items-center">
-                    <?php if ($post_type_link) : ?>
-                        <a href="<?= esc_url($post_type_link); ?>" class="text-gray-600 hover:text-gray-700">
-                            <?= esc_html($post_type_name); ?>
-                        </a>
-                    <?php else : ?>
-                        <span class="<?= $currentColor; ?>"><?= esc_html($post_type_name); ?></span>
-                    <?php endif; ?>
-                </li>
-
-                <li class="<?= $slashClass; ?>" aria-hidden="true">/</li>
-
-                <?php
-                $categories = get_the_category();
-                if (!empty($categories)) :
-                    $category = $categories[0];
-
-                    // Add Category to Schema
-                    $add_schema_item($category->name, get_category_link($category->term_id));
-                    ?>
-                    <li class="flex items-center">
-                        <a href="<?= esc_url(get_category_link($category->term_id)); ?>" class="text-gray-500 hover:text-gray-700">
-                            <?= esc_html($category->name); ?>
-                        </a>
-                    </li>
-                    <li class="<?= $slashClass; ?>" aria-hidden="true">/</li>
-                <?php endif; ?>
-
-                <?php
-                // Add Final Post to Schema
-                $add_schema_item(get_the_title(), get_permalink());
-                ?>
-                <li class="flex items-center">
-                    <span class="<?= $currentColor; ?>" aria-current="page"><?php the_title(); ?></span>
-                </li>
-
-            <?php elseif (is_category()) : ?>
-                <?php $add_schema_item(single_cat_title('', false), $current_url); ?>
-                <li class="flex items-center">
-                    <span class="<?= $currentColor; ?>" aria-current="page"><?= esc_html(single_cat_title('', false)); ?></span>
-                </li>
-
-            <?php elseif (is_archive()) : ?>
-                <?php
-                $archive_title = (get_post_type() === 'post') ? 'بلاگ' : post_type_archive_title('', false);
-                $add_schema_item($archive_title, $current_url);
-                ?>
-                <li class="flex items-center">
-                <span class="<?= $currentColor; ?>" aria-current="page">
-                    <?= esc_html($archive_title); ?>
-                </span>
-                </li>
-
-            <?php elseif (is_search()) : ?>
-                <?php
-                $search_title = 'نتایج جستجو برای "' . get_search_query() . '"';
-                $add_schema_item($search_title, $current_url);
-                ?>
-                <li class="flex items-center">
-                    <span class="<?= $currentColor; ?>" aria-current="page"><?= esc_html($search_title); ?></span>
-                </li>
-
-            <?php elseif (is_404()) : ?>
-                <?php $add_schema_item('صفحه پیدا نشد', $current_url); ?>
-                <li class="flex items-center">
-                    <span class="<?= $currentColor; ?>" aria-current="page">صفحه پیدا نشد</span>
-                </li>
-            <?php endif; ?>
-        </ol>
-    </nav>
-
-<?php
-// 2. Output the Generated JSON-LD Schema
-if (!empty($schema_items)) :
-    $schema_data = [
-        '@context' => 'https://schema.org',
-        '@type' => 'BreadcrumbList',
-        'itemListElement' => $schema_items
-    ];
-    ?>
-    <script type="application/ld+json">
-<?= wp_json_encode($schema_data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT); ?>
-</script>
-<?php endif; ?>
+<nav class="breadcrumb <?php echo esc_attr( $args['class'] ?? '' ); ?>" aria-label="مسیر صفحه">
+	<ol>
+		<?php foreach ( $psb_items as $psb_i => $psb_item ) : ?>
+			<li>
+				<?php if ( $psb_i === $psb_last || empty( $psb_item['url'] ) ) : ?>
+					<span <?php echo $psb_i === $psb_last ? 'aria-current="page"' : ''; ?>><?php echo function_exists( 'psb_lat' ) ? psb_lat( $psb_item['name'] ) : esc_html( $psb_item['name'] ); // phpcs:ignore -- escaped in helper ?></span>
+				<?php else : ?>
+					<a href="<?php echo esc_url( $psb_item['url'] ); ?>"><?php echo function_exists( 'psb_lat' ) ? psb_lat( $psb_item['name'] ) : esc_html( $psb_item['name'] ); // phpcs:ignore -- escaped in helper ?></a>
+				<?php endif; ?>
+			</li>
+		<?php endforeach; ?>
+	</ol>
+</nav>

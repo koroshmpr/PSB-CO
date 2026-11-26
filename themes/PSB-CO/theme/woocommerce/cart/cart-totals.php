@@ -16,6 +16,9 @@
  */
 
 defined( 'ABSPATH' ) || exit;
+if ( ! function_exists( 'WC' ) || ! WC()->cart || ! WC()->customer ) {
+	return;
+}
 
 ?>
 <div class="cart_totals !w-full <?php echo ( WC()->customer->has_calculated_shipping() ) ? 'calculated_shipping' : ''; ?>">
@@ -104,7 +107,7 @@ defined( 'ABSPATH' ) || exit;
 
     </table>
 
-    <div class="max-lg:fixed transition-all duration-300 bottom-14 inset-x-0 w-full rounded-none max-lg:p-3 max-lg:z-[55] max-lg:bg-white/95 max-lg:backdrop-blur-md max-lg:border-t max-lg:border-slate-200 max-lg:shadow-[0_-4px_20px_rgba(0,0,0,0.1)] wc-proceed-to-checkout">
+    <div class="max-lg:fixed transition-all duration-300 bottom-14 inset-x-0 w-full rounded-none max-lg:p-3 max-lg:z-[55] max-lg:bg-white/95 max-lg:backdrop-blur-md max-lg:border-t max-lg:border-slate-200 wc-proceed-to-checkout">
         <?php do_action( 'woocommerce_proceed_to_checkout' ); ?>
     </div>
 

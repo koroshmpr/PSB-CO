@@ -1,0 +1,62 @@
+/**
+ * Type-matched default illustrations («تصویر نمایشی», inc/placeholders.php) and low-res photo frames.
+ * Illustrations are 4:3 line-art on a steel-50 field whose grid fades out at the edges, so `contain`
+ * letterboxes seamlessly into any card ratio.
+ */
+@layer components {
+	img.is-placeholder,
+	.card-media img.is-placeholder,
+	.pr-card-media img.is-placeholder,
+	.product-gallery-main img.is-placeholder,
+	.media-box > img.is-placeholder {
+		object-fit: contain;
+		background-color: var(--color-slate-50);
+	}
+
+	.card-media:has(> img.is-placeholder),
+	.pr-card-media:has(> img.is-placeholder) {
+		position: relative;
+		background-color: var(--color-slate-50);
+	}
+
+	/* «تصویر نمایشی» chip over a text-free illustration (bottom-left = the trailing corner in RTL). */
+	.ph-tag {
+		@apply pointer-events-none absolute bottom-2 left-2 z-[1] rounded-full border border-line bg-white/90 px-2 py-0.5 text-[11px] leading-5 font-medium text-slate-600;
+	}
+
+	/* No zoom-on-hover for illustrations: it is not a photo to inspect. */
+	.card:hover .card-media img.is-placeholder,
+	.product-gallery-main:hover img.is-placeholder {
+		transform: none;
+	}
+
+	/* Low-res real photo on a single page: natural size, never upscaled, never cover-cropped. */
+	.ph-frame {
+		@apply flex items-center justify-center overflow-hidden rounded-card border border-line p-4 sm:p-6;
+		background-color: var(--color-slate-50);
+	}
+
+	img.is-lowres,
+	.product-gallery-main img.is-lowres,
+	.ph-frame img {
+		width: auto;
+		height: auto;
+		max-width: 100%;
+		max-height: 100%;
+		object-fit: contain;
+		box-shadow: 0 1px 2px rgb(20 23 28 / 0.08);
+	}
+
+	.product-gallery-main:has(> img.is-lowres) {
+		@apply flex items-center justify-center p-4;
+	}
+
+	.product-gallery-main:hover img.is-lowres {
+		transform: none;
+	}
+
+	.ph-frame--hero {
+		position: relative;
+		aspect-ratio: 4 / 3;
+	}
+}

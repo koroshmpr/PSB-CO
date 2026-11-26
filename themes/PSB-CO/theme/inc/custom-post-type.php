@@ -1,6 +1,11 @@
 <?php
 // Register all CPTs and Taxonomies natively for PSB-CO
 
+// Customer letters (رضایت‌نامه‌ها) CPT, letter_type taxonomy, meta box, version-gated rewrite flush, lightbox.
+require_once __DIR__ . '/post-type-functions/customer-letters.php';
+// Article series taxonomy (series) + term meta + part order.
+require_once __DIR__ . '/post-type-functions/series.php';
+
 function psb_co_register_custom_post_types() {
     // 1. Portfolio Post Type & Taxonomies
     register_post_type('portfolio', array(
@@ -13,7 +18,7 @@ function psb_co_register_custom_post_types() {
             'add_new' => 'افزودن نمونه کار جدید',
             'add_new_item' => 'افزودن نمونه کار جدید',
             'edit_item' => 'ویرایش نمونه کار',
-            'all_items' => 'همه ی نمونه کارها',
+            'all_items' => 'همه نمونه‌کارها',
             'singular_name' => 'نمونه کار'
         ),
         'menu_icon' => 'dashicons-portfolio'
@@ -21,7 +26,7 @@ function psb_co_register_custom_post_types() {
 
     register_taxonomy('portfolio_categories', 'portfolio', array(
         'hierarchical' => true,
-        'label' => 'دسته بندی نمونه کار',
+        'label' => 'دسته‌بندی نمونه کار',
         'query_var' => true,
         'rewrite' => array('slug' => 'portfolio-category', 'with_front' => false),
     ));
@@ -46,20 +51,20 @@ function psb_co_register_custom_post_types() {
         'has_archive' => true,
         'public' => true,
         'labels' => array(
-            'name' => 'خدمات ما',
+            'name' => 'خدمات',
             'singular_name' => 'خدمت',
             'add_new' => 'افزودن خدمت جدید',
             'add_new_item' => 'افزودن خدمت جدید',
             'edit_item' => 'ویرایش خدمت',
             'all_items' => 'همه‌ی خدمات',
-            'menu_name' => 'خدمات ما',
+            'menu_name' => 'خدمات',
         ),
         'menu_icon' => 'dashicons-admin-generic',
     ));
 
     register_taxonomy('services_categories', 'services', array(
         'hierarchical' => true,
-        'label' => 'دسته بندی خدمات',
+        'label' => 'دسته‌بندی خدمات',
         'query_var' => true,
     ));
 
@@ -78,18 +83,18 @@ function psb_co_register_custom_post_types() {
 
     // 4. Certificates Post Type & Taxonomy
     register_post_type('certificates', array(
-        'supports' => array('title', 'editor', 'custom-fields', 'thumbnail'),
+        'supports' => array('title', 'editor', 'custom-fields', 'thumbnail', 'excerpt'),
         'rewrite' => array('slug' => 'certificates', 'with_front' => false),
         'has_archive' => true,
         'public' => true,
         'labels' => array(
-            'name' => 'گواهی نامه ها',
-            'singular_name' => 'گواهی نامه',
-            'menu_name' => 'گواهی نامه ها',
-            'add_new' => 'افزودن گواهی نامه جدید',
-            'add_new_item' => 'افزودن گواهی نامه جدید',
-            'edit_item' => 'ویرایش گواهی نامه',
-            'all_items' => 'همه گواهی نامه ها'
+            'name' => 'گواهینامه‌ها',
+            'singular_name' => 'گواهینامه',
+            'menu_name' => 'گواهینامه‌ها',
+            'add_new' => 'افزودن گواهینامه جدید',
+            'add_new_item' => 'افزودن گواهینامه جدید',
+            'edit_item' => 'ویرایش گواهینامه',
+            'all_items' => 'همه گواهینامه‌ها'
         ),
         'menu_icon' => 'dashicons-id-alt'
     ));
@@ -97,9 +102,9 @@ function psb_co_register_custom_post_types() {
     register_taxonomy('certificate_category', 'certificates', array(
         'hierarchical' => true,
         'labels' => array(
-            'name' => 'دسته‌بندی گواهی‌نامه',
-            'singular_name' => 'دسته‌بندی گواهی‌نامه',
-            'menu_name' => 'دسته‌بندی گواهی‌نامه',
+            'name' => 'دسته‌بندی گواهینامه',
+            'singular_name' => 'دسته‌بندی گواهینامه',
+            'menu_name' => 'دسته‌بندی گواهینامه',
         ),
         'show_ui' => true,
         'show_admin_column' => true,
@@ -132,8 +137,8 @@ function psb_co_register_custom_post_types() {
         'has_archive' => true,
         'public' => true,
         'labels' => array(
-            'name' => 'تایپ تست',
-            'singular_name' => 'تایپ تست',
+            'name' => 'تایپ‌تست‌ها',
+            'singular_name' => 'تایپ‌تست',
             'menu_name' => 'تایپ تست',
             'all_items' => 'همه تایپ تست‌ها',
             'add_new' => 'افزودن تایپ تست جدید',

@@ -1,423 +1,129 @@
 <?php
-/* Template Name: Contact Us - Editorial Style */
+/**
+ * Template Name: Contact Us - Editorial Style
+ *
+ * Contact: quick channels, office/factory cards (ACF options via helpers), Gravity Form,
+ * maps loaded only after a click (no heavy iframe on page load).
+ *
+ * @package bluebox
+ */
+
 get_header();
-$form_id = get_field('gravity_form');
 
-// ACF repeaters from site-setting
-$contacts = get_field('contact', 'option');
-$phones = get_field('phones', 'option') ?: get_field('phone', 'option');
-$emails = get_field('emails', 'option') ?: get_field('email', 'option');
+$psb_form_id   = (int) psb_field( 'gravity_form', 0, get_the_ID() );
+$psb_phones    = psb_phones();
+$psb_emails    = psb_emails();
+$psb_addresses = psb_addresses();
+$psb_maps_raw  = psb_field( 'contact', array() );
+$psb_socials   = psb_socials();
 
-// Legacy fallbacks
-$legacy_address = get_field('address', 'option');
-$legacy_email = get_field('email', 'option');
-$legacy_phone = get_field('phone', 'option') ?: get_field('phone_number', 'option');
-$legacy_map = get_field('map', 'option') ?: get_field('map-link', 'option');
-?>
+/** Embed URL of the "map" textarea (iframe code) of the contact row with this index; only Google Maps embeds. */
+$psb_map_src = function ( $index ) use ( $psb_maps_raw ) {
+	$row = is_array( $psb_maps_raw ) ? array_values( array_filter( $psb_maps_raw, function ( $r ) {
+		return ! empty( $r['address'] );
+	} ) ) : array();
+	$html = (string) ( $row[ $index ]['map'] ?? '' );
+	if ( preg_match( '#src="(https://www\.google\.com/maps/embed\?[^"]+)"#', $html, $m ) ) {
+		return html_entity_decode( $m[1] );
+	}
+	return '';
+};
 
-<style>
-/* High-End Modern Gravity Form Styling for Contact Page */
-body .form-wrapper .gform_wrapper,
-body .form-wrapper .gform_wrapper * {
-    box-sizing: border-box !important;
-}
-body .form-wrapper .gform_wrapper {
-    margin: 0 !important;
-    max-width: 100% !important;
-}
-body .form-wrapper .gform_fields {
-    display: grid !important;
-    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
-    gap: 1.25rem !important;
-    list-style: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-}
-body .form-wrapper .gfield {
-    grid-column: span 12 / span 12 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-body .form-wrapper .gfield--width-half,
-body .form-wrapper .gfield_html {
-    grid-column: span 12 / span 12 !important;
-}
-@media (min-width: 640px) {
-    body .form-wrapper .gfield--width-half {
-        grid-column: span 6 / span 6 !important;
-    }
-}
-body .form-wrapper .gfield_label,
-body .form-wrapper label {
-    display: block !important;
-    font-size: 0.8125rem !important;
-    font-weight: 700 !important;
-    color: #1e293b !important;
-    margin-bottom: 0.5rem !important;
-}
-body .form-wrapper input[type="text"],
-body .form-wrapper input[type="email"],
-body .form-wrapper input[type="tel"],
-body .form-wrapper input[type="number"],
-body .form-wrapper input[type="url"],
-body .form-wrapper input[type="password"],
-body .form-wrapper textarea,
-body .form-wrapper select,
-body .form-wrapper .gform_body input:not([type="submit"]):not([type="file"]),
-body .form-wrapper .gform_body textarea,
-body .form-wrapper .gform_body select,
-body .form-wrapper .ginput_container input,
-body .form-wrapper .ginput_container textarea,
-body .form-wrapper .ginput_container select {
-    width: 100% !important;
-    background-color: #f8fafc !important;
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 0.875rem !important;
-    padding: 0.875rem 1.125rem !important;
-    font-size: 0.875rem !important;
-    line-height: 1.5 !important;
-    color: #0f172a !important;
-    transition: all 0.2s ease-in-out !important;
-    outline: none !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
-}
-body .form-wrapper input[type="text"]::placeholder,
-body .form-wrapper input[type="email"]::placeholder,
-body .form-wrapper input[type="tel"]::placeholder,
-body .form-wrapper textarea::placeholder,
-body .form-wrapper .ginput_container input::placeholder,
-body .form-wrapper .ginput_container textarea::placeholder {
-    color: #94a3b8 !important;
-    opacity: 1 !important;
-}
-body .form-wrapper input:focus,
-body .form-wrapper textarea:focus,
-body .form-wrapper select:focus,
-body .form-wrapper .gform_body input:focus,
-body .form-wrapper .gform_body textarea:focus,
-body .form-wrapper .ginput_container input:focus,
-body .form-wrapper .ginput_container textarea:focus,
-body .form-wrapper .ginput_container select:focus {
-    background-color: #ffffff !important;
-    border-color: #1d4ed8 !important;
-    box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.15) !important;
-}
-body .form-wrapper textarea,
-body .form-wrapper .ginput_container textarea {
-    min-height: 130px !important;
-    resize: vertical !important;
-}
-body .form-wrapper .gform_footer,
-body .form-wrapper .gform_page_footer {
-    margin-top: 1.75rem !important;
-    padding: 0 !important;
-}
-body .form-wrapper input[type="submit"],
-body .form-wrapper button[type="submit"],
-body .form-wrapper .gform_button {
-    width: 100% !important;
-    background-color: #1d4ed8 !important;
-    color: #ffffff !important;
-    font-weight: 700 !important;
-    font-size: 0.875rem !important;
-    padding: 0.875rem 2.5rem !important;
-    border-radius: 0.875rem !important;
-    border: none !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    box-shadow: 0 4px 14px rgba(29, 78, 216, 0.25) !important;
-}
-body .form-wrapper input[type="submit"]:hover,
-body .form-wrapper button[type="submit"]:hover,
-body .form-wrapper .gform_button:hover {
-    background-color: #1e40af !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 6px 18px rgba(29, 78, 216, 0.35) !important;
-}
-@media (min-width: 640px) {
-    body .form-wrapper input[type="submit"],
-    body .form-wrapper button[type="submit"],
-    body .form-wrapper .gform_button {
-        width: auto !important;
-        min-width: 180px !important;
-    }
-}
-</style>
+/** Phone of a contact row (matched by title, e.g. «دفتر مرکزی» / «کارخانه»). */
+$psb_phone_for = function ( $title ) use ( $psb_phones ) {
+	foreach ( $psb_phones as $p ) {
+		if ( $title && trim( $p['title'] ) === trim( $title ) ) {
+			return $p;
+		}
+	}
+	return null;
+};
 
-    <!-- 1. Immersive Hero Section -->
-    <section class="relative w-full h-[45vh] min-h-[380px] flex items-center justify-center overflow-hidden bg-slate-900 select-none">
-        <!-- Background Image -->
-        <?php if (has_post_thumbnail()) : ?>
-            <img src="<?php the_post_thumbnail_url('2048x2048'); ?>"
-                 alt="<?php the_title_attribute(); ?>"
-                 class="absolute inset-0 w-full h-full object-cover object-center opacity-40"
-                 fetchpriority="high"
-                 decoding="async">
-        <?php else : ?>
-            <div class="absolute inset-0 bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 opacity-90"></div>
-        <?php endif; ?>
+while ( have_posts() ) :
+	the_post();
+	get_template_part(
+		'template-parts/global/page-hero',
+		null,
+		array(
+			'variant' => 'light',
+			'eyebrow' => 'ارتباط با ' . psb_brand_name(),
+			'lead'    => 'برای استعلام قیمت، مشاوره فنی، بازدید از کارخانه یا پیگیری سفارش، از راه‌های ارتباطی زیر استفاده کنید. پاسخ‌گویی در ساعات اداری انجام می‌شود.',
+		)
+	);
+	?>
 
-        <!-- Soft Fade Overlay -->
-        <div class="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-slate-900/40 to-slate-50"></div>
+	<section class="container py-section-sm lg:py-section" aria-labelledby="contact-form-title">
+		<div class="grid items-start gap-6 lg:grid-cols-12">
+			<div class="grid content-start gap-6 lg:col-span-7">
+				<h2 class="sr-only">دفتر مرکزی و کارخانه</h2>
+				<?php foreach ( $psb_addresses as $psb_i => $psb_a ) : ?>
+					<?php
+					$psb_ph  = $psb_phone_for( $psb_a['title'] );
+					$psb_src = $psb_map_src( $psb_i );
+					?>
+					<article class="contact-card">
+						<div class="flex items-start gap-3">
+							<span class="icon-tile" aria-hidden="true"><?php echo psb_icon( false !== mb_strpos( (string) $psb_a['title'], 'کارخانه' ) ? 'factory' : 'map' ); // phpcs:ignore ?></span>
+							<div class="min-w-0">
+								<h3 class="text-base font-bold text-dark"><?php echo esc_html( $psb_a['title'] ? $psb_a['title'] : 'نشانی' ); ?></h3>
+								<p class="mt-1 text-sm leading-7 text-slate-600"><?php echo esc_html( psb_fa_num( $psb_a['address'] ) ); ?></p>
+							</div>
+						</div>
+						<div class="flex flex-wrap gap-2">
+							<?php if ( $psb_ph ) : ?>
+								<a class="btn btn-outline btn-sm" href="<?php echo esc_url( $psb_ph['href'] ); ?>"><?php echo psb_icon( 'phone', 'size-4' ); // phpcs:ignore ?><span dir="ltr"><?php echo esc_html( psb_fa_num( psb_format_phone( $psb_ph['number'] ) ) ); ?></span></a>
+							<?php endif; ?>
+							<?php if ( $psb_a['map_link'] ) : ?>
+								<a class="btn btn-ghost btn-sm" href="<?php echo esc_url( $psb_a['map_link'] ); ?>" target="_blank" rel="noopener"><?php echo psb_icon( 'map', 'size-4' ); // phpcs:ignore ?> مسیریابی</a>
+							<?php endif; ?>
+						</div>
+						<?php if ( $psb_src ) : ?>
+							<div class="map-placeholder" data-map>
+								<?php echo psb_icon( 'map', 'size-8 text-foreground' ); // phpcs:ignore ?>
+								<button type="button" class="btn btn-outline btn-sm" data-map-load="<?php echo esc_url( $psb_src ); ?>" data-map-title="<?php echo esc_attr( 'نقشه ' . $psb_a['title'] ); ?>">نمایش نقشه</button>
+								<p class="px-4 text-xs text-slate-500">نقشه گوگل پس از کلیک بارگذاری می‌شود.</p>
+							</div>
+						<?php endif; ?>
+					</article>
+				<?php endforeach; ?>
 
-        <!-- Header Text -->
-        <div class="relative z-10 text-center px-4 mt-[-6vh]" data-aos="fade-up">
-            <span class="inline-block px-3.5 py-1 rounded-full bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-bold mb-3">
-                ارتباط مستقیم با واحد فروش و مهندسی
-            </span>
-            <h1 class="text-3xl md:text-5xl font-black text-white tracking-tight mb-3 drop-shadow-md">
-                <?php the_title(); ?>
-            </h1>
-            <p class="text-sm md:text-base text-slate-300 font-medium max-w-xl mx-auto leading-relaxed">
-                پاسخگوی تمامی استعلام‌ها، مشاوره تخصصی تابلوسازی و درخواست‌های پروژه شما هستیم.
-            </p>
-        </div>
-    </section>
+			</div>
+			<div class="grid content-start gap-6 lg:col-span-5">
+			<div class="panel">
+				<h2 id="contact-form-title" class="text-h3 font-bold text-foreground">ارسال پیام</h2>
+				<p class="mt-2 text-sm leading-7 text-slate-600">برای استعلام قیمت دقیق‌تر، از <a class="font-bold text-primary-700" href="<?php echo esc_url( psb_quote_url() ); ?>">فرم استعلام</a> استفاده کنید و نقشه تک‌خطی یا مشخصات پروژه را پیوست کنید.</p>
+				<div class="gform-psb mt-6">
+					<?php
+					if ( $psb_form_id && shortcode_exists( 'gravityform' ) ) {
+						echo do_shortcode( '[gravityform id="' . (int) $psb_form_id . '" title="false" description="false" ajax="true"]' );
+					} elseif ( '' !== trim( get_the_content() ) ) {
+						the_content();
+					} else {
+						echo '<a class="btn btn-primary" href="' . esc_url( psb_quote_url() ) . '">ثبت درخواست استعلام</a>';
+					}
+					?>
+				</div>
+			</div>
 
-    <!-- 2. Floating Contact Card -->
-    <section class="relative z-20 container mx-auto px-4 md:px-8 max-w-6xl -mt-24 mb-16 select-none" data-aos="fade-up">
-        <div class="bg-white shadow-xl rounded-3xl overflow-hidden border border-slate-200">
-            <div class="grid lg:grid-cols-12">
-
-                <!-- Right Side (Form Area - RTL) -->
-                <div class="lg:col-span-7 p-6 sm:p-8 md:p-10 lg:p-12 order-2 lg:order-1 bg-white">
-                    <div class="mb-8 border-b border-slate-100 pb-5">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 mb-2">
-                            <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-                            <span>فرم مشاوره & استعلام قیمت</span>
-                        </div>
-                        <h2 class="text-xl lg:text-2xl font-black text-slate-900 mb-1.5">ارسال پیام و مشخصات پروژه</h2>
-                        <p class="text-xs md:text-sm text-slate-600 leading-relaxed">فرم زیر را تکمیل کنید تا کارشناسان ما در سریع‌ترین زمان ممکن با شما تماس بگیرند.</p>
-                    </div>
-
-                    <div class="form-wrapper">
-                        <?php
-                        if ($form_id) {
-                            echo do_shortcode('[gravityform id="' . esc_attr($form_id) . '" title="false" ajax="true" description="false"]');
-                        } else {
-                            echo '<div class="p-6 bg-slate-50 rounded-2xl text-center text-slate-500 text-sm border border-slate-200">لطفاً فرم تماس را در تنظیمات برگه انتخاب نمایید.</div>';
-                        }
-                        ?>
-                    </div>
-                </div>
-
-                <!-- Left Side (Contact Info Area - RTL) -->
-                <div class="lg:col-span-5 bg-slate-950 text-white p-6 sm:p-8 md:p-10 order-1 lg:order-2 flex flex-col justify-between relative overflow-hidden space-y-6 border-b lg:border-b-0 lg:border-r border-slate-800">
-
-                    <div class="relative z-10 space-y-6">
-                        <!-- Header -->
-                        <h3 class="text-lg font-bold text-white border-b border-slate-800 pb-3 flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block animate-pulse"></span>
-                            اطلاعات تماس و دفتر مرکزی
-                        </h3>
-
-                        <!-- Addresses Repeater -->
-                        <?php if (!empty($contacts) && is_array($contacts)) : ?>
-                            <div class="space-y-3">
-                                <?php foreach ($contacts as $c) :
-                                    $c_title = $c['title'] ?? '';
-                                    $c_addr = $c['address'] ?? '';
-                                    $c_map_link = $c['map-link'] ?? '';
-                                ?>
-                                    <div class="space-y-2 p-4 rounded-2xl bg-slate-900 border border-slate-800/80 shadow-sm">
-                                        <?php if ($c_title) : ?>
-                                            <h4 class="text-xs sm:text-sm font-bold text-blue-400 flex items-center gap-2">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
-                                                <?= esc_html($c_title); ?>
-                                            </h4>
-                                        <?php endif; ?>
-
-                                        <?php if ($c_addr) : ?>
-                                            <div class="flex items-start gap-2.5">
-                                                <div class="p-1.5 bg-slate-800 rounded-lg text-blue-400 flex-shrink-0 mt-0.5 border border-slate-700">
-                                                    <?php get_template_part('template-parts/svg/map', null, ['size' => 16, 'class' => 'fill-current']); ?>
-                                                </div>
-                                                <div class="space-y-1 flex-1">
-                                                    <address class="not-italic text-slate-300 text-xs leading-relaxed font-sans"><?= esc_html($c_addr); ?></address>
-                                                    <?php if ($c_map_link) : ?>
-                                                        <a href="<?= esc_url($c_map_link); ?>" target="_blank" class="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 text-[11px] font-semibold mt-0.5 transition-colors">
-                                                            <span>مسیریابی در گوگل مپ</span>
-                                                            <svg class="w-3 h-3 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                                                        </a>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </div>
-                                        <?php endif; ?>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php elseif ($legacy_address) : ?>
-                            <div class="flex items-start gap-3 p-4 rounded-2xl bg-slate-900 border border-slate-800">
-                                <div class="p-2 bg-slate-800 rounded-lg text-blue-400 flex-shrink-0 border border-slate-700">
-                                    <?php get_template_part('template-parts/svg/map', null, ['size' => 18, 'class' => 'fill-current']); ?>
-                                </div>
-                                <div>
-                                    <h4 class="text-xs font-bold text-slate-400 mb-1">آدرس</h4>
-                                    <address class="not-italic text-slate-300 text-xs leading-relaxed font-sans"><?= esc_html($legacy_address); ?></address>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-
-                        <!-- Phone Repeater Section (Clean 2-Column Grid for Multiple Numbers) -->
-                        <?php if (!empty($phones) && is_array($phones)) : ?>
-                            <div class="space-y-3 p-4 rounded-2xl bg-slate-900 border border-slate-800">
-                                <h4 class="text-xs font-bold text-slate-300 flex items-center justify-between border-b border-slate-800/80 pb-2">
-                                    <span class="flex items-center gap-1.5">
-                                        <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>                                        شماره‌های تماس و پشتیبانی
-                                    </span>
-                                    <span class="text-[10px] text-blue-400 font-mono"><?= count($phones); ?> شماره</span>
-                                </h4>
-                                
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                                     <?php foreach ($phones as $p) :
-                                         $num_obj = $p['number'] ?? ($p['phone'] ?? null);
-                                         $title = $p['title'] ?? '';
-
-                                         if (is_array($num_obj)) {
-                                             $title = $title ?: ($num_obj['title'] ?? '');
-                                             $num_obj = $num_obj['url'] ?? '';
-                                         }
-
-                                         $raw_num = is_string($num_obj) ? $num_obj : '';
-                                         $clean_num = preg_replace('#^https?://#i', '', $raw_num);
-                                         $clean_num = str_replace('tel:', '', $clean_num);
-
-                                         if (!$clean_num) continue;
-                                         $phone_href = 'tel:' . preg_replace('/[^0-9+]/', '', $clean_num);
-                                     ?>
-                                         <a href="<?= esc_url($phone_href); ?>" class="group p-2.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-blue-500/50 transition-all flex flex-col justify-between space-y-1">
-                                             <span class="text-[11px] text-slate-400 font-medium group-hover:text-slate-200 transition-colors line-clamp-1"><?= esc_html($title ?: 'تلفن تماس'); ?></span>
-                                             <span class="text-blue-400 group-hover:text-blue-300 font-mono text-xs font-bold ltr text-left tracking-wider">
-                                                 <?= esc_html($clean_num); ?>
-                                             </span>
-                                         </a>
-                                     <?php endforeach; ?>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-
-                        <!-- Email Repeater Section -->
-                        <?php if (!empty($emails) && is_array($emails)) : ?>
-                            <div class="flex items-start gap-3 p-4 rounded-2xl bg-slate-900 border border-slate-800">
-                                <div class="p-2 bg-slate-800 rounded-xl text-blue-400 flex-shrink-0 mt-0.5 border border-slate-700">
-                                    <?php get_template_part('template-parts/svg/envelope', null, ['size' => 18, 'class' => 'fill-current']); ?>
-                                </div>
-                                <div class="space-y-1">
-                                    <span class="text-xs text-slate-400 block font-medium">ایمیل‌های ارتباطی:</span>
-                                    <div class="space-y-1">
-                                        <?php foreach ($emails as $e) :
-                                            $e_val = $e['email'] ?? '';
-                                            if ($e_val) :
-                                        ?>
-                                            <a href="mailto:<?= esc_attr($e_val); ?>" class="text-slate-200 text-xs hover:text-blue-400 transition-colors block font-mono"><?= esc_html($e_val); ?></a>
-                                        <?php endif; endforeach; ?>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-
-                    <!-- Social Links Footer -->
-                    <div class="relative z-10 mt-6 pt-4 border-t border-slate-800">
-                        <p class="text-xs font-bold text-slate-400 mb-2.5">شبکه‌های اجتماعی
-                            <?= get_field('brand_name' , 'option') ?? 'پارس سوییچ بورد' ?>
-                        </p>
-                        <nav aria-label="social network links" class="flex gap-2">
-                            <?php get_template_part('template-parts/global/social-links', null , ['class' => 'border-slate-700 text-slate-300 hover:text-white hover:bg-blue-600']); ?>
-                        </nav>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- 3. Interactive Maps Section (2-Column Grid with Header Box) -->
-    <?php
-    $valid_maps = array();
-
-    if (!empty($contacts) && is_array($contacts)) {
-        foreach ($contacts as $c) {
-            $c_title = $c['title'] ?? 'موقعیت جغرافیایی';
-            $c_addr = $c['address'] ?? '';
-            $c_map = $c['map'] ?? '';
-            $c_link = $c['map-link'] ?? '';
-
-            if (!empty($c_map) || !empty($c_addr)) {
-                $valid_maps[] = array(
-                    'title' => $c_title,
-                    'address' => $c_addr,
-                    'map' => $c_map,
-                    'link' => $c_link,
-                );
-            }
-        }
-    }
-
-    // Fallback to legacy map if repeater is empty
-    if (empty($valid_maps) && (!empty($legacy_map) || !empty($legacy_address))) {
-        $valid_maps[] = array(
-            'title' => 'دفتر مرکزی پارس سویچ برد',
-            'address' => $legacy_address ?: '',
-            'map' => $legacy_map ?: '',
-            'link' => '',
-        );
-    }
-    ?>
-
-    <?php if (!empty($valid_maps)) : ?>
-        <section class="container mx-auto px-4 md:px-8 pb-16 pt-4 select-none" data-aos="fade-up">
-            <div class="text-center max-w-2xl mx-auto space-y-2 mb-8">
-                <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 shadow-sm">
-                    <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-                    نقشه و موقعیت جغرافیایی
-                </span>
-                <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                    موقعیت کارخانه و دفاتر شرکت پارس سویچ برد
-                </h2>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                <?php foreach ($valid_maps as $m) : ?>
-                    <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between" data-aos="fade-up">
-                        <!-- Box Header with Name & Address -->
-                        <div class="p-5 sm:p-6 bg-slate-50/80 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                            <div class="space-y-1">
-                                <h3 class="font-bold text-slate-900 text-base sm:text-lg flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0"></span>
-                                    <?= esc_html($m['title']); ?>
-                                </h3>
-                                <?php if ($m['address']) : ?>
-                                    <p class="text-xs text-slate-600 leading-relaxed max-w-md">
-                                        <?= esc_html($m['address']); ?>
-                                    </p>
-                                <?php endif; ?>
-                            </div>
-
-                            <?php if ($m['link']) : ?>
-                                <a href="<?= esc_url($m['link']); ?>" target="_blank" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-white hover:bg-blue-700 text-blue-700 hover:text-white transition-all border border-blue-200 shadow-sm shrink-0 self-start sm:self-auto">
-                                    <span>مسیریابی گوگل‌مپ</span>
-                                    <svg class="w-3.5 h-3.5 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                                </a>
-                            <?php endif; ?>
-                        </div>
-
-                        <!-- Map Iframe Frame -->
-                        <?php if ($m['map']) : ?>
-                            <div class="w-full h-80 min-h-[320px] relative overflow-hidden bg-slate-100 [&_iframe]:w-full [&_iframe]:h-full [&_iframe]:border-0">
-                                <?= $m['map']; ?>
-                            </div>
-                        <?php else : ?>
-                            <div class="w-full h-48 bg-slate-100 flex items-center justify-center text-xs text-slate-400">
-                                نقشه‌ای ثبت نشده است.
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        </section>
-    <?php endif; ?>
-
-<?php
+				<?php if ( count( $psb_phones ) > 1 || $psb_emails ) : ?>
+					<div class="contact-card">
+						<h3 class="text-base font-bold text-foreground">خطوط مستقیم</h3>
+						<dl class="spec-list">
+							<?php foreach ( $psb_phones as $psb_p ) : ?>
+								<div><dt class="flex items-center gap-2"><?php echo psb_icon( false !== mb_strpos( (string) $psb_p['title'], 'فاکس' ) ? 'fax' : 'phone', 'size-4 text-slate-500' ); // phpcs:ignore ?><?php echo esc_html( $psb_p['title'] ? $psb_p['title'] : 'تلفن' ); ?></dt><dd><a class="ltr-num font-bold text-dark hover:text-primary-700" href="<?php echo esc_url( $psb_p['href'] ); ?>"><?php echo esc_html( psb_fa_num( psb_format_phone( $psb_p['number'] ) ) ); ?></a></dd></div>
+							<?php endforeach; ?>
+							<?php foreach ( $psb_emails as $psb_e ) : ?>
+								<div><dt class="flex items-center gap-2"><?php echo psb_icon( 'mail', 'size-4 text-slate-500' ); // phpcs:ignore ?>ایمیل</dt><dd><a class="font-bold text-dark hover:text-primary-700" dir="ltr" href="mailto:<?php echo esc_attr( $psb_e ); ?>"><?php echo esc_html( $psb_e ); ?></a></dd></div>
+							<?php endforeach; ?>
+						</dl>
+					</div>
+				<?php endif; ?>
+			</div>
+		</div>
+	</section>
+	<script>
+	document.addEventListener('click',function(e){var b=e.target.closest('[data-map-load]');if(!b)return;var box=b.closest('[data-map]'),f=document.createElement('iframe');f.src=b.getAttribute('data-map-load');f.title=b.getAttribute('data-map-title')||'نقشه';f.loading='lazy';f.referrerPolicy='no-referrer-when-downgrade';f.allowFullscreen=true;box.appendChild(f);b.remove();});
+	</script>
+	<?php
+endwhile;
 get_footer();
-?>

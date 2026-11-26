@@ -8,14 +8,14 @@
          style="display: none;"></div>
 
     <nav :class="isMobileMenuOpen ? 'w-[65vw] max-w-[280px] z-40' : 'max-lg:!w-12'"
-         class="lg:w-[30%] float-right max-lg:fixed top-0 <?= current_user_can('administrator') ? 'max-lg:pt-24' : 'max-lg:pt-12'; ?> right-0 h-full bg-white border-l border-gray-100 transition-all duration-300 ease-out flex flex-col overflow-hidden lg:shadow-none lg:border-none lg:bg-transparent lg:static lg:h-auto lg:p-0"
+         class="lg:w-[30%] float-right max-lg:fixed top-0 <?= current_user_can('administrator') ? 'max-lg:pt-24' : 'max-lg:pt-12'; ?> right-0 h-full bg-white border-l border-slate-100 transition-all duration-300 ease-out flex flex-col overflow-hidden lg:shadow-none lg:border-none lg:bg-transparent lg:static lg:h-auto lg:p-0"
          aria-label="<?php esc_html_e( 'Account pages', 'woocommerce' ); ?>">
 
-        <div :class="isMobileMenuOpen ? 'p-1' : 'pt-1'" class="flex items-center gap-3 border-b transition-all duration-300 border-gray-200 bg-gray-50 lg:hidden relative shrink-0">
+        <div :class="isMobileMenuOpen ? 'p-1' : 'pt-1'" class="flex items-center gap-3 border-b transition-all duration-300 border-slate-200 bg-slate-50 lg:hidden relative shrink-0">
 
             <button @click="isMobileMenuOpen = !isMobileMenuOpen"
-                    :class="isMobileMenuOpen ? 'rounded-lg border' : 'border-t'"
-                    class="size-11 shrink-0 bg-white border-gray-200 flex items-center justify-center text-gray-600 transition-colors">
+                    :class="isMobileMenuOpen ? 'rounded-control border' : 'border-t'"
+                    class="size-11 shrink-0 bg-white border-slate-200 flex items-center justify-center text-slate-600 transition-colors">
                 <svg x-show="!isMobileMenuOpen" class="h-5 w-5" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M2 2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zm12-1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2z"/>
                     <path d="M13 4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1z"/>
@@ -24,7 +24,7 @@
             </button>
 
             <span :class="isMobileMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'"
-                  class="font-black text-gray-800 text-sm whitespace-nowrap transition-all duration-300">
+                  class="font-bold text-slate-800 text-sm whitespace-nowrap transition-all duration-300">
                 <?php esc_html_e( 'My Account', 'woocommerce' ); ?>
             </span>
         </div>
@@ -57,10 +57,10 @@
                 $current_svg = $svg_icons[$endpoint] ?? $default_svg;
                 ?>
 
-                <li class="<?php echo wc_get_account_menu_item_classes( $endpoint ); ?> bg-gray-50 hover:bg-gray-100 max-lg:border-b lg:border border-gray-200 lg:rounded-xl transition-all <?php echo $active ? '!bg-primary !border-primary' : ''; ?>">
+                <li class="<?php echo wc_get_account_menu_item_classes( $endpoint ); ?> bg-slate-50 hover:bg-slate-100 max-lg:border-b lg:border border-slate-200 lg:rounded-card transition-all <?php echo $active ? '!bg-primary !border-primary' : ''; ?>">
 
                     <a href="<?php echo esc_url( wc_get_account_endpoint_url( $endpoint ) ); ?>"
-                       class="flex items-center h-10 px-1 lg:px-4 gap-3 no-underline <?php echo $active ? '!text-white' : '!text-gray-600'; ?>"
+                       class="flex items-center h-10 px-1 lg:px-4 gap-3 no-underline <?php echo $active ? '!text-white' : '!text-slate-600'; ?>"
                         <?php echo $active ? 'aria-current="page"' : ''; ?>>
 
                         <div class="w-9 flex justify-center shrink-0">

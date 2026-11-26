@@ -32,7 +32,7 @@ function out_stock_product_list_dropdown()
     else :
         echo '<p class="absolute inset-0 rounded-lg bg-primary/80 border border-white/15 select-none flex flex-col max-lg:gap-2 items-center justify-center backdrop-blur-3xl">
                 <span class="text-sm opacity-50">همه محصولات موجود هستند </span>
-                <span class="text-xl lg:text-2xl font-bold">محصولی برای نمایش وجود ندارد!</span>
+                <span class="text-xl lg:text-2xl font-bold">محصولی برای نمایش وجود ندارد.</span>
             </p>';
     endif;
 }?>
