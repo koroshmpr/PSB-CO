@@ -334,7 +334,8 @@ foreach ( array(
 	'/inc/rfq/rfq.php',                        // Quote requests + bot notifications.
 	'/inc/pwa/pwa.php',                        // Manifest, service worker, install prompt.
 	'/inc/owner-panel/owner-panel.php',        // Mobile admin panel.
-	'/inc/project-records/project-records.php', // «سوابق اجرایی» CPT, importer, page.
+	'/inc/project-records/project-records.php',
+	'/inc/live-setup.php',                     // One-time live data setup (runs on psb.co.ir only).
 ) as $psb_module ) {
 	if ( is_readable( get_template_directory() . $psb_module ) ) {
 		require_once get_template_directory() . $psb_module;

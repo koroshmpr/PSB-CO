@@ -1,0 +1,190 @@
+[
+{
+"slug": "lv-switchboards",
+"name": "تابلو برق فشار ضعیف",
+"color": "blue",
+"icon": "bolt",
+"description": "از انواع تابلوهای فشار ضعیف و MDB تا MCC، بانک خازنی، ATS، فرم‌های جداسازی، انتخاب کلید، شینه و ارتینگ؛ مسیر کامل شناخت تابلوهای LV.",
+"pillar": 1792,
+"posts": [
+[
+1792,
+1
+],
+[
+1794,
+2
+],
+[
+1793,
+3
+],
+[
+1795,
+4
+],
+[
+1796,
+5
+],
+[
+1797,
+6
+],
+[
+"acb-vs-mccb-circuit-breaker-selection",
+7
+],
+[
+"protection-coordination-selectivity",
+8
+],
+[
+"busbar-sizing-and-busduct",
+9
+],
+[
+"earthing-and-bonding-in-switchboards",
+10
+],
+[
+"harmonics-and-active-filter",
+11
+],
+[
+"metering-panel-distribution-standard",
+12
+]
+]
+},
+{
+"slug": "mv-switchgear",
+"name": "تابلو فشار متوسط و کمپکت",
+"color": "violet",
+"icon": "factory",
+"description": "انواع تابلوهای فشار متوسط، سلول ثابت و کشویی، تابلو کمپکت RMU، استاندارد IEC 62271-200 و مقایسه عایق SF6 و هوا.",
+"pillar": 1785,
+"posts": [
+[
+1785,
+1
+],
+[
+1787,
+2
+],
+[
+1759,
+3
+],
+[
+1790,
+4
+],
+[
+1791,
+5
+]
+]
+},
+{
+"slug": "quality-testing-standards",
+"name": "کیفیت، تست و استاندارد",
+"color": "emerald",
+"icon": "flask",
+"description": "تایپ تست و روتین تست، IEC 61439، درجه حفاظت IP، رنگ پودری، تست تزریق جریان، FAT و SAT، ترموگرافی و تأییدیه توانیر.",
+"pillar": 1780,
+"posts": [
+[
+1780,
+1
+],
+[
+1753,
+2
+],
+[
+1782,
+3
+],
+[
+1786,
+4
+],
+[
+1449,
+5
+],
+[
+"fat-sat-switchboard-testing",
+6
+],
+[
+"switchboard-assembly-and-wiring-standards",
+7
+],
+[
+"electrical-panel-thermography",
+8
+],
+[
+1789,
+9
+]
+]
+},
+{
+"slug": "buying-guide",
+"name": "راهنمای خرید و پروژه",
+"color": "amber",
+"icon": "doc",
+"description": "انتخاب سازنده، عوامل قیمت، اطلاعات لازم برای استعلام، تابلو برای ساختمان، صنعت، بیمارستان، نیروگاه خورشیدی و محیط‌های ضد انفجار، و نگهداری.",
+"pillar": 1779,
+"posts": [
+[
+1779,
+1
+],
+[
+1781,
+2
+],
+[
+"electrical-panel-price-factors",
+3
+],
+[
+"industrial-electrical-panel",
+4
+],
+[
+"building-electrical-panel-residential",
+5
+],
+[
+"lighting-distribution-panel",
+6
+],
+[
+1783,
+7
+],
+[
+"generator-synchronizing-panel",
+8
+],
+[
+"solar-power-plant-switchgear",
+9
+],
+[
+"explosion-proof-ex-panel",
+10
+],
+[
+1788,
+11
+]
+]
+}
+]
