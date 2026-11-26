@@ -277,12 +277,12 @@
 	/* Desktop side TOC: sticky, viewport-capped, own scrollbar, h3 only for the active section */
 	.toc-stick {
 		@apply xl:sticky;
-		top: calc(var(--header-live, var(--header-h, 4rem)) + 24px);
+		top: calc(var(--header-live, var(--header-h, 4rem)) + var(--wp-admin--admin-bar--height, 0px) + 24px);
 	}
 
 	@media (min-width: 80rem) {
 		.toc-stick {
-			max-height: calc(100vh - var(--header-live, var(--header-h, 4rem)) - 48px);
+			max-height: calc(100vh - var(--header-live, var(--header-h, 4rem)) - var(--wp-admin--admin-bar--height, 0px) - 48px);
 		}
 	}
 

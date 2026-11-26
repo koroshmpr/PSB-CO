@@ -9,7 +9,7 @@
 		-webkit-text-size-adjust: 100%;
 		-webkit-tap-highlight-color: transparent;
 		text-rendering: optimizeLegibility;
-		scroll-padding-top: calc(var(--spacing-header) + 1rem);
+		scroll-padding-top: calc(var(--spacing-header) + var(--wp-admin--admin-bar--height, 0px) + 1rem);
 	}
 
 	@media (prefers-reduced-motion: no-preference) {

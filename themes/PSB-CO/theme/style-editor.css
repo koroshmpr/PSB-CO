@@ -476,7 +476,7 @@ body:not(.page-template-form):not(.page-template-contact-us) .gform_wrapper {
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
     text-rendering: optimizeLegibility;
-    scroll-padding-top: calc(var(--spacing-header) + 1rem);
+    scroll-padding-top: calc(var(--spacing-header) + var(--wp-admin--admin-bar--height, 0px) + 1rem);
   }
   @media (prefers-reduced-motion: no-preference) {
     html {
@@ -3895,11 +3895,11 @@ html.vt-back::view-transition-new(main) {
     }
   }
   .toc-stick {
-    top: calc(var(--header-live, var(--header-h, 4rem)) + 24px);
+    top: calc(var(--header-live, var(--header-h, 4rem)) + var(--wp-admin--admin-bar--height, 0px) + 24px);
   }
   @media (min-width: 80rem) {
     .toc-stick {
-      max-height: calc(100vh - var(--header-live, var(--header-h, 4rem)) - 48px);
+      max-height: calc(100vh - var(--header-live, var(--header-h, 4rem)) - var(--wp-admin--admin-bar--height, 0px) - 48px);
     }
   }
   .toc--side {
