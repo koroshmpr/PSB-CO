@@ -12,6 +12,9 @@
  *  2. Page templates (FAQ) + the «سوابق اجرایی» page (/project-references/).
  *  3. Products: copy public meta psb_rfq_type → protected _psb_rfq_type.
  *  4. Article series: terms + term meta + _series_order (inc/live-setup-series.json).
+ *  6. RFQ notification channels (non-secret parts only: enabled flags, channel ids, e-mail recipient).
+ *     Bot tokens never live in git: they come from wp-config constants PSB_RFQ_BALE_TOKEN /
+ *     PSB_RFQ_TELEGRAM_TOKEN or the RFQ settings screen.
  *  5. Project references import (inc/project-records/data/projects-public.csv; restricted rows are
  *     filtered by the importer again).
  *
@@ -20,7 +23,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-const PSB_LIVE_SETUP_VERSION = 1;
+const PSB_LIVE_SETUP_VERSION = 2;
 
 function psb_live_setup_is_live() {
 	return 'psb.co.ir' === strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
@@ -171,6 +174,24 @@ function psb_live_setup_run() {
 			}
 			$r['series'][] = $s['slug'] . ':' . $n . '/' . count( $s['posts'] );
 		}
+	}
+
+	// 6. RFQ channels (merge; never overwrites a token typed in the settings screen).
+	if ( function_exists( 'psb_rfq_save_channels' ) ) {
+		$saved = get_option( 'psb_rfq_channels', array() );
+		$saved = is_array( $saved ) ? $saved : array();
+		$want  = array(
+			'bale'     => array( 'enabled' => 1, 'chats' => '@psbrequests', 'parse' => 'html', 'files' => 1 ),
+			'telegram' => array( 'enabled' => 1, 'chats' => '@psbrequests', 'parse' => 'html' ),
+			'email'    => array( 'enabled' => 1, 'to' => get_option( 'admin_email' ) ),
+		);
+		foreach ( $want as $ch => $vals ) {
+			$saved[ $ch ] = array_merge( isset( $saved[ $ch ] ) && is_array( $saved[ $ch ] ) ? $saved[ $ch ] : array(), $vals );
+		}
+		psb_rfq_save_channels( $saved );
+		$r['rfq_channels'] = 'bale+telegram @psbrequests, email ' . get_option( 'admin_email' )
+			. '; tokens: bale ' . ( defined( 'PSB_RFQ_BALE_TOKEN' ) || ! empty( $saved['bale']['token'] ) ? 'ok' : 'missing' )
+			. ', telegram ' . ( defined( 'PSB_RFQ_TELEGRAM_TOKEN' ) || ! empty( $saved['telegram']['token'] ) ? 'ok' : 'missing' );
 	}
 
 	// 5. Project references.

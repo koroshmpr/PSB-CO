@@ -162,3 +162,20 @@ function psb_co_register_custom_post_types() {
     ));
 }
 add_action('init', 'psb_co_register_custom_post_types');
+/**
+ * The old «نمونه کارها» page (/portfolio/) duplicates the portfolio archive (/portfolios/) and has no
+ * template on live; send it (and its menu item) to the archive with a permanent redirect.
+ */
+add_action(
+	'template_redirect',
+	static function () {
+		if ( is_page( 'portfolio' ) && post_type_exists( 'portfolio' ) ) {
+			$url = get_post_type_archive_link( 'portfolio' );
+			if ( $url && untrailingslashit( $url ) !== untrailingslashit( home_url( '/portfolio' ) ) ) {
+				wp_safe_redirect( $url, 301 );
+				exit;
+			}
+		}
+	},
+	5
+);
