@@ -403,3 +403,50 @@ function psb_series_script_print() {
 	</script>
 	<?php
 }
+
+/**
+ * Blog home «featured» block: pillar of the largest series (else first sticky, else latest post) + the 2 latest others.
+ * The main blog query excludes these, so the grid always shows exactly Settings › Reading › «Blog pages show at most».
+ *
+ * @return int[]
+ */
+function psb_blog_featured_ids() {
+	static $ids = null;
+	if ( null !== $ids ) {
+		return $ids;
+	}
+	$series = function_exists( 'psb_series_all' ) ? psb_series_all() : array();
+	$lead   = $series ? (int) $series[0]['pillar'] : 0;
+	if ( $lead && 'publish' !== get_post_status( $lead ) ) {
+		$lead = 0;
+	}
+	$sticky = array_map( 'intval', (array) get_option( 'sticky_posts' ) );
+	if ( ! $lead && $sticky ) {
+		$lead = $sticky[0];
+	}
+	$side = get_posts(
+		array(
+			'post_type'        => 'post',
+			'post_status'      => 'publish',
+			'numberposts'      => $lead ? 2 : 3,
+			'post__not_in'     => $lead ? array( $lead ) : array(),
+			'fields'           => 'ids',
+			'suppress_filters' => true,
+		)
+	);
+	$ids = array_values( array_filter( array_map( 'intval', array_merge( $lead ? array( $lead ) : array(), (array) $side ) ) ) );
+	return $ids;
+}
+
+add_action(
+	'pre_get_posts',
+	static function ( $q ) {
+		if ( is_admin() || ! $q->is_main_query() || ! $q->is_home() ) {
+			return;
+		}
+		$ids = psb_blog_featured_ids();
+		if ( $ids ) {
+			$q->set( 'post__not_in', array_merge( (array) $q->get( 'post__not_in' ), $ids ) );
+		}
+	}
+);

@@ -75,25 +75,13 @@ $psb_series = function_exists( 'psb_series_all' ) ? psb_series_all() : array();
 
 <?php
 $psb_featured = array();
-if ( $psb_first && have_posts() ) :
-	// Featured: pillar of the largest series, else the first sticky post, else the latest post.
-	$psb_lead_id = $psb_series ? (int) $psb_series[0]['pillar'] : 0;
-	$psb_sticky  = array_map( 'intval', (array) get_option( 'sticky_posts' ) );
-	if ( ! $psb_lead_id && $psb_sticky ) {
-		$psb_lead_id = $psb_sticky[0];
-	}
-	if ( ! $psb_lead_id ) {
-		$psb_lead_id = (int) $wp_query->posts[0]->ID;
-	}
-	$psb_side = get_posts(
-		array(
-			'post_type'    => 'post',
-			'post_status'  => 'publish',
-			'numberposts'  => 2,
-			'post__not_in' => array( $psb_lead_id ),
-		)
-	);
-	$psb_featured = array_merge( array( $psb_lead_id ), wp_list_pluck( $psb_side, 'ID' ) );
+if ( $psb_first && psb_blog_featured_ids() ) :
+	// Featured: pillar of the largest series, else the first sticky post, else the latest post (+2 latest).
+	// The main query already excludes these (psb_blog_featured_ids()), so the grid keeps the full page size.
+	$psb_featured = psb_blog_featured_ids();
+	$psb_lead_id  = (int) $psb_featured[0];
+	$psb_side     = array_map( 'get_post', array_slice( $psb_featured, 1 ) );
+	$psb_sticky   = array_map( 'intval', (array) get_option( 'sticky_posts' ) );
 	?>
 	<section class="container py-section-sm" aria-labelledby="mag-featured-title">
 		<h2 id="mag-featured-title" class="sr-only">مقالات برگزیده</h2>
