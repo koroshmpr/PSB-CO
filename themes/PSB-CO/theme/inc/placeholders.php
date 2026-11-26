@@ -497,7 +497,7 @@ function psb_image_blocked( $att_id ) {
 	if ( isset( $memo[ $att_id ] ) ) {
 		return $memo[ $att_id ];
 	}
-	$ids   = array( 1336, 1388, 1703, 1734, 1742, 1743, 1744, 1745, 1750, 1752, 1776, 1777, 1837, 1838, 1839, 1841, 1842 );
+	$ids   = array( 1336, 1388, 1703, 1734, 1742, 1743, 1744, 1745, 1750, 1752, 1776, 1777, 1837, 1838, 1839, 1841, 1842, 1705, 1708, 1836 ); // 1705/1708/1836: AI-generated «Electrical-Panel» renders (garbled labels).
 	$files = array(
 		'psb-powder-coating-unit', 'psb-sheet-metal-machinery', 'psb-cnc-amada-machinery-banner',
 		'0b10e189-5a18-4b99-a943-6218b886efc9', '4ef125b9-cf0b-4c84-b2ad-5e5ce714f9c2',
