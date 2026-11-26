@@ -196,3 +196,30 @@ if ( defined( 'DOING_CRON' ) && DOING_CRON ) {
 	remove_action( 'init', 'wp_cron' );
 	remove_action( 'wp_loaded', '_wp_cron' );
 }
+
+/**
+ * Purge the page cache after a theme deploy.
+ *
+ * A deploy changes built assets (style.css / js/script.min.js) but Cache Enabler keeps serving the old HTML
+ * (with old asset versions). On any uncached request — the 5-minute server cron, wp-admin, REST, logged-in
+ * visits — compare a fingerprint of the deployed build and clear the complete cache once when it changed.
+ */
+add_action(
+	'init',
+	static function () {
+		$dir   = get_template_directory();
+		$print = '';
+		foreach ( array( '/style.css', '/js/script.min.js', '/functions.php' ) as $f ) {
+			$print .= (string) @filemtime( $dir . $f ) . (string) @filesize( $dir . $f ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+		$print = md5( $print );
+		if ( get_option( 'psb_build_fingerprint' ) === $print ) {
+			return;
+		}
+		update_option( 'psb_build_fingerprint', $print, true );
+		if ( has_action( 'cache_enabler_clear_complete_cache' ) ) {
+			do_action( 'cache_enabler_clear_complete_cache' );
+		}
+	},
+	99
+);
