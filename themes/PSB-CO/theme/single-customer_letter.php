@@ -30,7 +30,7 @@ while ( have_posts() ) :
 	?>
 	<section class="container py-section">
 		<div class="grid gap-10 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:gap-14">
-			<div class="lg:sticky lg:self-start" style="top:calc(var(--header-h,4rem) + 1.5rem)">
+			<div class="lg:sticky lg:self-start" style="top:calc(var(--header-h,4rem) + var(--wp-admin--admin-bar--height,0px) + 1.5rem)">
 				<?php if ( $psb_full ) : ?>
 					<button type="button" class="doc-frame w-full cursor-zoom-in" data-lightbox="<?php echo esc_url( $psb_full ); ?>" data-lightbox-title="<?php echo esc_attr( $psb_name ); ?>" <?php echo $psb_l['pdf'] ? 'data-lightbox-pdf="' . esc_url( $psb_l['pdf']['url'] ) . '"' : ''; ?>>
 						<?php

@@ -70,7 +70,7 @@ while ( have_posts() ) :
 				<div class="article-prose mt-6"><?php the_content(); ?></div>
 			</div>
 			<?php if ( $psb_intro_img ) : ?>
-				<figure class="lg:sticky lg:col-span-5" style="top:calc(var(--header-h,4rem) + 2rem)">
+				<figure class="lg:sticky lg:col-span-5" style="top:calc(var(--header-h,4rem) + var(--wp-admin--admin-bar--height,0px) + 2rem)">
 					<?php echo psb_image( $psb_intro_img, 'large', array( 'alt' => 'کارخانه ' . psb_brand_name(), 'sizes' => '(min-width: 1024px) 30rem, 92vw', 'class' => 'aspect-[4/5] w-full rounded-card object-cover' ) ); // phpcs:ignore ?>
 				</figure>
 			<?php endif; ?>

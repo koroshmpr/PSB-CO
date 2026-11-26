@@ -15,7 +15,7 @@
 	/* ---------------- Underline tabs (credentials hub, product sections) — spec 4.14 ---------------- */
 	.subnav {
 		@apply relative z-30 border-b border-line bg-white lg:sticky;
-		top: var(--header-h, 4rem);
+		top: calc(var(--header-h, 4rem) + var(--wp-admin--admin-bar--height, 0px));
 	}
 
 	.subnav-list {
@@ -55,7 +55,7 @@
 
 	.inner-aside {
 		@apply flex flex-col gap-5 lg:sticky lg:col-span-4 lg:self-start lg:ps-6;
-		top: calc(var(--header-h, 4rem) + 4rem);
+		top: calc(var(--header-h, 4rem) + var(--wp-admin--admin-bar--height, 0px) + 4rem);
 	}
 
 	.panel {
@@ -388,7 +388,7 @@
 
 	.anchor-nav {
 		@apply relative z-30 flex gap-6 overflow-x-auto border-b border-line bg-white lg:sticky;
-		top: var(--header-h, 4rem);
+		top: calc(var(--header-h, 4rem) + var(--wp-admin--admin-bar--height, 0px));
 		scrollbar-width: none;
 	}
 

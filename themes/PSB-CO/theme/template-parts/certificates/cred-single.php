@@ -85,7 +85,7 @@ get_template_part( 'template-parts/certificates/cred-nav', null, array( 'current
 		</div>
 
 		<aside class="lg:col-span-5 lg:ps-10" aria-label="<?php echo esc_attr( $args['doc_label'] ?? 'سند' ); ?>">
-			<div class="lg:sticky" style="top:calc(var(--header-h,4rem) + 4rem)">
+			<div class="lg:sticky" style="top:calc(var(--header-h,4rem) + var(--wp-admin--admin-bar--height,0px) + 4rem)">
 				<?php if ( $psb_full ) : ?>
 					<button type="button" class="doc-frame w-full cursor-zoom-in" data-lightbox="<?php echo esc_url( $psb_full ); ?>" data-lightbox-title="<?php echo esc_attr( $psb_title ); ?>" <?php echo $psb_pdf ? 'data-lightbox-pdf="' . esc_url( $psb_pdf['url'] ) . '"' : ''; ?>>
 						<?php echo psb_image( $psb_prev, 'large', array( 'alt' => 'تصویر سند: ' . $psb_title, 'sizes' => '(min-width: 1024px) 28rem, 92vw' ) ); // phpcs:ignore ?>

@@ -3292,7 +3292,7 @@ html.vt-back::view-transition-new(main) {
     }
   }
   .subnav {
-    top: var(--header-h, 4rem);
+    top: calc(var(--header-h, 4rem) + var(--wp-admin--admin-bar--height, 0px));
   }
   .subnav-list {
     width: 100%;
@@ -3430,7 +3430,7 @@ html.vt-back::view-transition-new(main) {
     }
   }
   .inner-aside {
-    top: calc(var(--header-h, 4rem) + 4rem);
+    top: calc(var(--header-h, 4rem) + var(--wp-admin--admin-bar--height, 0px) + 4rem);
   }
   .panel {
     border-radius: var(--radius-card);
@@ -4078,7 +4078,7 @@ html.vt-back::view-transition-new(main) {
     }
   }
   .anchor-nav {
-    top: var(--header-h, 4rem);
+    top: calc(var(--header-h, 4rem) + var(--wp-admin--admin-bar--height, 0px));
     scrollbar-width: none;
   }
   .anchor-nav a {

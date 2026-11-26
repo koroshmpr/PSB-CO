@@ -93,7 +93,7 @@ $psb_is = function ( $term ) use ( $psb_term ) {
 	<div class="grid gap-8 lg:grid-cols-12 lg:gap-6">
 		<?php if ( $psb_tree ) : ?>
 			<nav class="min-w-0 lg:col-span-3" aria-label="دسته‌بندی محصولات">
-				<div class="cat-nav lg:sticky" style="top:calc(var(--header-h,4rem) + 1.5rem)">
+				<div class="cat-nav lg:sticky" style="top:calc(var(--header-h,4rem) + var(--wp-admin--admin-bar--height,0px) + 1.5rem)">
 					<p class="mb-3 hidden text-sm font-semibold text-slate-600 lg:block">دسته‌بندی محصولات</p>
 					<ul class="cat-list" role="list">
 						<li><?php echo $psb_link( null, 'همه محصولات', $psb_total, 'grid', ! $psb_term ); // phpcs:ignore ?></li>
