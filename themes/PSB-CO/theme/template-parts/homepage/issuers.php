@@ -5,7 +5,12 @@
  * Hidden when there are no approvals.
  */
 $psb_issuers = array();
-foreach ( get_posts( array( 'post_type' => 'confirmation', 'posts_per_page' => 20, 'no_found_rows' => true ) ) as $psb_p ) {
+foreach ( get_posts( array( 'post_type' => 'confirmation', 'posts_per_page' => 50, 'no_found_rows' => true ) ) as $psb_p ) {
+	// Approvals / vendor-list entries only (titles «تأییدیه…»); customer satisfaction letters and tender
+	// qualifications live in the same post type but are not «approved manufacturer» listings.
+	if ( ! preg_match( '/^\s*ت(أ|ا)یید(یه|یهٔ)/u', get_the_title( $psb_p ) ) ) {
+		continue;
+	}
 	$psb_org = trim( (string) psb_field( 'issuing_organization', '', $psb_p->ID ) );
 	$psb_org = $psb_org ? $psb_org : get_the_title( $psb_p );
 	$psb_key = psb_search_normalize( $psb_org );
