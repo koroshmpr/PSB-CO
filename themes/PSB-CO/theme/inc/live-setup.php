@@ -29,10 +29,8 @@ function psb_live_setup_is_live() {
 	return 'psb.co.ir' === strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
 }
 
-add_action(
-	'admin_init',
-	static function () {
-		if ( wp_doing_ajax() || ! psb_live_setup_is_live() || ! current_user_can( 'manage_options' ) ) {
+function psb_live_setup_maybe_run() {
+		if ( ! psb_live_setup_is_live() || ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
 		if ( (int) get_option( 'psb_live_setup', 0 ) >= PSB_LIVE_SETUP_VERSION ) {
@@ -52,8 +50,26 @@ add_action(
 		}
 		delete_transient( 'psb_live_setup_lock' );
 		flush_rewrite_rules( false );
+}
+
+// First wp-admin visit by an administrator…
+add_action(
+	'admin_init',
+	static function () {
+		if ( ! wp_doing_ajax() ) {
+			psb_live_setup_maybe_run();
+		}
 	},
 	99
+);
+// …or the first authenticated administrator REST/API call (e.g. the remote management connector).
+add_filter(
+	'rest_pre_dispatch',
+	static function ( $result ) {
+		psb_live_setup_maybe_run();
+		return $result;
+	},
+	1
 );
 
 add_action(
