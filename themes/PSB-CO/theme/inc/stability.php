@@ -41,6 +41,23 @@ function psb_http_breaker_applies( $url ) {
 	return false;
 }
 
+/**
+ * An administrator explicitly installing/updating something (plugins/themes/core screens or
+ * their AJAX actions). Those requests are never short-circuited — the breaker only protects
+ * visitors and background checks.
+ */
+function psb_http_breaker_user_action() {
+	if ( ! is_admin() || ! function_exists( 'current_user_can' ) || ! current_user_can( 'update_plugins' ) ) {
+		return false;
+	}
+	global $pagenow;
+	if ( in_array( $pagenow, array( 'update.php', 'update-core.php', 'plugin-install.php', 'theme-install.php' ), true ) ) {
+		return true;
+	}
+	$action = isset( $_REQUEST['action'] ) ? sanitize_key( wp_unslash( $_REQUEST['action'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
+	return wp_doing_ajax() && in_array( $action, array( 'update-plugin', 'install-plugin', 'update-theme', 'install-theme', 'search-install-plugins' ), true );
+}
+
 function psb_http_breaker_key( $url ) {
 	$host = wp_parse_url( $url, PHP_URL_HOST );
 	return $host ? 'psb_http_down_' . md5( strtolower( $host ) ) : '';
@@ -56,6 +73,14 @@ add_filter(
 			return $pre;
 		}
 		$key = psb_http_breaker_key( $url );
+		if ( psb_http_breaker_user_action() ) {
+			// Manual update/install: always try for real, and start from a clean slate.
+			if ( $key ) {
+				delete_transient( $key );
+				delete_transient( $key . '_n' );
+			}
+			return $pre;
+		}
 		if ( $key && get_transient( $key ) ) {
 			return new WP_Error( 'psb_http_breaker', 'Host temporarily skipped after a recent connection failure.' );
 		}
@@ -95,6 +120,10 @@ add_action(
 add_filter(
 	'http_request_args',
 	static function ( $args ) {
+		// File downloads (plugin/theme/core packages stream to disk) and manual updates keep their own timeout.
+		if ( ! empty( $args['stream'] ) || ! empty( $args['filename'] ) || psb_http_breaker_user_action() ) {
+			return $args;
+		}
 		if ( empty( $args['timeout'] ) || $args['timeout'] > 8 ) {
 			$args['timeout'] = 8;
 		}
