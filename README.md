@@ -19,7 +19,7 @@ npm run production   # theme/style.css + theme/js/*.min.js
 ```
 
 ## Deploy secrets (GitHub → Settings → Secrets and variables → Actions)
-`FTP_SERVER`, `FTP_USERNAME`, `FTP_PASSWORD`. Optional: `FTP_SERVER_DIR` (default `public_html/wp-content/themes/PSB-CO/theme/`), `FTP_PORT`, `FTP_PROTOCOL` (`ftps` | `ftp`).
+`FTP_SERVER`, `FTP_USERNAME`, `FTP_PASSWORD`. Optional: `FTP_SERVER_DIR` (default `wp-content/themes/PSB-CO/theme/`; the FTP root is already public_html), `FTP_PORT`, `FTP_PROTOCOL` (`ftps` | `ftp`).
 
 ## Emergency switches (wp-config.php)
 - `define('PSB_LOGIN_GUARD_DISABLE', true);` — restore `/wp-login.php` if locked out of `/secret-door/`.

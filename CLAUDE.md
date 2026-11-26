@@ -61,7 +61,7 @@ node .dev/qa/pw/<script>.js                     # Playwright QA (playwright-core
 Local site: http://localhost:10048 (Local by Flywheel). Use the MySQL socket in `.dev/tools/render/run.sh`, with `mysql -uroot -proot local`. CLI `php` can't load WordPress without that `-d mysqli.default_socket=…` flag.
 
 ## Deploy
-- **A push to `main` deploys to production.** Workflow: build → PHP 8.1 lint → FTP to `public_html/wp-content/themes/PSB-CO/theme/` → smoke test. Push only with the owner's approval.
+- **A push to `main` deploys to production.** Workflow: build → PHP 8.1 lint → FTP to `wp-content/themes/PSB-CO/theme/` (FTP root = public_html; plain FTP because FTPS data ports are blocked) → smoke test. Push only with the owner's approval.
 - Only `themes/PSB-CO/theme/` is uploaded. Files deleted in git stay on the server (no clean-slate).
 - Live host: Talashnet cPanel (CloudLinux), PHP 8.2, real cron on wp-cron every 5 minutes, no CDN.
 

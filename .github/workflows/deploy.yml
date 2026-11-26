@@ -21,9 +21,10 @@ env:
   # repo variable (Settings > Secrets and variables > Actions) of the same name.
   #
   # cPanel account "psbco": WP_CONTENT_DIR on the server is
-  # /home/psbco/public_html/wp-content. The main cPanel FTP account lands in
-  # /home/psbco, so the theme path is relative to that home directory.
-  FTP_SERVER_DIR: ${{ secrets.FTP_SERVER_DIR || vars.FTP_SERVER_DIR || 'public_html/wp-content/themes/PSB-CO/theme/' }}
+  # /home/psbco/public_html/wp-content. The FTP account's root IS public_html
+  # (verified 2026-11-26: "public_html/..." created a nested public_html/public_html),
+  # so the theme path must NOT start with public_html/.
+  FTP_SERVER_DIR: ${{ secrets.FTP_SERVER_DIR || vars.FTP_SERVER_DIR || 'wp-content/themes/PSB-CO/theme/' }}
   FTP_PORT: ${{ secrets.FTP_PORT || vars.FTP_PORT || '21' }}
   # Explicit FTPS (TLS on port 21). If the host only supports plain FTP
   # (common on Iranian shared hosts), set FTP_PROTOCOL to "ftp".
@@ -89,6 +90,7 @@ jobs:
           # The active theme lives in wp-content/themes/PSB-CO/theme/ on the server.
           # Refuse anything else so a typo can never upload into the wrong folder.
           case "$FTP_SERVER_DIR" in
+            public_html/*|/public_html/*) echo "::error::FTP root is already public_html — use wp-content/themes/PSB-CO/theme/ (got '$FTP_SERVER_DIR')"; exit 1 ;;
             */themes/PSB-CO/theme/) echo "Server dir: $FTP_SERVER_DIR" ;;
             *) echo "::error::FTP_SERVER_DIR must end with /themes/PSB-CO/theme/ (got '$FTP_SERVER_DIR')"; exit 1 ;;
           esac
