@@ -19,11 +19,24 @@ function psb_production_steps() {
 		return $steps;
 	}
 	$steps    = array();
-	$services = get_posts( array( 'post_type' => 'services', 'post_status' => 'publish', 'posts_per_page' => 20, 'no_found_rows' => true ) );
-	$find     = function ( $pattern ) use ( $services ) {
-		foreach ( $services as $s ) {
-			if ( preg_match( $pattern, $s->post_title . ' ' . urldecode( $s->post_name ) ) ) {
-				return $s;
+	$services = get_posts( array( 'post_type' => 'services', 'post_status' => 'publish', 'posts_per_page' => 20, 'no_found_rows' => true, 'orderby' => array( 'menu_order' => 'ASC', 'date' => 'ASC' ) ) );
+	$used     = array();
+	// Words are tried in the order they are written (first = strongest); titles before slugs, and a service
+	// already linked by an earlier step is skipped. (A loose slug word like «electrical» used to send the
+	// electrical-lab step to «electrical-panel-installation…».)
+	$find = function ( array $words ) use ( $services, &$used ) {
+		foreach ( array( 'title', 'slug' ) as $where ) {
+			foreach ( $words as $w ) {
+				foreach ( $services as $s ) {
+					if ( isset( $used[ $s->ID ] ) ) {
+						continue;
+					}
+					$hay = 'title' === $where ? $s->post_title : urldecode( $s->post_name );
+					if ( false !== mb_stripos( $hay, $w ) ) {
+						$used[ $s->ID ] = true;
+						return $s;
+					}
+				}
 			}
 		}
 		return null;
@@ -41,7 +54,7 @@ function psb_production_steps() {
 			'title'  => psb_pf_text( $row['title'] ),
 			'text'   => psb_pf_text( $row['text'] ?? '' ),
 			'points' => array_filter( array_map( 'trim', preg_split( '/\r\n|\r|\n/', (string) ( $row['points'] ?? '' ) ) ) ),
-			'post'   => $words ? $find( '/' . implode( '|', array_map( function ( $w ) { return preg_quote( $w, '/' ); }, $words ) ) . '/ui' ) : null,
+			'post'   => $words ? $find( $words ) : null,
 		);
 	}
 	$steps = apply_filters( 'psb_home_factory_steps', $steps );
