@@ -15,13 +15,23 @@ while ( have_posts() ) :
 	$psb_brochure = psb_doc( psb_field( 'brochure_pdf', null, $psb_id ) );
 	$psb_thumb    = get_post_thumbnail_id();
 
+	// Hero: the facility's line illustration; real photos (featured + gallery) in «تصاویر واقعی» below.
+	$psb_photos = array_values(
+		array_filter(
+			array_unique( array_map( 'intval', array_merge( array( (int) $psb_thumb ), wp_list_pluck( (array) psb_field( 'service_gallery', array(), $psb_id ), 'ID' ), array_filter( (array) psb_field( 'service_gallery', array(), $psb_id ), 'is_numeric' ) ) ) ),
+			function ( $i ) {
+				return $i && wp_attachment_is_image( $i ) && ! ( function_exists( 'psb_image_blocked' ) && psb_image_blocked( $i ) );
+			}
+		)
+	);
 	get_template_part(
 		'template-parts/global/page-hero',
 		null,
 		array(
 			'eyebrow' => 'خدمات و امکانات تولید',
 			'lead'    => $psb_desc,
-			'image'   => get_post_thumbnail_id(),
+			'variant' => 'split',
+			'media'   => function_exists( 'psb_placeholder_img' ) ? '<div class="product-gallery-main flex items-center justify-center">' . psb_placeholder_img( psb_placeholder_key( get_post() ), array( 'class' => 'size-full', 'alt' => get_the_title(), 'loading' => 'eager', 'fetchpriority' => 'high' ) ) . '</div>' : '',
 		)
 	);
 	?>
@@ -52,8 +62,9 @@ while ( have_posts() ) :
 					'template-parts/portfolio/gallery-rail',
 					null,
 					array(
-						'images' => psb_field( 'service_gallery', array(), $psb_id ),
-						'title'  => 'تصاویر ' . get_the_title(),
+						'images' => $psb_photos,
+						'title'  => 'تصاویر واقعی',
+						'alt'    => get_the_title(),
 						'id'     => 'svc-gallery-title',
 					)
 				);

@@ -1,7 +1,7 @@
 <?php
 /**
- * Factory & lab (spec v2 §5.5): the one dark band. 7/5 photo mosaic (CNC big; assembly + test lab
- * small), each tile linking to its service, then a ruled 4-fact row. Facts: company-facts.md.
+ * Factory & lab (spec v2 §5.5): the one dark band. Three equal cards (line illustration on a light mat,
+ * eyebrow, title, text, link) — a sideways rail on mobile — then a ruled 4-fact row. Facts: company-facts.md.
  * Images: service featured images (CNC, electrical test lab); assembly = attachment 1726 if it is
  * an image, else a product photo. Filter: psb_home_factory_tiles.
  */
@@ -52,7 +52,7 @@ $psb_tiles = array_values(
 			'psb_home_factory_tiles',
 			array(
 				( $psb_cnc || $psb_tf( 'cnc', 'image' ) ) ? array( $psb_cnc, $psb_tf( 'cnc', 'image' ), $psb_cnc ? get_permalink( $psb_cnc ) : $psb_services_url, $psb_tf( 'cnc', 'eyebrow' ), $psb_tf( 'cnc', 'title' ), $psb_tf( 'cnc', 'text' ) ) : null,
-				( $psb_int_post || $psb_int_att || $psb_tf( 'assembly', 'image' ) ) ? array( $psb_int_post, $psb_tf( 'assembly', 'image' ) ? $psb_tf( 'assembly', 'image' ) : $psb_int_att, $psb_services_url, $psb_tf( 'assembly', 'eyebrow' ), $psb_tf( 'assembly', 'title' ), $psb_tf( 'assembly', 'text' ) ) : null,
+				( $psb_int_post || $psb_tf( 'assembly', 'image' ) ) ? array( $psb_int_post, $psb_tf( 'assembly', 'image' ), $psb_services_url, $psb_tf( 'assembly', 'eyebrow' ), $psb_tf( 'assembly', 'title' ), $psb_tf( 'assembly', 'text' ) ) : null,
 				( $psb_lab || $psb_tf( 'lab', 'image' ) ) ? array( $psb_lab, $psb_tf( 'lab', 'image' ), $psb_lab ? get_permalink( $psb_lab ) : $psb_services_url, $psb_tf( 'lab', 'eyebrow' ), $psb_tf( 'lab', 'title' ), $psb_tf( 'lab', 'text' ) ) : null,
 			)
 		)
@@ -62,63 +62,34 @@ if ( ! $psb_tiles ) {
 	return;
 }
 
-/** Image HTML for a tile + whether it fell back to an illustration. */
-$psb_tile_img = function ( $t, $big ) {
-	list( $post, $att ) = $t;
-	if ( ! $att && $post ) {
-		$wide = (int) get_post_meta( $post->ID, 'psb_wide_image', true ); // All tiles are 16:9 (the large one is taller but cover-cropped).
-		$att  = ( $wide && wp_attachment_is_image( $wide ) ) ? $wide : (int) get_post_thumbnail_id( $post );
-	}
+/**
+ * One factory card (owner decision 2026-11-27: line illustrations, not photos): illustration on a light
+ * mat, then eyebrow / title / text and the link. A photo chosen in the page field still wins.
+ */
+$psb_tile = function ( $t ) {
+	list( $post, $att, $url, $eyebrow, $title, $text ) = $t;
 	$attr = array(
-		'class' => 'size-full object-cover object-center [filter:saturate(.85)] transition-transform duration-[400ms] group-hover:scale-[1.03]',
+		'class' => 'size-full object-contain',
 		'alt'   => '',
-		'sizes' => $big ? '(min-width: 1024px) 700px, 100vw' : '(min-width: 1024px) 500px, 100vw',
+		'sizes' => '(min-width: 1024px) 380px, 80vw',
 	);
-	$args = array( 'size' => $big ? 'large' : 'medium_large', 'attr' => $attr );
-	if ( $post && function_exists( 'psb_placeholder_key' ) ) {
-		$args['key'] = psb_placeholder_key( $post );
-	}
-	if ( function_exists( 'psb_best_image' ) ) {
-		$html = psb_best_image( $att ? $att : $post, $big ? 700 : 500, '16 / 9', $args );
+	if ( $att ) {
+		$img = psb_image( $att, 'medium_large', $attr + array( 'class' => 'size-full object-cover' ) );
 	} else {
-		$html = $att ? psb_image( $att, $args['size'], $attr ) : '';
+		$img = function_exists( 'psb_placeholder_img' ) ? psb_placeholder_img( $post && function_exists( 'psb_placeholder_key' ) ? psb_placeholder_key( $post ) : 'default', array( 'class' => 'size-full object-contain', 'alt' => $title ) ) : '';
 	}
-	return array( $html, false !== strpos( (string) $html, 'is-placeholder' ) || '' === $html );
-};
-
-$psb_tile = function ( $t, $big ) use ( $psb_tile_img ) {
-	list( $img, $is_ph ) = $psb_tile_img( $t, $big );
-	$size = $big ? 'h-full min-h-[340px]' : 'aspect-[16/9]';
-	if ( $is_ph ) :
-		// Light variant: illustration on steel-50 above, graphite text on a white strip (never white on light art).
-		?>
-		<a class="group flex flex-col overflow-hidden rounded-card bg-white text-foreground <?php echo esc_attr( $size ); ?>" href="<?php echo esc_url( $t[2] ); ?>" data-reveal>
-			<span class="relative block min-h-0 flex-1 bg-slate-50 <?php echo $big ? 'min-h-[220px]' : 'min-h-[110px]'; ?> [&_img]:absolute [&_img]:inset-0 [&_img]:size-full [&_img]:object-contain [&_img]:p-4 [&_img]:[filter:none]">
-				<?php echo $img; // phpcs:ignore ?>
-			</span>
-			<span class="block border-t border-line p-5 lg:px-6">
-				<small class="text-xs font-semibold text-slate-600"><?php echo esc_html( $t[3] ); ?></small>
-				<span class="mt-1 block text-lg font-bold leading-normal text-foreground"><?php echo esc_html( $t[4] ); ?></span>
-				<?php if ( $t[5] && $big ) : ?>
-					<span class="mt-1 block text-sm leading-[1.8] text-slate-600"><?php echo esc_html( $t[5] ); ?></span>
-				<?php endif; ?>
+	?>
+	<li class="fac-slide">
+		<a class="fac-card group" href="<?php echo esc_url( $url ); ?>" data-reveal>
+			<span class="fac-media <?php echo $att ? 'is-photo' : ''; ?>"><?php echo $img; // phpcs:ignore ?></span>
+			<span class="fac-body">
+				<?php if ( $eyebrow ) : ?><small class="fac-eyebrow"><?php echo esc_html( $eyebrow ); ?></small><?php endif; ?>
+				<span class="fac-title"><?php echo psb_pf_html( $title ); // phpcs:ignore ?></span>
+				<?php if ( $text ) : ?><span class="fac-text"><?php echo psb_pf_html( $text ); // phpcs:ignore ?></span><?php endif; ?>
+				<span class="fac-more">جزئیات <?php echo psb_icon( 'arrow', 'btn-arrow size-4' ); // phpcs:ignore ?></span>
 			</span>
 		</a>
-		<?php
-		return;
-	endif;
-	?>
-	<a class="group relative isolate block overflow-hidden rounded-card bg-dark-800 <?php echo esc_attr( $size ); ?>" href="<?php echo esc_url( $t[2] ); ?>" data-reveal>
-		<span class="absolute inset-0 -z-20 block"><?php echo $img; // phpcs:ignore ?></span>
-		<span class="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgb(17_20_24/.92)_0%,rgb(17_20_24/.55)_38%,rgb(17_20_24/0)_65%)]" aria-hidden="true"></span>
-		<span class="absolute inset-x-0 bottom-0 block p-6 lg:px-7">
-			<small class="text-xs font-semibold text-slate-300"><?php echo esc_html( $t[3] ); ?></small>
-			<span class="mb-1.5 mt-1 block text-xl font-bold leading-normal text-white"><?php echo esc_html( $t[4] ); ?></span>
-			<?php if ( $t[5] ) : ?>
-				<span class="block max-w-[30rem] text-sm leading-[1.8] text-slate-200"><?php echo esc_html( $t[5] ); ?></span>
-			<?php endif; ?>
-		</span>
-	</a>
+	</li>
 	<?php
 };
 $psb_facts = array();
@@ -147,16 +118,11 @@ foreach ( psb_pf_rows( 'home_factory_facts', $psb_fp ) as $psb_row ) {
 			)
 		);
 		?>
-		<div class="grid gap-6 lg:grid-cols-12">
-			<div class="lg:col-span-7 [&>a]:h-full"><?php $psb_tile( $psb_tiles[0], true ); ?></div>
-			<?php if ( count( $psb_tiles ) > 1 ) : ?>
-				<div class="grid gap-6 lg:col-span-5">
-					<?php foreach ( array_slice( $psb_tiles, 1, 2 ) as $psb_t ) : ?>
-						<?php $psb_tile( $psb_t, false ); ?>
-					<?php endforeach; ?>
-				</div>
-			<?php endif; ?>
-		</div>
+		<ul class="fac-rail" role="list">
+			<?php foreach ( $psb_tiles as $psb_t ) : ?>
+				<?php $psb_tile( $psb_t ); ?>
+			<?php endforeach; ?>
+		</ul>
 
 		<?php if ( $psb_facts ) : ?>
 		<dl class="stats stats--invert mt-8 lg:mt-12">

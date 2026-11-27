@@ -5,6 +5,8 @@
  *
  * $args:
  * - class   extra classes ('breadcrumb--invert' on dark heroes)
+ * Below md the trail is replaced by one «back» pill to the direct parent (.crumb-back); the full trail
+ * stays in the markup for desktop (BreadcrumbList JSON-LD is printed separately by inc/seo.php).
  */
 if ( is_front_page() ) {
 	return;
@@ -93,8 +95,22 @@ if ( is_singular() ) {
 }
 
 $psb_last = count( $psb_items ) - 1;
+// Mobile: one app-like «back» pill to the direct parent (category / archive / home) instead of the trail.
+$psb_back = null;
+for ( $psb_b = $psb_last - 1; $psb_b >= 0; $psb_b-- ) {
+	if ( ! empty( $psb_items[ $psb_b ]['url'] ) ) {
+		$psb_back = $psb_items[ $psb_b ];
+		break;
+	}
+}
 ?>
 <nav class="breadcrumb <?php echo esc_attr( $args['class'] ?? '' ); ?>" aria-label="مسیر صفحه">
+	<?php if ( $psb_back ) : ?>
+		<a class="crumb-back" href="<?php echo esc_url( $psb_back['url'] ); ?>" aria-label="<?php echo esc_attr( 'بازگشت به ' . $psb_back['name'] ); ?>">
+			<?php echo psb_icon( 'chevron', 'size-4 shrink-0 -scale-x-100' ); // phpcs:ignore ?>
+			<span class="truncate"><?php echo function_exists( 'psb_lat' ) ? psb_lat( $psb_back['name'] ) : esc_html( $psb_back['name'] ); // phpcs:ignore ?></span>
+		</a>
+	<?php endif; ?>
 	<ol>
 		<?php foreach ( $psb_items as $psb_i => $psb_item ) : ?>
 			<li>

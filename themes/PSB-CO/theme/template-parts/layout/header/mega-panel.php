@@ -5,6 +5,8 @@
  *  products    : category list (icons + counts) · product cards of the hovered category · quote promo
  *  credentials : icon rows (archives + key documents) · highlight card (Tavanir)
  *  about       : icon rows (menu children) · highlight card (phone, lead time)
+ *  services    : icon rows (every facility) · highlight card (factory facts)
+ *  projects    : icon rows (portfolio items + «سوابق اجرایی») · highlight card (track-record numbers)
  */
 $psb_top   = $args['top'] ?? array();
 $psb_panel = $psb_top['panel'] ?? '';
@@ -197,6 +199,41 @@ elseif ( 'about' === $psb_panel ) :
 				<?php endif; ?>
 				<div><dt class="flex items-center gap-2 text-slate-600"><?php echo psb_icon( 'clock', 'size-4' ); // phpcs:ignore ?>زمان ساخت</dt><dd class="mt-1 font-semibold text-foreground">۱۵ تا ۴۵ روز کاری پس از تأیید نقشه‌ها</dd></div>
 			</dl>
+		</div>
+	</div>
+<?php
+elseif ( 'services' === $psb_panel || 'projects' === $psb_panel ) :
+	$psb_is_svc = 'services' === $psb_panel;
+	?>
+	<div class="grid grid-cols-12 gap-6">
+		<div class="col-span-8 grid grid-cols-2 content-start gap-x-6 gap-y-1">
+			<?php foreach ( $psb_kids as $psb_kid ) : ?>
+				<?php
+				if ( 'arrow' === ( $psb_kid['icon'] ?? '' ) ) {
+					continue;
+				}
+				$psb_row( $psb_kid['url'], $psb_kid['icon'] ?: ( $psb_is_svc ? 'factory' : 'building' ), $psb_kid['title'], $psb_kid['desc'] ?? '', $psb_kid['count'] ?? 0 );
+				?>
+			<?php endforeach; ?>
+		</div>
+		<div class="col-span-4 rounded-card bg-slate-50 p-5">
+			<?php if ( $psb_is_svc ) : ?>
+				<?php echo psb_icon( 'factory', 'size-7 text-slate-700' ); // phpcs:ignore ?>
+				<p class="mt-3 text-base font-bold text-foreground">همه مراحل ساخت در یک کارخانه</p>
+				<p class="mt-1 text-[0.8125rem] leading-6 text-slate-600">ورق‌کاری CNC، رنگ پودری، مونتاژ و آزمون روتین؛ بازدید و حضور در آزمون با هماهنگی امکان‌پذیر است.</p>
+			<?php else : ?>
+				<?php echo psb_icon( 'briefcase', 'size-7 text-slate-700' ); // phpcs:ignore ?>
+				<?php $psb_st = function_exists( 'psb_pr_stats' ) ? psb_pr_stats() : array(); ?>
+				<?php if ( ! empty( $psb_st['projects'] ) ) : ?>
+					<p class="mt-3 text-base font-bold text-foreground"><?php echo esc_html( psb_fa_num( $psb_st['projects'] ) . ' پروژه اجراشده' ); ?></p>
+					<p class="mt-1 text-[0.8125rem] leading-6 text-slate-600"><?php echo esc_html( 'در ' . psb_fa_num( $psb_st['sectors'] ?? 0 ) . ' حوزه؛ صنایع، شبکه توزیع، ساختمان و نیروگاه' ); ?></p>
+				<?php else : ?>
+					<p class="mt-3 text-base font-bold text-foreground">پروژه‌های اجراشده</p>
+				<?php endif; ?>
+			<?php endif; ?>
+			<?php if ( $psb_top['url'] ) : ?>
+				<a class="link-arrow mt-4 flex w-fit" href="<?php echo esc_url( $psb_top['url'] ); ?>"><?php echo esc_html( $psb_is_svc ? 'صفحه کارخانه و خدمات' : 'همه نمونه‌کارها' ); ?> <?php echo psb_icon( 'arrow', 'btn-arrow' ); // phpcs:ignore ?></a>
+			<?php endif; ?>
 		</div>
 	</div>
 <?php endif; ?>

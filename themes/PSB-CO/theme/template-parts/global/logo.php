@@ -24,7 +24,7 @@ if ( 'swap' === $psb_variant ) :
 	?>
 	<a class="site-logo brand-swap <?php echo esc_attr( $args['class'] ?? '' ); ?>" href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home" aria-label="<?php echo esc_attr( psb_brand_name() . ' (PSB)' ); ?>">
 		<?php // Inline sizes: plugin CSS such as WooCommerce's `.woocommerce img { height:auto; max-width:100% }` (unlayered) must never collapse the logo. ?>
-		<img class="logo-full" src="<?php echo esc_url( $psb_dir . 'psb-logo.svg' ); ?>" width="119" height="68" style="height:68px;width:119px;max-width:none" alt="" decoding="async" fetchpriority="high">
+		<img class="logo-full" src="<?php echo esc_url( $psb_dir . 'psb-logo.svg' ); ?>" width="77" height="44" style="height:44px;width:77px;max-width:none" alt="" decoding="async" fetchpriority="high">
 		<img class="logo-mark" src="<?php echo esc_url( $psb_dir . 'psb-mark.svg' ); ?>" width="63" height="28" style="height:28px;width:63px;max-width:none" alt="" decoding="async">
 	</a>
 	<?php

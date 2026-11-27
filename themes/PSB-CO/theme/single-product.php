@@ -49,6 +49,9 @@ while ( have_posts() ) :
 	// Gallery: featured image + product gallery.
 	$psb_images = array_filter( array_merge( array( get_post_thumbnail_id( $psb_id ) ), $psb_product ? $psb_product->get_gallery_image_ids() : array() ) );
 	$psb_images = array_values( array_unique( array_map( 'intval', $psb_images ) ) );
+	// Real photos (featured + gallery) go to the «تصاویر واقعی» section; the hero always shows the
+	// product's line illustration (owner decision 2026-11-27). Blocked renders are never shown.
+	$psb_images = array_values( array_filter( $psb_images, function ( $i ) { return wp_attachment_is_image( $i ) && ! ( function_exists( 'psb_image_blocked' ) && psb_image_blocked( $i ) ); } ) );
 	if ( $psb_images ) {
 		psb_lightbox();
 	}
@@ -133,6 +136,9 @@ while ( have_posts() ) :
 		'overview' => 'معرفی',
 		'specs'    => 'خلاصه مشخصات',
 	);
+	if ( $psb_images ) {
+		$psb_nav['photos'] = 'تصاویر واقعی';
+	}
 	if ( $psb_creds ) {
 		$psb_nav['credentials'] = 'تأییدیه‌ها و آزمون‌ها';
 	}
@@ -203,37 +209,8 @@ while ( have_posts() ) :
 					</div>
 				</div>
 
-				<div class="min-w-0 lg:col-span-6">
-					<?php if ( $psb_images ) : ?>
-						<button type="button" class="product-gallery-main cursor-zoom-in" data-lightbox="<?php echo esc_url( wp_get_attachment_image_url( $psb_images[0], 'full' ) ); ?>" data-lightbox-title="<?php echo esc_attr( $psb_title ); ?>">
-							<?php
-							$psb_main_attr = array(
-								'alt'           => $psb_title,
-								'sizes'         => '(min-width: 1024px) 36rem, 92vw',
-								'loading'       => 'eager',
-								'fetchpriority' => 'high',
-							);
-							// Low-res photo → natural size inside the frame (no upscaling / cover-crop).
-							echo function_exists( 'psb_single_image' ) // phpcs:ignore
-								? psb_single_image( $psb_images[0], 576, '4 / 3', array( 'attr' => $psb_main_attr ) )['html']
-								: psb_image( $psb_images[0], 'large', $psb_main_attr );
-							?>
-							<span class="sr-only">نمایش تصویر در اندازه بزرگ</span>
-						</button>
-						<?php if ( count( $psb_images ) > 1 ) : ?>
-							<ul class="product-thumbs" role="list">
-								<?php foreach ( array_slice( $psb_images, 1, 4 ) as $psb_img ) : ?>
-									<li>
-										<a href="<?php echo esc_url( wp_get_attachment_image_url( $psb_img, 'full' ) ); ?>" data-lightbox="<?php echo esc_url( wp_get_attachment_image_url( $psb_img, 'full' ) ); ?>" data-lightbox-title="<?php echo esc_attr( $psb_title ); ?>">
-											<?php echo psb_image( $psb_img, 'thumbnail', array( 'alt' => $psb_title . ' — تصویر دیگر', 'sizes' => '72px' ) ); // phpcs:ignore ?>
-										</a>
-									</li>
-								<?php endforeach; ?>
-							</ul>
-						<?php endif; ?>
-					<?php else : ?>
-						<div class="product-gallery-main flex items-center justify-center text-slate-300"><?php echo function_exists( 'psb_placeholder_img' ) ? psb_placeholder_img( psb_placeholder_key( $psb_id ), array( 'class' => 'size-full', 'loading' => 'eager', 'fetchpriority' => 'high' ) ) : psb_icon( 'bolt', 'size-12' ); // phpcs:ignore ?></div>
-					<?php endif; ?>
+				<div class="min-w-0 max-lg:order-first lg:col-span-6">
+					<div class="product-gallery-main flex items-center justify-center text-slate-300"><?php echo function_exists( 'psb_placeholder_img' ) ? psb_placeholder_img( psb_placeholder_key( $psb_id ), array( 'class' => 'size-full', 'alt' => $psb_title, 'loading' => 'eager', 'fetchpriority' => 'high' ) ) : psb_icon( 'bolt', 'size-12' ); // phpcs:ignore ?></div>
 				</div>
 			</div>
 		</div>
@@ -297,6 +274,12 @@ while ( have_posts() ) :
 							)
 						);
 						?>
+					</div>
+				<?php endif; ?>
+
+				<?php if ( $psb_images ) : ?>
+					<div id="photos" class="scroll-mt-32">
+						<?php get_template_part( 'template-parts/portfolio/gallery-rail', null, array( 'images' => $psb_images, 'title' => 'تصاویر واقعی', 'alt' => $psb_title, 'id' => 'product-photos-title' ) ); ?>
 					</div>
 				<?php endif; ?>
 

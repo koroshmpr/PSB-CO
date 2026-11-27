@@ -182,6 +182,12 @@ function psb_nav_panel_type( $top ) {
 			return 'about';
 		}
 	}
+	if ( in_array( 'services', $types, true ) ) {
+		return 'services';
+	}
+	if ( in_array( 'portfolio', $types, true ) ) {
+		return 'projects';
+	}
 	return 'list'; // Desktop: no dropdown (spec §4.9); the drawer still lists the children.
 }
 
@@ -194,10 +200,10 @@ function psb_nav_enrich( &$top ) {
 		$top['children']
 	);
 	$add  = function ( $url, $title, $icon, $count = 0, $desc = '' ) use ( &$top, &$urls ) {
+		$url = $url ? psb_iri( $url ) : ''; // Compare decoded: menu URLs are already decoded by psb_iri().
 		if ( ! $url || in_array( untrailingslashit( $url ), $urls, true ) ) {
 			return;
 		}
-		$url               = psb_iri( $url );
 		$urls[]            = untrailingslashit( $url );
 		$top['children'][] = array(
 			'id'       => 0,
@@ -260,6 +266,36 @@ function psb_nav_enrich( &$top ) {
 			}
 		}
 		unset( $c );
+	}
+
+	if ( 'services' === $top['panel'] ) {
+		// Every published facility (the menu may list only some), each with a matching line icon.
+		foreach ( get_posts( array( 'post_type' => 'services', 'post_status' => 'publish', 'numberposts' => 12, 'orderby' => array( 'menu_order' => 'ASC', 'date' => 'DESC' ) ) ) as $p ) {
+			$add( get_permalink( $p ), get_the_title( $p ), 'factory', 0, psb_nav_post_desc( $p->ID ) );
+		}
+		foreach ( $top['children'] as &$c ) {
+			$t         = (string) $c['title'];
+			$c['icon'] = preg_match( '/CNC|ماشین/u', $t ) ? 'cog' : ( preg_match( '/تست برق|برق/u', $t ) ? 'bolt' : ( preg_match( '/تست رنگ|آزمایشگاه/u', $t ) ? 'flask' : ( preg_match( '/رنگ/u', $t ) ? 'factory' : ( preg_match( '/پس از فروش|خدمات/u', $t ) ? 'wrench' : 'factory' ) ) ) );
+			if ( ! $c['desc'] && ! empty( $c['post_id'] ) ) {
+				$c['desc'] = psb_nav_post_desc( $c['post_id'] );
+			}
+		}
+		unset( $c );
+	}
+
+	if ( 'projects' === $top['panel'] ) {
+		foreach ( $top['children'] as &$c ) {
+			$c['icon'] = 'building';
+			if ( ! $c['desc'] && ! empty( $c['post_id'] ) ) {
+				$c['desc'] = psb_nav_post_desc( $c['post_id'] );
+			}
+		}
+		unset( $c );
+		$refs = get_page_by_path( 'project-references' );
+		if ( $refs && 'publish' === $refs->post_status ) {
+			$n = function_exists( 'psb_pr_stats' ) ? (int) ( psb_pr_stats()['projects'] ?? 0 ) : 0;
+			$add( get_permalink( $refs ), 'سوابق اجرایی', 'briefcase', $n, 'فهرست پروژه‌های اجراشده به تفکیک حوزه' );
+		}
 	}
 
 	if ( 'list' === $top['panel'] && $top['url'] ) {

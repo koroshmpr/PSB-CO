@@ -43,7 +43,7 @@ $psb_phone = psb_primary_phone();
 		</div>
 		<nav class="drawer-body drawer-nav" aria-label="منوی موبایل">
 			<?php
-			$psb_tree = psb_nav_tree( has_nav_menu( 'menu-3' ) ? 'menu-3' : 'menu-1' );
+			$psb_tree = psb_nav_tree( 'menu-1' ); // Same menu as the desktop (one source: names, order, icons).
 			// «view all» label per section (natural Persian, not «همه + title»).
 			$psb_all_label = array(
 				'products'    => 'همه محصولات',

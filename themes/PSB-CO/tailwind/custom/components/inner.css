@@ -22,7 +22,7 @@
 	@media (width >= 64rem) {
 		.subnav {
 			position: sticky;
-			top: calc(var(--header-h, 4rem) + var(--wp-admin--admin-bar--height, 0px));
+			top: calc(var(--header-live, var(--header-h, 4rem)) + var(--wp-admin--admin-bar--height, 0px));
 		}
 	}
 
@@ -63,7 +63,7 @@
 
 	.inner-aside {
 		@apply flex flex-col gap-5 lg:sticky lg:col-span-4 lg:self-start lg:ps-6;
-		top: calc(var(--header-h, 4rem) + var(--wp-admin--admin-bar--height, 0px) + 4rem);
+		top: calc(var(--header-live, var(--header-h, 4rem)) + var(--wp-admin--admin-bar--height, 0px) + 4rem);
 	}
 
 	.panel {
@@ -409,7 +409,7 @@
 	@media (width >= 64rem) {
 		.anchor-nav {
 			position: sticky;
-			top: calc(var(--header-h, 4rem) + var(--wp-admin--admin-bar--height, 0px));
+			top: calc(var(--header-live, var(--header-h, 4rem)) + var(--wp-admin--admin-bar--height, 0px));
 		}
 	}
 

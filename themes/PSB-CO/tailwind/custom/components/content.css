@@ -301,6 +301,23 @@
 		@apply max-w-[18rem] truncate text-foreground;
 	}
 
+	/* App-like back pill (mobile only); the trail itself shows from md up */
+	.crumb-back {
+		@apply inline-flex h-9 max-w-[16rem] items-center gap-1 rounded-full border border-line bg-white ps-2.5 pe-3.5 text-[0.8125rem] font-semibold text-foreground shadow-[0_1px_2px_rgb(20_23_28/0.06)] transition-colors hover:border-line-strong md:hidden;
+	}
+
+	.breadcrumb .crumb-back {
+		@apply text-foreground hover:text-foreground;
+	}
+
+	.breadcrumb:has(.crumb-back) ol {
+		@apply max-md:hidden;
+	}
+
+	.breadcrumb--invert .crumb-back {
+		@apply border-white/25 bg-white/10 text-white backdrop-blur-sm;
+	}
+
 	/* Mobile: wrap instead of clipping at the screen edge; the current title truncates within the line */
 	@media (width < 48rem) {
 		.breadcrumb ol {
@@ -453,6 +470,66 @@
 	.search-hl mark,
 	mark.search-mark {
 		@apply rounded-[2px] bg-primary-100 px-0.5 text-inherit;
+	}
+
+	/* ---------------- Home: factory cards (dark band, line illustrations) ---------------- */
+	.fac-rail {
+		@apply -mx-[var(--spacing-gutter)] flex snap-x snap-mandatory gap-4 overflow-x-auto px-[var(--spacing-gutter)] pb-2 lg:mx-0 lg:grid lg:snap-none lg:grid-cols-3 lg:gap-6 lg:overflow-visible lg:px-0 lg:pb-0;
+		scroll-padding-inline: var(--spacing-gutter);
+		scrollbar-width: none;
+	}
+
+	.fac-rail::-webkit-scrollbar {
+		display: none;
+	}
+
+	.fac-slide {
+		@apply flex shrink-0 basis-[80%] snap-start sm:basis-[46%] lg:basis-auto;
+	}
+
+	.fac-card {
+		@apply flex w-full flex-col overflow-hidden rounded-card bg-white text-foreground transition-transform duration-300;
+	}
+
+	.fac-card:hover {
+		transform: translateY(-3px);
+	}
+
+	/* illustration mat: same light grid feel as the artwork, contained with breathing room */
+	.fac-media {
+		@apply relative block aspect-[4/3] overflow-hidden border-b border-line bg-slate-50 p-3;
+	}
+
+	.fac-media img {
+		@apply transition-transform duration-500;
+	}
+
+	.fac-card:hover .fac-media img {
+		transform: scale(1.03);
+	}
+
+	.fac-media.is-photo {
+		@apply p-0;
+	}
+
+	.fac-body {
+		@apply flex flex-1 flex-col gap-1.5 p-5 lg:p-6;
+	}
+
+	.fac-eyebrow {
+		@apply text-xs font-semibold text-slate-600;
+	}
+
+	.fac-title {
+		@apply text-lg font-bold leading-normal text-foreground;
+	}
+
+	.fac-text {
+		@apply line-clamp-3 text-sm leading-[1.8] text-slate-600;
+	}
+
+	.fac-more {
+		@apply mt-auto inline-flex items-center gap-1.5 pt-3 text-sm font-semibold text-foreground group-hover:text-primary-700;
 	}
 
 	/* ---------------- Home: issuer strip (one row, never wraps) ---------------- */

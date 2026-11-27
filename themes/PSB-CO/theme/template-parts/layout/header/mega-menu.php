@@ -16,7 +16,7 @@ if ( ! $psb_tree ) {
 }
 $psb_part = $args['part'] ?? 'nav';
 $psb_has  = function ( $top ) {
-	return in_array( $top['panel'] ?? '', array( 'products', 'credentials', 'about' ), true );
+	return in_array( $top['panel'] ?? '', array( 'products', 'credentials', 'about', 'services', 'projects' ), true );
 };
 
 if ( 'panels' === $psb_part ) :
@@ -53,9 +53,9 @@ endif;
 					@mouseenter="enter(<?php echo $psb_id; // phpcs:ignore ?>)" @mouseleave="leave()"
 				<?php endif; ?>>
 				<?php if ( $psb_top['url'] ) : ?>
-					<a class="mm-top" href="<?php echo esc_url( $psb_top['url'] ); ?>" <?php echo $psb_top['current'] ? 'aria-current="page"' : ''; ?>><?php echo esc_html( $psb_top['title'] ); ?></a>
+					<a class="mm-top" href="<?php echo esc_url( $psb_top['url'] ); ?>" <?php echo $psb_top['current'] ? 'aria-current="page"' : ''; ?>><?php echo psb_icon( psb_nav_section_icon( $psb_top['url'] ), 'mm-top-ico' ); // phpcs:ignore -- same icon as the mobile drawer ?><?php echo esc_html( $psb_top['title'] ); ?></a>
 				<?php else : ?>
-					<button type="button" class="mm-top" @click="toggle(<?php echo $psb_id; // phpcs:ignore ?>, $event.detail === 0)"><?php echo esc_html( $psb_top['title'] ); ?></button>
+					<button type="button" class="mm-top" @click="toggle(<?php echo $psb_id; // phpcs:ignore ?>, $event.detail === 0)"><?php echo psb_icon( psb_nav_section_icon( $psb_top['url'] ), 'mm-top-ico' ); // phpcs:ignore -- same icon as the mobile drawer ?><?php echo esc_html( $psb_top['title'] ); ?></button>
 				<?php endif; ?>
 				<?php if ( $psb_drop ) : ?>
 					<button type="button" class="mm-toggle" id="mm-btn-<?php echo $psb_id; // phpcs:ignore ?>"
