@@ -19,7 +19,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-const PSB_HTACCESS_VERSION = 2;
+const PSB_HTACCESS_VERSION = 3;
 
 /** Rule lines of the block. */
 function psb_htaccess_lines() {
@@ -44,14 +44,16 @@ function psb_htaccess_lines() {
 		'ExpiresByType font/ttf "access plus 1 year"',
 		'ExpiresByType video/mp4 "access plus 1 year"',
 		'ExpiresByType text/html "access plus 0 seconds"',
+		'<If "%{THE_REQUEST} =~ m#\s/(sw\.js|manifest\.webmanifest)[\s?]#">',
+		'ExpiresActive Off',
+		'</If>',
 		'</IfModule>',
 		'<IfModule mod_headers.c>',
 		'<FilesMatch "\.(css|js|mjs|webp|avif|jpe?g|png|gif|svg|ico|woff2?|ttf|otf|mp4)$">',
 		'Header set Cache-Control "public, max-age=31536000"',
 		'</FilesMatch>',
-		'<If "%{REQUEST_URI} =~ m#^/(sw\.js|manifest\.webmanifest)$#">',
-		'Header unset Expires',
-		'Header set Cache-Control "no-cache"',
+		'<If "%{THE_REQUEST} =~ m#\s/(sw\.js|manifest\.webmanifest)[\s?]#">',
+		'Header always set Cache-Control "no-cache"',
 		'</If>',
 		'Header append Vary Accept-Encoding env=!dont-vary',
 		'</IfModule>',
