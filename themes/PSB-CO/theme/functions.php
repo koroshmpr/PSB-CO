@@ -343,6 +343,7 @@ foreach ( array(
 	'/inc/featured-setup.php',                 // One-time featured images for posts/products without one (live only).
 	'/inc/rankmath-setup.php',                 // One-time Rank Math settings (knowledge graph, sitemap types, OG default).
 	'/inc/services-setup.php',                 // One-time: service titles / English slugs / order for the production flow (live only).
+	'/inc/letters-migrate.php',                // One-time: satisfaction letters move from approvals to «رضایت‌نامه‌ها» (+ 301s).
 ) as $psb_module ) {
 	if ( is_readable( get_template_directory() . $psb_module ) ) {
 		require_once get_template_directory() . $psb_module;

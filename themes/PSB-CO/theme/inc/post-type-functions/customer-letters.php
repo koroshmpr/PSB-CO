@@ -11,6 +11,8 @@
  * - _psb_letter_date         letter date, Jalali text (e.g. ۱۴۰۳/۰۶/۱۲)
  * - _psb_letter_pdf          PDF attachment ID (optional; the scan itself is the featured image)
  * - _psb_letter_quote        highlight quote (1–2 sentences, shown on cards)
+ * - _psb_letter_number       letter number and date as written on it (e.g. «۳۷/ص-۰۸/۱۵۸۴ مورخ ۱۳۸۴/۰۶/۰۱»)
+ * - _psb_letter_scope        subject / scope (e.g. «ساخت ۳۴ دستگاه تابلو برق …»)
  * The full transcription of the letter goes in the editor (SEO + accessibility).
  *
  * @package bluebox
@@ -140,6 +142,8 @@ function psb_letter_data( $post_id ) {
 		'project' => $project,
 		'date'    => trim( (string) get_post_meta( $post_id, '_psb_letter_date', true ) ),
 		'quote'   => trim( (string) get_post_meta( $post_id, '_psb_letter_quote', true ) ),
+		'number'  => trim( (string) get_post_meta( $post_id, '_psb_letter_number', true ) ),
+		'scope'   => trim( (string) get_post_meta( $post_id, '_psb_letter_scope', true ) ),
 		'pdf'     => $pdf_id ? psb_doc( $pdf_id ) : null,
 		'scan'    => (int) get_post_thumbnail_id( $post_id ),
 		'type'    => ( $types && ! is_wp_error( $types ) ) ? $types[0] : null,
@@ -316,6 +320,75 @@ add_action(
 			} else {
 				update_post_meta( $post_id, '_psb_letter_' . $key, $value );
 			}
+		}
+	}
+);
+
+/* -------------------------------------------------------------------------
+ * Meta box «مشخصات نامه» (the fields above are protected meta, so they need their own box).
+ * ---------------------------------------------------------------------- */
+
+/** Field key => label, textarea? */
+function psb_letter_meta_fields() {
+	return array(
+		'_psb_letter_org'         => array( 'کارفرما / سازمان', false ),
+		'_psb_letter_scope'       => array( 'موضوع و دامنه', true ),
+		'_psb_letter_number'      => array( 'شماره و تاریخ نامه (همان‌طور که روی نامه آمده)', false ),
+		'_psb_letter_date'        => array( 'تاریخ نامه (مثلاً ۱۴۰۳/۰۶/۱۲)', false ),
+		'_psb_letter_signer'      => array( 'امضاکننده (اختیاری)', false ),
+		'_psb_letter_signer_role' => array( 'سمت امضاکننده (اختیاری)', false ),
+		'_psb_letter_quote'       => array( 'جمله شاخص برای کارت‌ها (۱ تا ۲ جمله)', true ),
+		'_psb_letter_project'     => array( 'شناسه پروژه مرتبط (ID نمونه‌کار، اختیاری)', false ),
+		'_psb_letter_pdf'         => array( 'شناسه فایل PDF در رسانه (اختیاری؛ تصویر نامه = تصویر شاخص)', false ),
+	);
+}
+
+add_action(
+	'add_meta_boxes_customer_letter',
+	function () {
+		add_meta_box(
+			'psb_letter_meta',
+			'مشخصات نامه',
+			function ( $post ) {
+				wp_nonce_field( 'psb_letter_meta', 'psb_letter_meta_nonce' );
+				echo '<div dir="rtl" style="display:grid;gap:12px">';
+				foreach ( psb_letter_meta_fields() as $key => $f ) {
+					$v  = (string) get_post_meta( $post->ID, $key, true );
+					$id = esc_attr( ltrim( $key, '_' ) );
+					echo '<p style="margin:0"><label for="' . $id . '" style="display:block;font-weight:600;margin-bottom:4px">' . esc_html( $f[0] ) . '</label>';
+					echo $f[1]
+						? '<textarea id="' . $id . '" name="' . esc_attr( $key ) . '" rows="2" style="width:100%">' . esc_textarea( $v ) . '</textarea>'
+						: '<input id="' . $id . '" type="text" name="' . esc_attr( $key ) . '" value="' . esc_attr( $v ) . '" style="width:100%">';
+					echo '</p>';
+				}
+				echo '</div>';
+			},
+			'customer_letter',
+			'normal',
+			'high'
+		);
+	}
+);
+
+add_action(
+	'save_post_customer_letter',
+	function ( $post_id ) {
+		if ( ! isset( $_POST['psb_letter_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['psb_letter_meta_nonce'] ) ), 'psb_letter_meta' ) ) {
+			return;
+		}
+		if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) || ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+		foreach ( psb_letter_meta_fields() as $key => $f ) {
+			if ( ! isset( $_POST[ $key ] ) ) {
+				continue;
+			}
+			$raw = wp_unslash( $_POST[ $key ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+			$v   = $f[1] ? sanitize_textarea_field( $raw ) : sanitize_text_field( $raw );
+			if ( in_array( $key, array( '_psb_letter_project', '_psb_letter_pdf' ), true ) ) {
+				$v = absint( $v ) ?: '';
+			}
+			'' === $v ? delete_post_meta( $post_id, $key ) : update_post_meta( $post_id, $key, $v );
 		}
 	}
 );

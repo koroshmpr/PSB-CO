@@ -65,10 +65,15 @@ while ( have_posts() ) :
 					<?php if ( $psb_l['org'] ) : ?>
 						<div><dt>کارفرما / سازمان</dt><dd><?php echo esc_html( $psb_l['org'] ); ?></dd></div>
 					<?php endif; ?>
+					<?php if ( $psb_l['scope'] ) : ?>
+						<div><dt>موضوع و دامنه</dt><dd><?php echo psb_lat( esc_html( $psb_l['scope'] ) ); // phpcs:ignore ?></dd></div>
+					<?php endif; ?>
 					<?php if ( $psb_l['signer'] ) : ?>
 						<div><dt>امضاکننده</dt><dd><?php echo esc_html( $psb_l['signer'] . ( $psb_l['role'] ? ' — ' . $psb_l['role'] : '' ) ); ?></dd></div>
 					<?php endif; ?>
-					<?php if ( $psb_l['date'] ) : ?>
+					<?php if ( $psb_l['number'] ) : ?>
+						<div><dt>شماره و تاریخ نامه</dt><dd><?php echo esc_html( $psb_l['number'] ); ?></dd></div>
+					<?php elseif ( $psb_l['date'] ) : ?>
 						<div><dt>تاریخ نامه</dt><dd><?php echo esc_html( psb_fa_num( $psb_l['date'] ) ); ?></dd></div>
 					<?php endif; ?>
 					<?php if ( $psb_l['type'] ) : ?>
