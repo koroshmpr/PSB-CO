@@ -59,6 +59,14 @@ $psb_pr_lead  = $psb_pr_from
 		);
 		get_template_part( 'template-parts/project-records/list' );
 		get_template_part( 'template-parts/project-records/breakdown', null, array( 'stats' => $psb_pr_stats ) );
+		?>
+		<section class="border-t border-line py-section-sm">
+			<div class="container flex flex-wrap items-center justify-between gap-4">
+				<p class="text-[0.9375rem] text-slate-700">گزارش تصویری و مشخصات فنی برخی از این پروژه‌ها در بخش نمونه‌کارها آمده است.</p>
+				<a class="btn btn-outline" href="<?php echo esc_url( psb_archive_url( 'portfolio', '/portfolios/' ) ); ?>">نمونه‌کارهای مصور <?php echo psb_icon( 'arrow', 'btn-arrow' ); // phpcs:ignore ?></a>
+			</div>
+		</section>
+		<?php
 	}
 
 	while ( have_posts() ) {

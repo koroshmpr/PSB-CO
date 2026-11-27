@@ -62,4 +62,20 @@ get_template_part(
 	<?php endif; ?>
 </section>
 <?php
+// The full track record lives on /project-references/ (one source: project_record CPT, restricted
+// projects filtered by the importer). Here only its numbers + six highlighted projects + a link.
+if ( ! is_paged() && ! is_tax() ) {
+	get_template_part(
+		'template-parts/project-records/highlights',
+		null,
+		array(
+			'count'   => 6,
+			'class'   => 'border-t border-line bg-background',
+			'eyebrow' => 'سوابق اجرایی',
+			'title'   => 'سوابق اجرایی شرکت',
+		)
+	);
+}
+?>
+<?php
 get_footer();

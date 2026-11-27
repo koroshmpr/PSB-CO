@@ -70,7 +70,8 @@ function psb_placeholder_keys() {
 function psb_placeholder_url( $key, $ext = 'svg', $notext = false ) {
 	$key = isset( psb_placeholder_keys()[ $key ] ) ? $key : 'default';
 	$ext = 'webp' === $ext ? 'webp' : 'svg';
-	return get_template_directory_uri() . '/images/placeholders/' . $key . ( $notext && 'svg' === $ext ? '-notext' : '' ) . '.' . $ext;
+	// ?v= busts the 1-year browser cache (inc/htaccess-perf.php) when the artwork changes (v2: PSB mark).
+	return get_template_directory_uri() . '/images/placeholders/' . $key . ( $notext && 'svg' === $ext ? '-notext' : '' ) . '.' . $ext . '?v=2';
 }
 
 /** Normalise Persian text for keyword matching (Arabic ي/ك, ZWNJ, hamza-yeh, case). */
@@ -403,10 +404,11 @@ function psb_placeholder_img( $key, $attr = array() ) {
 	$keys  = psb_placeholder_keys();
 	$key   = isset( $keys[ $key ] ) ? $key : 'default';
 	$label = isset( $attr['alt'] ) && '' !== $attr['alt'] ? $attr['alt'] : $keys[ $key ];
-	$tag   = ! isset( $attr['tag'] ) || $attr['tag'];
-	$html  = sprintf(
+	// Illustrations carry a faint PSB mark (bottom-left, line-art colour) instead of the old «تصویر نمایشی»
+	// chip; the alt text still says it is an illustration.
+	return sprintf(
 		'<img src="%s" width="1200" height="900" alt="%s" class="%s" loading="%s" decoding="async"%s%s data-placeholder="%s">',
-		esc_url( psb_placeholder_url( $key, 'svg', $tag ) ),
+		esc_url( psb_placeholder_url( $key, 'svg', true ) ),
 		esc_attr( 'تصویر نمایشی: ' . $label ),
 		esc_attr( trim( 'is-placeholder ' . ( $attr['class'] ?? '' ) ) ),
 		esc_attr( $attr['loading'] ?? 'lazy' ),
@@ -414,10 +416,6 @@ function psb_placeholder_img( $key, $attr = array() ) {
 		! empty( $attr['style'] ) ? ' style="' . esc_attr( $attr['style'] ) . '"' : '',
 		esc_attr( $key )
 	);
-	if ( $tag ) {
-		$html .= '<span class="ph-tag" aria-hidden="true">تصویر نمایشی</span>';
-	}
-	return $html;
 }
 
 /** '4 / 3', '4:3', '16/9', 1.5 → float width/height ratio. */

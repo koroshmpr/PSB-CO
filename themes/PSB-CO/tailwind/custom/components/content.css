@@ -126,8 +126,9 @@
 	   javascript/modules/timeline.js); without JS it spans the list. */
 	.timeline::before {
 		content: "";
-		@apply absolute top-1 start-[0.25rem] w-px bg-line-strong;
+		@apply absolute top-1 start-[0.25rem] w-px;
 		height: calc(var(--tl-end, 100%) - 0.25rem);
+		background: linear-gradient(to bottom, var(--color-line-strong) calc(100% - 3.5rem), var(--color-primary-600) 100%);
 	}
 
 	.timeline-item {
@@ -139,9 +140,20 @@
 		@apply absolute -start-7 top-[0.45rem] size-[9px] rounded-full bg-foreground;
 	}
 
-	/* «today»: a larger red dot (14px) with a soft halo, still centred on the line */
-	.timeline-item.is-current::before {
-		@apply -start-[calc(1.75rem+2.5px)] top-[calc(0.45rem-2.5px)] size-[14px] bg-primary-600 shadow-[0_0_0_5px_rgb(214_15_26/0.15)];
+	/* «today»: a large red dot (34px) with a white medal icon and a soft halo, centred on the line;
+	   the line stops at its top edge (--tl-end, timeline.js) and turns red just before it. */
+	.timeline-item.is-current {
+		@apply ps-4;
+	}
+
+	.timeline-item.is-current::before,
+	.timeline.is-anim .timeline-item.is-current::before,
+	.timeline.is-anim .timeline-item.is-current.is-passed::before {
+		@apply -start-[calc(1.75rem+12.5px)] -top-[7px] size-[34px] bg-primary-600 shadow-[0_0_0_6px_rgb(214_15_26/0.14)];
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='9' r='5.5'/%3E%3Cpath d='m9 13.8-1.5 7.2 4.5-2.5 4.5 2.5-1.5-7.2'/%3E%3Cpath d='M10 9h4'/%3E%3C/svg%3E");
+		background-repeat: no-repeat;
+		background-position: center;
+		background-size: 18px;
 	}
 
 	.timeline-year {
@@ -160,8 +172,9 @@
 	   JS runs and motion is allowed — otherwise the static timeline above is what renders. */
 	.timeline.is-anim::after {
 		content: "";
-		@apply pointer-events-none absolute start-[calc(0.25rem-0.5px)] top-1 w-0.5 origin-top rounded-full bg-foreground;
+		@apply pointer-events-none absolute start-[calc(0.25rem-0.5px)] top-1 w-0.5 origin-top rounded-full;
 		height: calc(var(--tl-end, 100%) - 0.25rem);
+		background: linear-gradient(to bottom, var(--color-foreground) calc(100% - 3.5rem), var(--color-primary-600) 100%);
 		transform: scaleY(var(--tl-p, 0));
 		will-change: transform;
 	}
@@ -188,10 +201,6 @@
 
 	.timeline.is-anim .timeline-item.is-passed::before {
 		@apply bg-foreground shadow-[inset_0_0_0_1.5px_var(--color-foreground)];
-	}
-
-	.timeline.is-anim .timeline-item.is-current.is-passed::before {
-		@apply bg-primary-600 shadow-[0_0_0_5px_rgb(214_15_26/0.15)];
 	}
 
 	@media (prefers-reduced-motion: reduce) {
@@ -487,6 +496,7 @@
 	.cert-frame {
 		@apply relative grid place-items-center overflow-hidden p-4 sm:p-5;
 		aspect-ratio: 4 / 5;
+		grid-template: minmax(0, 1fr) / minmax(0, 1fr); /* definite track → max-height: 100% works for tall scans */
 		background:
 			radial-gradient(120% 80% at 50% 0%, rgb(255 255 255 / 0.9) 0%, rgb(255 255 255 / 0) 60%),
 			linear-gradient(160deg, #EEF1F4 0%, #DCE2E9 55%, #C9D1DB 100%);

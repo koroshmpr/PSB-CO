@@ -101,13 +101,20 @@
 	}
 
 	/* ---------------- Documents: 3:4 preview, 1px border on steel-50 (spec 7.3/7.5) ---------------- */
+	/* Document preview: the whole scan (never cropped, whatever its paper size) on the same soft
+	   gradient mat + paper shadow as the home certificate cards. */
 	.doc-frame {
-		@apply relative block overflow-hidden rounded-card border border-line bg-slate-50;
+		@apply relative grid place-items-center overflow-hidden rounded-card border border-line p-4 sm:p-6;
 		aspect-ratio: 3 / 4;
+		grid-template: minmax(0, 1fr) / minmax(0, 1fr); /* definite track → max-height: 100% works for tall scans */
+		background:
+			radial-gradient(120% 80% at 50% 0%, rgb(255 255 255 / 0.9) 0%, rgb(255 255 255 / 0) 60%),
+			linear-gradient(160deg, #EEF1F4 0%, #DCE2E9 55%, #C9D1DB 100%);
 	}
 
 	.doc-frame img {
-		@apply block size-full object-cover object-top;
+		@apply block h-auto max-h-full w-auto max-w-full rounded-[3px] bg-white object-contain;
+		box-shadow: 0 1px 2px rgb(20 23 28 / 0.12), 0 10px 24px -10px rgb(20 23 28 / 0.4);
 	}
 
 	.doc-frame--empty {

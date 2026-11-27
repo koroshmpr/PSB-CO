@@ -1747,8 +1747,8 @@ blockquote {
     inset-inline-start: 0.25rem;
     top: calc(var(--spacing) * 1);
     width: 1px;
-    background-color: var(--color-line-strong);
     height: calc(var(--tl-end, 100%) - 0.25rem);
+    background: linear-gradient(to bottom, var(--color-line-strong) calc(100% - 3.5rem), var(--color-primary-600) 100%);
   }
   .timeline-item {
     position: relative;
@@ -1763,14 +1763,21 @@ blockquote {
     border-radius: calc(infinity * 1px);
     background-color: var(--color-foreground);
   }
-  .timeline-item.is-current::before {
-    inset-inline-start: calc(calc(1.75rem + 2.5px) * -1);
-    top: calc(0.45rem - 2.5px);
-    width: 14px;
-    height: 14px;
+  .timeline-item.is-current {
+    padding-inline-start: calc(var(--spacing) * 4);
+  }
+  .timeline-item.is-current::before,	.timeline.is-anim .timeline-item.is-current::before,	.timeline.is-anim .timeline-item.is-current.is-passed::before {
+    inset-inline-start: calc(calc(1.75rem + 12.5px) * -1);
+    top: calc(7px * -1);
+    width: 34px;
+    height: 34px;
     background-color: var(--color-primary-600);
-    --tw-shadow: 0 0 0 5px var(--tw-shadow-color, rgb(214 15 26/0.15));
+    --tw-shadow: 0 0 0 6px var(--tw-shadow-color, rgb(214 15 26/0.14));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='9' r='5.5'/%3E%3Cpath d='m9 13.8-1.5 7.2 4.5-2.5 4.5 2.5-1.5-7.2'/%3E%3Cpath d='M10 9h4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 18px;
   }
   .timeline-year {
     margin-bottom: calc(var(--spacing) * 0.5);
@@ -1805,8 +1812,8 @@ blockquote {
     width: calc(var(--spacing) * 0.5);
     transform-origin: top;
     border-radius: calc(infinity * 1px);
-    background-color: var(--color-foreground);
     height: calc(var(--tl-end, 100%) - 0.25rem);
+    background: linear-gradient(to bottom, var(--color-foreground) calc(100% - 3.5rem), var(--color-primary-600) 100%);
     transform: scaleY(var(--tl-p, 0));
     will-change: transform;
   }
@@ -1828,11 +1835,6 @@ blockquote {
   .timeline.is-anim .timeline-item.is-passed::before {
     background-color: var(--color-foreground);
     --tw-shadow: inset 0 0 0 1.5px var(--tw-shadow-color, var(--color-foreground));
-    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
-  }
-  .timeline.is-anim .timeline-item.is-current.is-passed::before {
-    background-color: var(--color-primary-600);
-    --tw-shadow: 0 0 0 5px var(--tw-shadow-color, rgb(214 15 26/0.15));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
   @media (prefers-reduced-motion: reduce) {
@@ -2443,6 +2445,7 @@ blockquote {
   }
   .cert-frame {
     aspect-ratio: 4 / 5;
+    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
     background: radial-gradient(120% 80% at 50% 0%, rgb(255 255 255 / 0.9) 0%, rgb(255 255 255 / 0) 60%),	linear-gradient(160deg, #EEF1F4 0%, #DCE2E9 55%, #C9D1DB 100%);
     box-shadow: inset 0 0 0 1px rgb(20 23 28 / 0.06);
   }
@@ -3921,21 +3924,35 @@ html.vt-back::view-transition-new(main) {
   }
   .doc-frame {
     position: relative;
-    display: block;
+    display: grid;
+    place-items: center;
     overflow: hidden;
     border-radius: var(--radius-card);
     border-style: var(--tw-border-style);
     border-width: 1px;
     border-color: var(--color-line);
-    background-color: var(--color-slate-50);
+    padding: calc(var(--spacing) * 4);
+  }
+  @media (width >= 40rem) {
+    .doc-frame {
+      padding: calc(var(--spacing) * 6);
+    }
+  }
+  .doc-frame {
     aspect-ratio: 3 / 4;
+    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+    background: radial-gradient(120% 80% at 50% 0%, rgb(255 255 255 / 0.9) 0%, rgb(255 255 255 / 0) 60%),	linear-gradient(160deg, #EEF1F4 0%, #DCE2E9 55%, #C9D1DB 100%);
   }
   .doc-frame img {
     display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top;
+    height: auto;
+    max-height: 100%;
+    width: auto;
+    max-width: 100%;
+    border-radius: 3px;
+    background-color: var(--color-white);
+    object-fit: contain;
+    box-shadow: 0 1px 2px rgb(20 23 28 / 0.12), 0 10px 24px -10px rgb(20 23 28 / 0.4);
   }
   .doc-frame--empty {
     display: flex;

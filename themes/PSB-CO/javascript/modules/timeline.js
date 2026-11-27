@@ -12,7 +12,10 @@ const DOT = 12; // dot centre ≈ item top + .45rem + 4.5px
 /** The line stops at the last dot: --tl-end = last item's dot centre (px from the list top). */
 function setEnd(list) {
 	const last = list.querySelector(':scope > .timeline-item:last-child');
-	if (last) list.style.setProperty('--tl-end', `${last.offsetTop + DOT}px`);
+	if (!last) return;
+	// Stop at the TOP edge of the last dot (the «today» dot is large), never across it.
+	const top = parseFloat(getComputedStyle(last, '::before').top);
+	list.style.setProperty('--tl-end', `${last.offsetTop + (Number.isFinite(top) ? top : DOT)}px`);
 }
 
 function setup(list) {
@@ -26,7 +29,7 @@ function setup(list) {
 
 	const measure = () => {
 		setEnd(list);
-		height = items[items.length - 1].offsetTop + DOT; // the line ends at the last dot
+		height = parseFloat(list.style.getPropertyValue('--tl-end')) || items[items.length - 1].offsetTop + DOT; // the line ends at the last dot
 		offsets = items.map((li) => li.offsetTop + DOT);
 	};
 
