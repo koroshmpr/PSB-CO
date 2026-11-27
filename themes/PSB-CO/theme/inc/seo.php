@@ -16,8 +16,9 @@
  *      foundingDate (۱۳۵۵ = 1976, stated on the home page), address / phones / email / socials from the ACF
  *      options page "site-setting", office + factory locations with geo from the stored Google-Maps embeds.
  *   2. Fixes page-level types: no Article on static pages, AboutPage / ContactPage on those templates.
- *   3. Cleans the Product node for catalogue products: plain product name, brand + manufacturer = the
- *      organisation, description, no empty offers (catalogue has no prices).
+ *   3. Catalogue products: plain name, brand = the organisation, description; with no price (catalogue
+ *      mode) the Product node becomes a Service (made-to-order manufacturing), because a Product without
+ *      offers/review/aggregateRating is an invalid «Product snippet» in Search Console.
  *   4. Where Rank Math printed nothing (CPT singles), prints a minimal graph: Organization, WebSite, WebPage.
  *   5. Prints BreadcrumbList in the footer unless Rank Math did (theme breadcrumb partials are markup only).
  *   6. One representative image per URL (psb_seo_image_id): og:image / twitter:image when Rank Math found
@@ -372,6 +373,34 @@ add_filter(
 				if ( isset( $data[ $key ]['offers'] ) && ( ! $product || '' === (string) $product->get_price() ) ) {
 					unset( $data[ $key ]['offers'] );
 				}
+				/*
+				 * Without offers / review / aggregateRating Google marks a Product as an invalid «Product
+				 * snippet» (Search Console error on every catalogue item). The catalogue items are made to
+				 * order, so they are described as the manufacturing Service they are; no fake prices or
+				 * reviews. A product that gets a real price keeps the Product type.
+				 */
+				if ( empty( $data[ $key ]['offers'] ) && empty( $data[ $key ]['review'] ) && empty( $data[ $key ]['aggregateRating'] ) ) {
+					$node        = $data[ $key ];
+					$data[ $key ] = array_filter(
+						array(
+							'@type'            => 'Service',
+							'@id'              => get_permalink( $post_id ) . '#service',
+							'name'             => $node['name'],
+							'serviceType'      => $node['name'],
+							'category'         => $node['category'] ?? null,
+							'description'      => $node['description'] ?? null,
+							'url'              => $node['url'],
+							'image'            => $node['image'] ?? null,
+							'provider'         => array( '@id' => $org_id ),
+							'brand'            => $node['brand'],
+							'areaServed'       => array(
+								'@type' => 'Country',
+								'name'  => 'Iran',
+							),
+							'mainEntityOfPage' => $node['mainEntityOfPage'] ?? null,
+						)
+					);
+				}
 			}
 		}
 
@@ -389,7 +418,7 @@ add_filter(
 					$data[ $key ]['primaryImageOfPage'] = $img;
 				}
 			}
-			if ( $img && empty( $node['image'] ) && array_intersect( $types, array( 'Article', 'BlogPosting', 'NewsArticle', 'Product' ) ) ) {
+			if ( $img && empty( $node['image'] ) && array_intersect( $types, array( 'Article', 'BlogPosting', 'NewsArticle', 'Product', 'Service' ) ) ) {
 				$data[ $key ]['image'] = $img;
 			}
 			// Archives have no author: drop Rank Math's stray Person node.

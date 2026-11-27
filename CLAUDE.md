@@ -37,7 +37,7 @@ wp-content/                 ← git repo root (github koroshmpr/PSB-CO, branch m
 | `login-guard.php` | Hidden login `/secret-door/`, 404s `wp-login`/`wp-admin` for guests. Off while Perfmatters owns the login. Kill switch: `PSB_LOGIN_GUARD_DISABLE` |
 | `antispam.php` | Gravity Forms and comments: honeypot, signed time token, content rules. Spam goes to the spam folders. Kill switch: `PSB_ANTISPAM_DISABLE` |
 | `otp-login-form.php` | Customer OTP login (`/login/`). `psb_otp_verify()` has attempt caps; admins can't use OTP |
-| `seo.php` | JSON-LD on top of Rank Math (Organization, Product with no offers, FAQ, Breadcrumb) |
+| `seo.php` | JSON-LD on top of Rank Math (Organization; catalogue items without a price as Service, not Product; FAQ, Breadcrumb; DigitalDocument for approvals/tests) |
 | `ai-visibility/` | `/llms.txt`, `/llms-full.txt`, `/llms/<id>.md`, `/ai.txt`, robots AI rules, dashboard, bot log |
 | `rfq/` | Quote wizard (`page-request-quote.php`), CPT `psb_rfq`, REST `psb/v1/rfq*`, Bale/Telegram/WhatsApp/email/SMS, tracking code `PSB-<jalali year>-NNNN` |
 | `pwa/` | `/manifest.webmanifest`, `/sw.js`, `/pwa-offline/` |
