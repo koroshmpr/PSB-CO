@@ -59,7 +59,7 @@ $psb_series = function_exists( 'psb_series_all' ) ? psb_series_all() : array();
 </section>
 
 <?php if ( count( $psb_topics ) > 0 || $psb_series ) : ?>
-	<nav class="sticky top-0 z-20 border-b border-line bg-white/95 backdrop-blur-md lg:static" aria-label="موضوعات مقالات">
+	<nav class="border-b border-line bg-white" aria-label="موضوعات مقالات">
 		<ul class="container flex gap-2 overflow-x-auto py-3" role="list" style="scrollbar-width:none">
 			<li><a class="chip shrink-0" href="<?php echo esc_url( $psb_burl ); ?>" <?php echo 'home' === $psb_mode ? 'aria-current="page" aria-pressed="true"' : ''; ?>>همه مقالات</a></li>
 			<?php foreach ( $psb_topics as $psb_t ) : ?>

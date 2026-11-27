@@ -4,7 +4,7 @@
 	var C = window.psbRfq;
 	if (!C || !window.fetch || !document.querySelector) return;
 
-	var FA = '۰۱۲۳۴۵۶۷۸۹', AR = '٠١٢٣٤٥٦٧٨٩', KEY = 'psb_rfq_v1';
+	var FA = '۰۱۲۳۴۵۶۷۸۹', AR = '٠١٢٣٤٥٦٧٨٩', KEY = 'psb_rfq_v1', PREV = 'psb_rfq_prev_v1';
 	var NET = 'اتصال به سرور برقرار نشد. اینترنت را بررسی و دوباره تلاش کنید.';
 
 	function latin(s) {
@@ -41,10 +41,11 @@
 	function $(r, s) { return r.querySelector(s); }
 	function $$(r, s) { return Array.prototype.slice.call(r.querySelectorAll(s)); }
 	function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
-	function store(v) {
+	function store(v, k) {
+		k = k || KEY;
 		try {
-			if (v === undefined) return JSON.parse(localStorage.getItem(KEY) || 'null');
-			if (v === null) localStorage.removeItem(KEY); else localStorage.setItem(KEY, JSON.stringify(v));
+			if (v === undefined) return JSON.parse(localStorage.getItem(k) || 'null');
+			if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v));
 		} catch (e) { return null; }
 	}
 	function empty(v) { return v == null || v === '' || (Array.isArray(v) && !v.length); }
@@ -125,12 +126,30 @@
 		var blank = function () { return { items: [], project: {}, contact: {}, files: [], step: 0 }; };
 		var saved = store();
 		st = saved && Array.isArray(saved.items) ? saved : blank();
-		if (saved && (saved.items.length || saved.contact.name)) $(root, '[data-restored]').hidden = false;
 
-		// Deep link: ?product=<slug|id> or ?type=<key>
+		// Deep link: ?product=<slug|id> or ?type=<key> (the «استعلام قیمت» buttons of products / cards).
+		// A deep link starts a NEW request for that board only, instead of merging it into an older draft:
+		// items, project data, files and the step are fresh; the contact details are kept (same customer).
+		// The older draft is parked under PREV and can be brought back with one click ([data-prev]).
+		// Coming back with the same single board keeps the draft as it is (the visitor is continuing it).
 		var qs = new URLSearchParams(location.search), pk = qs.get('product'), tk = qs.get('type');
 		if (pk && C.products[pk]) { tk = tk || C.products[pk][0]; product = C.products[pk][1]; }
-		if (tk && C.types[tk] && !st.items.some(function (i) { return i.type === tk; })) { st.items.push({ type: tk, qty: 1, specs: {} }); st.step = 0; }
+		var deep = !!(tk && C.types[tk]);
+		var hasWork = function (d) { return !!(d && (d.items.length || (d.files && d.files.length) || Object.keys(d.project || {}).some(function (k) { return !empty(d.project[k]); }))); };
+		var sameBoard = deep && st.items.length > 0 && st.items.every(function (i) { return i.type === tk; });
+		if (deep && !sameBoard) {
+			if (hasWork(saved)) {
+				store(saved, PREV);
+				$(root, '[data-prev]').hidden = false;
+			}
+			var keep = saved && saved.contact ? saved.contact : {};
+			st = blank();
+			st.contact = keep;
+			st.items.push({ type: tk, qty: 1, specs: {} });
+			store(st);
+		} else if (saved && (saved.items.length || saved.contact.name)) {
+			$(root, '[data-restored]').hidden = false;
+		}
 		if (product) st.product = product;
 
 		function save() { clearTimeout(saveT); saveT = setTimeout(function () { store(st); }, 300); }
@@ -375,6 +394,7 @@
 			st = blank(); uploading = []; store(null);
 			form.reset(); fillStatic(); renderItems();
 			$(root, '[data-restored]').hidden = true;
+			$(root, '[data-prev]').hidden = true;
 			go(0);
 		}
 
@@ -460,6 +480,18 @@
 			var t = e.target.closest('[data-act]');
 			if (!t) return;
 			if (t.dataset.act === 'reset') reset();
+			else if (t.dataset.act === 'restore-prev') {
+				var prev = store(undefined, PREV);
+				if (prev && Array.isArray(prev.items)) {
+					st = prev; store(st); store(null, PREV);
+					form.reset(); fillStatic(); renderItems();
+					go(st.step || 0);
+				}
+				$(root, '[data-prev]').hidden = true;
+			} else if (t.dataset.act === 'dismiss-prev') {
+				store(null, PREV);
+				$(root, '[data-prev]').hidden = true;
+			}
 			else if (t.dataset.act === 'new') {
 				$(root, '[data-success]').hidden = true; form.hidden = false;
 				$$(root, '.rfq-progress,.rfq-mstep').forEach(function (x) { x.hidden = false; });

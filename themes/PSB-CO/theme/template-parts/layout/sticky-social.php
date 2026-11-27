@@ -1,8 +1,10 @@
 <?php
 /**
  * Mobile bottom navigation (< 768px), minimal and icon-first:
- * a white floating pill with 5 monochrome line icons (خانه · محصولات · استعلام · اعتبارنامه‌ها · منو)
- * and ONE separate round call button outside the pill (inline-end) that opens the call sheet.
+ * a white floating pill with 4 monochrome line icons (خانه · محصولات · پروژه‌ها · اعتبارنامه‌ها; the menu
+ * lives in the header) on the inline-start side; the two round action buttons sit together on the
+ * inline-end side: the red quote button (switchboard + plus icon, soft pulse ring) and the graphite call
+ * button (opens the call sheet).
  * Active item = light grey circle behind a graphite icon. Labels are visually hidden (aria + title).
  * Printed by footer.php when psb_show_tabbar() is true (body.has-tabbar pads the page by --tabbar-offset).
  * File name kept for backwards compatibility.
@@ -22,7 +24,7 @@ $psb_is_quote = is_page( 'request-quote' ) || is_page_template( 'page-request-qu
 $psb_tabs     = array(
 	array( home_url( '/' ), 'خانه', 'home', 'home' === $psb_section ),
 	array( psb_shop_url(), 'محصولات', 'cabinet', 'products' === $psb_section ),
-	array( psb_quote_url(), 'استعلام قیمت', 'quote', $psb_is_quote ),
+	array( psb_archive_url( 'portfolio', '/portfolios/' ), 'پروژه‌ها', 'building', 'projects' === $psb_section ),
 	array( psb_archive_url( 'confirmation' ), 'اعتبارنامه‌ها', 'shield', 'credentials' === $psb_section ),
 );
 ?>
@@ -34,10 +36,13 @@ $psb_tabs     = array(
 					<span class="app-tab-ico"><?php echo psb_icon( $psb_tab[2] ); // phpcs:ignore ?></span>
 				</a>
 			<?php endforeach; ?>
-			<button type="button" class="app-tab" @click="menuOpen = true" aria-label="منو" title="منو" aria-controls="mobileMenu" aria-haspopup="dialog" :aria-expanded="menuOpen">
-				<span class="app-tab-ico"><?php echo psb_icon( 'menu' ); // phpcs:ignore ?></span>
-			</button>
 		</nav>
+		<?php if ( ! $psb_is_quote ) : ?>
+			<a class="app-quote" href="<?php echo esc_url( psb_quote_url() ); ?>" aria-label="درخواست استعلام قیمت" title="درخواست استعلام قیمت">
+				<span class="app-quote-pulse" aria-hidden="true"></span>
+				<?php echo psb_icon( 'panel-plus', 'size-6' ); // phpcs:ignore ?>
+			</a>
+		<?php endif; ?>
 		<button type="button" class="app-call" x-ref="callBtn" @click="sheet = true" aria-label="تماس با شرکت" title="تماس با شرکت" aria-haspopup="dialog" aria-controls="call-sheet" :aria-expanded="sheet">
 			<?php echo psb_icon( 'phone', 'size-[22px]' ); // phpcs:ignore ?>
 		</button>

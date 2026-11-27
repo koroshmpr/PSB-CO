@@ -4,7 +4,7 @@
  * z-index stack (§9): drawer 60 · search 55 · tab bar 50 · header 40 · in-page sticky 30 · FAB 20.
  */
 :root {
-	--app-tabbar-h: 3.5rem; /* 56px pill + 56px round call button */
+	--app-tabbar-h: 3.25rem; /* 52px pill (4px inner padding) + 52px round quote / call buttons */
 	--tabbar-offset: 0px;
 	--header-h: 3.75rem; /* 60px < 1100px (constant spacer height) */
 	--header-live: var(--header-h); /* current bar height (compact on scroll) */
@@ -391,7 +391,7 @@
 	}
 
 	.app-tabbar {
-		@apply grid flex-1 grid-cols-5 items-center rounded-full border border-line bg-white px-1.5;
+		@apply grid min-w-0 flex-1 grid-cols-4 items-stretch gap-0.5 rounded-full border border-line bg-white p-1;
 		height: var(--app-tabbar-h);
 		box-shadow: 0 10px 28px -14px rgb(17 20 24 / 0.35), 0 2px 6px -3px rgb(17 20 24 / 0.1);
 	}
@@ -402,12 +402,13 @@
 		transition: transform 0.15s var(--ease-out-quart), color 0.15s;
 	}
 
+	/* active state = a pill filling the cell, inset 4px from the bar (Instagram-like) */
 	.app-tab-ico {
-		@apply flex size-11 items-center justify-center rounded-full transition-colors duration-150;
+		@apply flex h-full w-full items-center justify-center rounded-full transition-colors duration-150;
 	}
 
 	.app-tab-ico svg {
-		@apply size-6;
+		@apply size-[22px];
 	}
 
 	.app-tab[aria-current="page"],
@@ -429,6 +430,36 @@
 		transition: transform 0.15s var(--ease-out-quart);
 	}
 
+	/* quote button: the brand red, price-tag icon, a soft ring that pulses every few seconds */
+	.app-quote {
+		@apply relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-primary text-white ring-2 ring-white;
+		width: var(--app-tabbar-h);
+		height: var(--app-tabbar-h);
+		-webkit-tap-highlight-color: transparent;
+		box-shadow: 0 10px 24px -12px rgb(214 15 26 / 0.6);
+		transition: transform 0.15s var(--ease-out-quart), background-color 0.15s;
+	}
+
+	.app-quote:hover {
+		@apply bg-primary-700;
+	}
+
+	.app-quote-pulse {
+		@apply pointer-events-none absolute inset-0 rounded-full;
+		box-shadow: 0 0 0 0 rgb(214 15 26 / 0.45);
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.app-quote-pulse {
+			animation: psb-quote-pulse 2.6s cubic-bezier(0.25, 1, 0.5, 1) 1.5s infinite;
+		}
+
+		.app-quote:active {
+			transform: scale(0.96);
+		}
+	}
+
+	.app-quote:focus-visible,
 	.app-call:focus-visible,
 	.app-tab:focus-visible {
 		outline: 2px solid var(--color-primary-600);
@@ -580,6 +611,16 @@
 		transform: translateX(100%);
 		background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.6), transparent);
 		animation: psb-shimmer 1.4s infinite;
+	}
+}
+
+@keyframes psb-quote-pulse {
+	0% {
+		box-shadow: 0 0 0 0 rgb(214 15 26 / 0.45);
+	}
+	70%,
+	100% {
+		box-shadow: 0 0 0 14px rgb(214 15 26 / 0);
 	}
 }
 

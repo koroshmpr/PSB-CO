@@ -14,8 +14,16 @@
 
 	/* ---------------- Underline tabs (credentials hub, product sections) — spec 4.14 ---------------- */
 	.subnav {
-		@apply relative z-30 border-b border-line bg-white lg:sticky;
-		top: calc(var(--header-h, 4rem) + var(--wp-admin--admin-bar--height, 0px));
+		@apply relative z-30 border-b border-line bg-white;
+	}
+
+	/* Sticky under the header on desktop only. `top` must not apply below lg: on a relative element it
+	   would push the bar down over the list (and leave a gap above it). */
+	@media (width >= 64rem) {
+		.subnav {
+			position: sticky;
+			top: calc(var(--header-h, 4rem) + var(--wp-admin--admin-bar--height, 0px));
+		}
 	}
 
 	.subnav-list {
@@ -387,9 +395,15 @@
 	}
 
 	.anchor-nav {
-		@apply relative z-30 flex gap-6 overflow-x-auto border-b border-line bg-white lg:sticky;
-		top: calc(var(--header-h, 4rem) + var(--wp-admin--admin-bar--height, 0px));
+		@apply relative z-30 flex gap-6 overflow-x-auto border-b border-line bg-white;
 		scrollbar-width: none;
+	}
+
+	@media (width >= 64rem) {
+		.anchor-nav {
+			position: sticky;
+			top: calc(var(--header-h, 4rem) + var(--wp-admin--admin-bar--height, 0px));
+		}
 	}
 
 	.anchor-nav a {

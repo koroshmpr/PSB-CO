@@ -50,6 +50,7 @@ If `rfq.min.js` is missing, or `SCRIPT_DEBUG` is on, the readable `rfq.js` is lo
 
 - **Page:** a page with slug `request-quote` uses `page-request-quote.php` automatically, even if «قالب» is left on default. Choosing the template «استعلام قیمت» by hand also works. The draft page has id **1826**.
 - **Deep links:** `/request-quote/?product=<slug|id>` preselects the board type of that product. `/request-quote/?type=lv_mcc` preselects a type key. The theme helper `psb_quote_url( $slug )` builds these links.
+- **Deep links start a new request.** Arriving through a deep link (a product's «استعلام قیمت») starts a fresh request with only that board: items, project data, files and step are reset; the contact details are kept. If the old draft (`localStorage` `psb_rfq_v1`) had any work, it is parked under `psb_rfq_prev_v1` and a notice offers «بازگرداندن پیش‌نویس قبلی» / «حذف آن». A draft that already holds only that same board is kept as it is (the visitor is continuing it). Without a deep link the draft is restored as before («شروع از نو» clears it).
 - **Shortcodes:**
   - `[psb_rfq]` renders the full wizard.
   - `[psb_rfq_quick product="slug-or-id" title="…" text="…"]` renders the quick form. On a single product page, the current product is used when `product` is not given.

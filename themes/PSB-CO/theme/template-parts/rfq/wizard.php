@@ -38,6 +38,7 @@ $psb_i     = 0;
 	</div>
 
 	<p class="rfq-restored" data-restored hidden><span>اطلاعاتی که قبلاً وارد کرده بودید بازیابی شد.</span> <button type="button" class="rfq-link" data-act="reset">شروع از نو</button></p>
+	<p class="rfq-restored" data-prev hidden><span>استعلام جدید برای همین محصول شروع شد؛ پیش‌نویس قبلی شما جداگانه نگه داشته شد.</span> <button type="button" class="rfq-link" data-act="restore-prev">بازگرداندن پیش‌نویس قبلی</button> <button type="button" class="rfq-link" data-act="dismiss-prev">حذف آن</button></p>
 
 	<form class="rfq-form" novalidate>
 		<div class="rfq-hp" aria-hidden="true"><label>وب‌سایت <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>

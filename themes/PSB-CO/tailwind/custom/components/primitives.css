@@ -185,7 +185,7 @@
 
 	/* Filter chip (pills only here) */
 	.chip {
-		@apply inline-flex h-10 cursor-pointer items-center gap-1.5 rounded-full border border-line-strong bg-white px-4 text-sm font-medium text-foreground transition-colors hover:border-slate-700;
+		@apply inline-flex h-10 shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full border border-line-strong bg-white px-4 text-sm font-medium text-foreground transition-colors hover:border-slate-700;
 	}
 
 	.chip[aria-pressed="true"],
