@@ -25,14 +25,15 @@ $psb_blog    = (int) get_option( 'page_for_posts' );
 		get_template_part(
 			'template-parts/global/section-head',
 			null,
-			array(
-				'id'      => 'home-blog-title',
-				'eyebrow' => 'مقالات',
-				'title'   => 'مقالات آموزشی تابلو برق',
-				'link'    => array(
-					'url'   => $psb_blog ? get_permalink( $psb_blog ) : home_url( '/blog/' ),
-					'label' => 'همه مقالات',
-				),
+			psb_pf_head(
+				'home_blog',
+				(int) get_option( 'page_on_front' ),
+				array(
+					'id'      => 'home-blog-title',
+					'link'    => array(
+						'url'   => $psb_blog ? get_permalink( $psb_blog ) : home_url( '/blog/' )
+					),
+				)
 			)
 		);
 		?>

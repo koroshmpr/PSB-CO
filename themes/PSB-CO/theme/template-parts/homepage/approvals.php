@@ -46,13 +46,24 @@ $psb_file_url = function ( $id, $keys ) {
 <section class="bg-white py-section" aria-labelledby="home-proof-title">
 	<div class="container grid items-start gap-8 lg:grid-cols-12 lg:gap-16">
 		<div class="lg:col-span-4" data-reveal>
-			<span class="eyebrow">تأییدیه‌ها و آزمون‌های نوعی</span>
-			<h2 id="home-proof-title" class="section-title mb-4 mt-3">اسنادی که در مناقصه به آن استناد می‌کنید</h2>
-			<p class="section-lead mb-5 lg:mb-8">نام <?php echo esc_html( psb_brand_name() ); ?> در فهرست سازندگان تأییدشده توانیر، شرکت‌های توزیع برق تهران و شرکت ملی مهندسی و ساختمان نفت ثبت است. اصل هر سند در سایت قابل مشاهده است.</p>
+			<?php
+			$psb_fp   = (int) get_option( 'page_on_front' );
+			$psb_head = psb_pf_head( 'home_approvals', $psb_fp, array( 'link' => array( 'url' => psb_archive_url( 'confirmation' ) ) ) );
+			$psb_lnk2 = psb_pf_text( psb_pf( 'home_approvals_link2', $psb_fp ) );
+			?>
+			<?php if ( $psb_head['eyebrow'] ) : ?>
+				<span class="eyebrow"><?php echo psb_pf_html( $psb_head['eyebrow'] ); // phpcs:ignore ?></span>
+			<?php endif; ?>
+			<h2 id="home-proof-title" class="section-title mb-4 mt-3"><?php echo psb_pf_html( $psb_head['title'] ); // phpcs:ignore ?></h2>
+			<?php if ( $psb_head['lead'] ) : ?>
+				<p class="section-lead mb-5 lg:mb-8"><?php echo psb_pf_html( $psb_head['lead'] ); // phpcs:ignore ?></p>
+			<?php endif; ?>
 			<div class="flex flex-wrap gap-x-6 gap-y-4 lg:flex-col lg:items-start">
-				<a class="link-arrow" href="<?php echo esc_url( psb_archive_url( 'confirmation' ) ); ?>">همه تأییدیه‌ها <?php echo psb_icon( 'arrow', 'btn-arrow' ); // phpcs:ignore ?></a>
-				<?php if ( $psb_tests ) : ?>
-					<a class="link-arrow" href="<?php echo esc_url( psb_archive_url( 'type-test' ) ); ?>">گزارش‌های آزمون نوعی <?php echo psb_icon( 'arrow', 'btn-arrow' ); // phpcs:ignore ?></a>
+				<?php if ( ! empty( $psb_head['link'] ) ) : ?>
+					<a class="link-arrow" href="<?php echo esc_url( $psb_head['link']['url'] ); ?>"><?php echo esc_html( $psb_head['link']['label'] ); ?> <?php echo psb_icon( 'arrow', 'btn-arrow' ); // phpcs:ignore ?></a>
+				<?php endif; ?>
+				<?php if ( $psb_tests && $psb_lnk2 ) : ?>
+					<a class="link-arrow" href="<?php echo esc_url( psb_archive_url( 'type-test' ) ); ?>"><?php echo esc_html( $psb_lnk2 ); ?> <?php echo psb_icon( 'arrow', 'btn-arrow' ); // phpcs:ignore ?></a>
 				<?php endif; ?>
 			</div>
 		</div>

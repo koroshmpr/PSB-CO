@@ -18,7 +18,13 @@ global $woo_active;
 	<?php
 	// LCP: preload the front-page hero photo (AVIF, per breakpoint; same srcset/sizes as the <picture>).
 	if ( is_front_page() ) {
-		psb_photo_preload( 'hero' );
+		$psb_fp   = (int) get_option( 'page_on_front' );
+		$psb_hero = function_exists( 'psb_pf_image_id' ) ? psb_pf_image_id( psb_pf( 'home_hero_image', $psb_fp ) ) : 0;
+		if ( $psb_hero ) {
+			psb_pf_preload( $psb_hero, psb_pf_image_id( psb_pf( 'home_hero_image_mobile', $psb_fp ) ), '(min-width: 64rem) 60vw, 100vw' );
+		} else {
+			psb_photo_preload( 'hero' );
+		}
 	}
 
 	wp_head();

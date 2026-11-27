@@ -127,7 +127,7 @@ while ( have_posts() ) :
 		}
 	}
 	$psb_table['گارانتی'] = array( 'text', psb_fa_num( PSB_WARRANTY_MONTHS ) . ' ماه' );
-	$psb_table['خدمات پس از فروش'] = array( 'text', '۱۰ سال' );
+	$psb_table['خدمات پس از فروش'] = array( 'text', psb_fa_num( PSB_SERVICE_YEARS ) . ' سال' );
 
 	$psb_nav = array(
 		'overview' => 'معرفی',
@@ -184,7 +184,7 @@ while ( have_posts() ) :
 					if ( $psb_lead ) {
 						$psb_facts[] = array( 'clock', 'زمان ساخت', esc_html( psb_fa_num( implode( '، ', $psb_lead ) ) ) );
 					}
-					$psb_facts[] = array( 'warranty', 'گارانتی', esc_html( psb_fa_num( PSB_WARRANTY_MONTHS ) . ' ماه گارانتی و ۱۰ سال خدمات پس از فروش' ) );
+					$psb_facts[] = array( 'warranty', 'گارانتی', esc_html( psb_fa_num( PSB_WARRANTY_MONTHS ) . ' ماه گارانتی و ' . psb_fa_num( PSB_SERVICE_YEARS ) . ' سال خدمات پس از فروش' ) );
 					$psb_facts[] = array( 'drawing', 'ساخت', 'سفارشی، بر اساس نقشه تک‌خطی و مشخصات پروژه' );
 					?>
 					<dl class="product-facts mt-6">

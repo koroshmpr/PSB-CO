@@ -37,7 +37,10 @@ foreach ( get_posts( array( 'post_type' => 'type-test', 'posts_per_page' => 20, 
 ?>
 <section class="border-b border-line bg-white" aria-label="مراجع تأیید و آزمون">
 	<div class="container flex flex-col gap-4 py-6 md:flex-row md:items-center md:gap-10 md:py-7">
-		<p class="max-w-[9.5rem] shrink-0 text-[0.8125rem] font-semibold leading-[1.6] text-slate-600 max-md:max-w-none">در فهرست سازندگان تأییدشده و آزمون‌شده نزد:</p>
+		<?php $psb_label = psb_pf_text( psb_pf( 'home_issuers_label', (int) get_option( 'page_on_front' ) ) ); ?>
+		<?php if ( $psb_label ) : ?>
+			<p class="max-w-[9.5rem] shrink-0 text-[0.8125rem] font-semibold leading-[1.6] text-slate-600 max-md:max-w-none"><?php echo esc_html( $psb_label ); ?></p>
+		<?php endif; ?>
 		<ul class="-mx-[var(--spacing-gutter)] flex flex-1 items-center gap-7 overflow-x-auto px-[var(--spacing-gutter)] [scrollbar-width:none] md:mx-0 md:flex-wrap md:justify-start md:gap-x-9 md:gap-y-4 md:overflow-visible md:px-0" role="list">
 			<?php foreach ( $psb_issuers as $psb_i ) : ?>
 				<li class="shrink-0">

@@ -130,7 +130,7 @@ function psb_seo_org_data() {
 		'legalName'     => 'شرکت تولیدی و صنعتی پارس سوئیچ بورد',
 		'alternateName' => array( 'Pars Switch Board', 'PSB' ),
 		'url'           => home_url( '/' ),
-		'foundingDate'  => '1976', // سال ۱۳۵۵ — stated on the home page ("با تاسیس شرکت در سال 1355").
+		'foundingDate'  => (string) ( PSB_FOUNDED_JALALI + 621 ), // Jalali founding year (Site Setting) → Gregorian.
 		'description'   => 'طراح و سازنده تابلو برق فشار ضعیف، فشار متوسط، کمپکت و تابلوهای کنترل صنعتی.',
 		'knowsAbout'    => array( 'تابلو برق فشار ضعیف', 'تابلو برق فشار متوسط', 'تابلو کمپکت', 'تابلو فرمان و کنترل', 'تابلو اندازه‌گیری (کنتوری)', 'IEC 61439' ),
 		'areaServed'    => array( '@type' => 'Country', 'name' => 'Iran' ),

@@ -42,14 +42,18 @@ $psb_services_url  = $psb_services_page ? get_permalink( $psb_services_page ) : 
  * Tiles: [ source post (service/product, drives the illustration key), preferred attachment (0 = auto),
  *          url, eyebrow, title, description ]. Large tile prefers the 16:9 crop in post meta `psb_wide_image`.
  */
+$psb_fp   = (int) get_option( 'page_on_front' );
+$psb_tf   = function ( $tile, $part ) use ( $psb_fp ) {
+	return 'image' === $part ? psb_pf_image_id( psb_pf( "home_tile_{$tile}_image", $psb_fp ) ) : psb_pf_text( psb_pf( "home_tile_{$tile}_{$part}", $psb_fp ) );
+};
 $psb_tiles = array_values(
 	array_filter(
 		apply_filters(
 			'psb_home_factory_tiles',
 			array(
-				$psb_cnc ? array( $psb_cnc, 0, get_permalink( $psb_cnc ), 'ورق‌کاری', 'برش، پانچ و خم CNC', 'قیچی، پرس‌برک و پانچ CNC ساخت AMADA ژاپن؛ از نقشه‌های ساخت واحد مهندسی تا قطعه آماده رنگ.' ) : null,
-				( $psb_int_post || $psb_int_att ) ? array( $psb_int_post, $psb_int_att, $psb_services_url, 'مونتاژ', 'مونتاژ، شینه‌بندی و سیم‌بندی', '' ) : null,
-				$psb_lab ? array( $psb_lab, 0, get_permalink( $psb_lab ), 'آزمایشگاه', 'آزمون روتین در حضور خریدار', 'تزریق جریان اولیه تا ۴۰۰۰ آمپر، میکرواهم‌متر و منابع تغذیه متغیر؛ برگه‌های آزمون امضاشده تحویل خریدار می‌شود.' ) : null,
+				( $psb_cnc || $psb_tf( 'cnc', 'image' ) ) ? array( $psb_cnc, $psb_tf( 'cnc', 'image' ), $psb_cnc ? get_permalink( $psb_cnc ) : $psb_services_url, $psb_tf( 'cnc', 'eyebrow' ), $psb_tf( 'cnc', 'title' ), $psb_tf( 'cnc', 'text' ) ) : null,
+				( $psb_int_post || $psb_int_att || $psb_tf( 'assembly', 'image' ) ) ? array( $psb_int_post, $psb_tf( 'assembly', 'image' ) ? $psb_tf( 'assembly', 'image' ) : $psb_int_att, $psb_services_url, $psb_tf( 'assembly', 'eyebrow' ), $psb_tf( 'assembly', 'title' ), $psb_tf( 'assembly', 'text' ) ) : null,
+				( $psb_lab || $psb_tf( 'lab', 'image' ) ) ? array( $psb_lab, $psb_tf( 'lab', 'image' ), $psb_lab ? get_permalink( $psb_lab ) : $psb_services_url, $psb_tf( 'lab', 'eyebrow' ), $psb_tf( 'lab', 'title' ), $psb_tf( 'lab', 'text' ) ) : null,
 			)
 		)
 	)
@@ -117,12 +121,12 @@ $psb_tile = function ( $t, $big ) use ( $psb_tile_img ) {
 	</a>
 	<?php
 };
-$psb_facts = array(
-	array( '<span class="lat">AMADA</span>', 'ماشین‌آلات CNC ورق‌کاری', 'cog' ),
-	array( '<span class="lat">Gema</span>', 'خط رنگ پودری الکترواستاتیک', 'factory' ),
-	array( '۴۰۰۰ آمپر', 'تزریق جریان اولیه', 'bolt' ),
-	array( '۱۵ تا ۴۵ روز', 'زمان ساخت پس از تأیید نقشه‌ها', 'clock' ),
-);
+$psb_facts = array();
+foreach ( psb_pf_rows( 'home_factory_facts', $psb_fp ) as $psb_row ) {
+	if ( ! empty( $psb_row['value'] ) ) {
+		$psb_facts[] = array( psb_pf_html( $psb_row['value'] ), $psb_row['label'] ?? '', ! empty( $psb_row['icon'] ) ? $psb_row['icon'] : 'check' );
+	}
+}
 ?>
 <section class="on-dark bg-dark py-section text-white" aria-labelledby="home-factory-title">
 	<div class="container">
@@ -130,16 +134,16 @@ $psb_facts = array(
 		get_template_part(
 			'template-parts/global/section-head',
 			null,
-			array(
-				'id'      => 'home-factory-title',
-				'eyebrow' => 'کارخانه و آزمایشگاه',
-				'title'   => 'از ورق خام تا آزمون نهایی، در یک مجموعه',
-				'lead'    => 'برش و خم CNC، رنگ پودری الکترواستاتیک، مونتاژ و آزمون روتین در کارخانه ' . psb_brand_name() . ' در تهران انجام می‌شود.',
-				'invert'  => true,
-				'link'    => array(
-					'url'   => $psb_services_url,
-					'label' => 'بازدید از خطوط تولید',
-				),
+			psb_pf_head(
+				'home_factory',
+				(int) get_option( 'page_on_front' ),
+				array(
+					'id'      => 'home-factory-title',
+					'invert'  => true,
+					'link'    => array(
+						'url'   => $psb_services_url
+					),
+				)
 			)
 		);
 		?>
@@ -154,13 +158,15 @@ $psb_facts = array(
 			<?php endif; ?>
 		</div>
 
+		<?php if ( $psb_facts ) : ?>
 		<dl class="stats stats--invert mt-8 lg:mt-12">
 			<?php foreach ( $psb_facts as $psb_f ) : ?>
 				<div class="stat">
 					<dt class="order-1 flex items-center gap-3 text-2xl font-bold leading-[1.3] text-white"><?php echo psb_icon( $psb_f[2] ?? 'check', 'size-6 shrink-0 text-slate-400' ); // phpcs:ignore ?><span><?php echo wp_kses( $psb_f[0], array( 'span' => array( 'class' => true ) ) ); ?></span></dt>
-					<dd class="stat-label order-2 !text-[0.8125rem]"><?php echo esc_html( $psb_f[1] ); ?></dd>
+					<dd class="stat-label order-2 !text-[0.8125rem]"><?php echo psb_pf_html( $psb_f[1] ); // phpcs:ignore ?></dd>
 				</div>
 			<?php endforeach; ?>
 		</dl>
+		<?php endif; ?>
 	</div>
 </section>

@@ -23,14 +23,15 @@ if ( ! $psb_q->have_posts() ) {
 		get_template_part(
 			'template-parts/global/section-head',
 			null,
-			array(
-				'id'      => 'home-certs-title',
-				'eyebrow' => 'گواهینامه‌ها',
-				'title'   => 'گواهینامه‌ها و افتخارات',
-				'link'    => array(
-					'url'   => psb_archive_url( 'certificates' ),
-					'label' => 'همه گواهینامه‌ها',
-				),
+			psb_pf_head(
+				'home_certificates',
+				(int) get_option( 'page_on_front' ),
+				array(
+					'id'      => 'home-certs-title',
+					'link'    => array(
+						'url'   => psb_archive_url( 'certificates' )
+					),
+				)
 			)
 		);
 		?>

@@ -53,15 +53,15 @@ $psb_specs_for = function ( $title ) {
 		get_template_part(
 			'template-parts/global/section-head',
 			null,
-			array(
-				'id'      => 'home-products-title',
-				'eyebrow' => 'محصولات',
-				'title'   => 'سه خط تولید، یک استاندارد ساخت',
-				'lead'    => 'هر تابلو بر اساس نقشه تک‌خطی و مشخصات فنی پروژه طراحی می‌شود و پیش از تحویل، آزمون روتین کارخانه‌ای را می‌گذراند.',
-				'link'    => array(
-					'url'   => psb_shop_url(),
-					'label' => 'همه محصولات',
-				),
+			psb_pf_head(
+				'home_products',
+				(int) get_option( 'page_on_front' ),
+				array(
+					'id'      => 'home-products-title',
+					'link'    => array(
+						'url'   => psb_shop_url()
+					),
+				)
 			)
 		);
 		?>

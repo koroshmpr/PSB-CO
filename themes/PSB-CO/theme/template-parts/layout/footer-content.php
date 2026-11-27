@@ -45,7 +45,7 @@ $psb_creds[] = array( 'url' => psb_contact_url(), 'label' => 'تماس با شر
 					<li class="footer-fact">دارای گواهینامه <span class="lat">ISO 9001</span></li>
 				<?php endif; ?>
 				<?php if ( PSB_WARRANTY_MONTHS ) : ?>
-					<li class="footer-fact"><?php echo esc_html( psb_fa_num( PSB_WARRANTY_MONTHS ) . ' ماه گارانتی و ۱۰ سال خدمات پس از فروش' ); ?></li>
+					<li class="footer-fact"><?php echo esc_html( psb_fa_num( PSB_WARRANTY_MONTHS ) . ' ماه گارانتی و ' . psb_fa_num( PSB_SERVICE_YEARS ) . ' سال خدمات پس از فروش' ); ?></li>
 				<?php endif; ?>
 				<li class="footer-fact"><?php echo esc_html( 'تأسیس ' . psb_fa_num( PSB_FOUNDED_JALALI ) ); ?></li>
 			</ul>

@@ -27,14 +27,15 @@ if ( ! $psb_real ) {
 		get_template_part(
 			'template-parts/global/section-head',
 			null,
-			array(
-				'id'      => 'home-letters-title',
-				'eyebrow' => 'رضایت‌نامه‌ها و حسن انجام کار',
-				'title'   => 'رضایت مشتریان',
-				'link'    => array(
-					'url'   => psb_archive_url( 'customer_letter', '/customer-letters/' ),
-					'label' => 'همه رضایت‌نامه‌ها',
-				),
+			psb_pf_head(
+				'home_letters',
+				(int) get_option( 'page_on_front' ),
+				array(
+					'id'      => 'home-letters-title',
+					'link'    => array(
+						'url'   => psb_archive_url( 'customer_letter', '/customer-letters/' )
+					),
+				)
 			)
 		);
 		get_template_part( 'template-parts/letters/letters-strip', null, array( 'count' => 6 ) );

@@ -327,6 +327,7 @@ require get_template_directory() . '/inc/otp-login-form.php';
  * Feature modules (each is self-contained; missing files are skipped).
  */
 foreach ( array(
+	'/inc/page-fields/page-fields.php',        // Page content fields (home, about): text + photos from ACF.
 	'/inc/placeholders.php',                   // Type-matched fallback illustrations.
 	'/inc/stability.php',                      // HTTP circuit breaker, cache exclusions, cron.
 	'/inc/seo.php',                            // JSON-LD on top of Rank Math.

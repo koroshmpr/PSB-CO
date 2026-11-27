@@ -37,14 +37,15 @@ $psb_cols = 2 === $psb_q->post_count ? 'md:grid-cols-2' : 'md:grid-cols-3';
 		get_template_part(
 			'template-parts/global/section-head',
 			null,
-			array(
-				'id'      => 'home-projects-title',
-				'eyebrow' => 'پروژه‌ها',
-				'title'   => 'پروژه‌های اجراشده',
-				'link'    => array(
-					'url'   => psb_archive_url( 'portfolio', '/portfolios/' ),
-					'label' => 'همه پروژه‌ها',
-				),
+			psb_pf_head(
+				'home_projects',
+				(int) get_option( 'page_on_front' ),
+				array(
+					'id'      => 'home-projects-title',
+					'link'    => array(
+						'url'   => psb_archive_url( 'portfolio', '/portfolios/' )
+					),
+				)
 			)
 		);
 		?>

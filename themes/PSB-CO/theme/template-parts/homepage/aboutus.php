@@ -2,66 +2,65 @@
 /**
  * About (spec v2 §5.7): alt background, 6/6. Theme photo set «about» (panel assembly, live 1921/1922):
  * 4:5 and sticky beside the timeline at lg+, 16:9 between the intro and the timeline below lg.
- * ACF paragraph, verified timeline (company-facts.md) with scroll progress (javascript/modules/timeline.js),
- * secondary «درباره شرکت».
+ * Every text, the photo (about_us.image; empty → theme set «about») and the timeline come from the
+ * front page fields (inc/page-fields/home.php). Timeline scroll progress: javascript/modules/timeline.js.
  */
-$psb_about = psb_field( 'about_us', null, (int) get_option( 'page_on_front' ) ?: null );
-$psb_about = is_array( $psb_about ) ? $psb_about : array();
-$psb_link  = is_array( $psb_about['btn_link'] ?? null ) ? ( $psb_about['btn_link']['url'] ?? '' ) : '';
-$psb_link  = $psb_link ? $psb_link : home_url( '/about-us/' );
-$psb_brand = psb_brand_name();
-$psb_now   = psb_jalali_year();
-$psb_steps = apply_filters(
-	'psb_home_timeline',
-	array(
-		array( psb_fa_num( PSB_FOUNDED_JALALI ), 'تأسیس شرکت ' . $psb_brand ),
-		array( '۱۳۶۴', 'پروانه بهره‌برداری از وزارت صنایع' ),
-		array( '۱۳۸۲', 'آزمون تابلوهای ۲۴ کیلوولت متال‌کلد در EPIL' ),
-		array( '۱۳۸۵', 'تأیید کامل در ارزیابی سازندگان تابلو برق' ),
-		array( '۱۳۹۲', 'ثبت در وندورلیست شرکت ملی مهندسی و ساختمان نفت' ),
-		array( '۱۳۹۳', 'گزارش‌های آزمون نوعی EPIL و لیسانس SAREL' ),
-		array( '۱۳۹۷', 'آزمون نوعی تابلو ایزوله بیمارستانی' ),
-		array( '۱۳۹۸–۱۳۹۹', 'تأییدیه‌های شرکت‌های توزیع برق و توانیر' ),
-		array( psb_fa_num( $psb_now ), psb_fa_num( psb_years_active() ) . ' سال تابلوسازی' ),
-	)
-);
+$psb_pid   = (int) get_option( 'page_on_front' );
+$psb_link  = psb_pf( 'about_us.btn_link', $psb_pid );
+$psb_btn   = is_array( $psb_link ) && ! empty( $psb_link['url'] ) ? $psb_link : array( 'url' => home_url( '/about-us/' ), 'title' => 'درباره شرکت', 'target' => '' );
+$psb_btn_t = trim( (string) ( $psb_btn['title'] ?? '' ) ) ?: 'درباره شرکت';
+$psb_eyebr = psb_pf_text( psb_pf( 'about_us.eyebrow', $psb_pid ) );
+$psb_title = psb_pf_text( psb_pf( 'about_us.heading', $psb_pid ) );
+$psb_body  = (string) psb_pf( 'about_us.content', $psb_pid );
+$psb_img   = psb_pf_image_id( psb_pf( 'about_us.image', $psb_pid ) );
+$psb_alt   = psb_pf_text( psb_pf( 'about_us.image_alt', $psb_pid ) );
+$psb_cap   = psb_pf_text( psb_pf( 'about_us.caption', $psb_pid ) );
+$psb_steps = array();
+foreach ( psb_pf_rows( 'home_timeline', $psb_pid ) as $psb_row ) {
+	if ( ! empty( $psb_row['year'] ) || ! empty( $psb_row['title'] ) ) {
+		$psb_steps[] = array( psb_pf_text( $psb_row['year'] ?? '' ), $psb_row['title'] ?? '' );
+	}
+}
+$psb_img_cls = 'aspect-video w-full object-cover object-[50%_60%] lg:aspect-[4/5] lg:object-center';
 ?>
 <section class="bg-background py-section" aria-labelledby="home-about-title">
 	<div class="container grid gap-8 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-x-16 lg:gap-y-0">
 		<div data-reveal>
-			<span class="eyebrow">درباره <?php echo esc_html( $psb_brand ); ?></span>
-			<h2 id="home-about-title" class="section-title mt-3"><?php echo esc_html( 'نزدیک به ' . psb_fa_num( psb_years_active() ) . ' سال تابلوسازی' ); ?></h2>
-			<?php if ( ! empty( $psb_about['content'] ) ) : ?>
+			<?php if ( $psb_eyebr ) : ?>
+				<span class="eyebrow"><?php echo psb_pf_html( $psb_eyebr ); // phpcs:ignore ?></span>
+			<?php endif; ?>
+			<h2 id="home-about-title" class="section-title mt-3"><?php echo psb_pf_html( $psb_title ); // phpcs:ignore ?></h2>
+			<?php if ( '' !== trim( wp_strip_all_tags( $psb_body ) ) ) : ?>
 				<div class="mt-4 max-w-[38rem] text-[1.0625rem] leading-[1.9] text-slate-600 [&_p]:mb-3">
-					<?php echo wp_kses_post( psb_brand_fix( $psb_about['content'] ) ); ?>
+					<?php echo wp_kses_post( psb_lat_content( psb_pf_text( $psb_body ) ) ); ?>
 				</div>
 			<?php endif; ?>
 		</div>
 
 		<figure class="about-photo lg:col-start-2 lg:row-span-2 lg:row-start-1" data-reveal>
 			<?php
-			echo psb_photo_picture( // phpcs:ignore
-				'about',
-				array(
-					'class' => 'aspect-video w-full object-cover object-[50%_60%] lg:aspect-[4/5] lg:object-center',
-					'alt'   => 'سیم‌بندی و مونتاژ تجهیزات داخل تابلو برق ساخت ' . $psb_brand,
-				)
-			);
+			echo $psb_img // phpcs:ignore
+				? psb_image( $psb_img, 'large', array( 'class' => $psb_img_cls, 'alt' => $psb_alt, 'sizes' => '(min-width: 80rem) 36rem, (min-width: 64rem) 45vw, (min-width: 48rem) 42rem, 100vw' ) )
+				: psb_photo_picture( 'about', array( 'class' => $psb_img_cls, 'alt' => $psb_alt ) );
 			?>
-			<figcaption class="about-photo-cap"><?php echo esc_html( 'کارخانه ' . $psb_brand . ' — از ' . psb_fa_num( PSB_FOUNDED_JALALI ) ); ?></figcaption>
+			<?php if ( $psb_cap ) : ?>
+				<figcaption class="about-photo-cap"><?php echo esc_html( $psb_cap ); ?></figcaption>
+			<?php endif; ?>
 		</figure>
 
 		<div class="lg:col-start-1 lg:row-start-2">
+			<?php if ( $psb_steps ) : ?>
 			<ol class="timeline lg:mt-8" data-timeline>
 				<?php foreach ( $psb_steps as $psb_i => $psb_s ) : ?>
 					<li class="timeline-item <?php echo count( $psb_steps ) - 1 === $psb_i ? 'is-current' : ''; ?>">
 						<span class="timeline-year"><?php echo esc_html( $psb_s[0] ); ?></span>
-						<span class="timeline-title"><?php echo wp_kses( preg_replace( '/\b(EPIL|SAREL)\b/', '<span class="lat">$1</span>', esc_html( $psb_s[1] ) ), array( 'span' => array( 'class' => true ) ) ); ?></span>
+						<span class="timeline-title"><?php echo psb_pf_html( $psb_s[1] ); // phpcs:ignore ?></span>
 					</li>
 				<?php endforeach; ?>
 			</ol>
+			<?php endif; ?>
 
-			<a class="btn btn-secondary mt-8" href="<?php echo esc_url( $psb_link ); ?>">درباره شرکت</a>
+			<a class="btn btn-secondary mt-8" href="<?php echo esc_url( $psb_btn['url'] ); ?>"<?php echo '_blank' === ( $psb_btn['target'] ?? '' ) ? ' target="_blank" rel="noopener"' : ''; ?>><?php echo esc_html( $psb_btn_t ); ?></a>
 		</div>
 	</div>
 </section>

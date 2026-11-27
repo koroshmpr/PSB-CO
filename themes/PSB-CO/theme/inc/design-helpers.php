@@ -10,17 +10,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/** Year the company was founded (Jalali), as stated on the site ("تاسیس شرکت در سال ۱۳۵۵"). */
-/** Owner-confirmed facts (2026-11): 18-month warranty, ISO 9001 certified (no number shown). */
+/**
+ * Company facts: editable in «تنظیمات سایت» → «اطلاعات شرکت» (inc/page-fields/site-settings.php,
+ * stored by ACF as options_*). Read with get_option() so they are ready before ACF loads.
+ * Defaults are the owner-confirmed facts (2026-11): founded ۱۳۵۵, 18-month warranty,
+ * 10 years after-sales service, ISO 9001 (no number shown).
+ */
+$psb_fact = function ( $key, $default ) {
+	$v = get_option( 'options_' . $key, '' );
+	return ( '' === $v || false === $v || null === $v ) ? $default : (int) $v;
+};
+if ( ! defined( 'PSB_FOUNDED_JALALI' ) ) {
+	define( 'PSB_FOUNDED_JALALI', max( 1300, $psb_fact( 'founded_year', 1355 ) ) );
+}
 if ( ! defined( 'PSB_WARRANTY_MONTHS' ) ) {
-	define( 'PSB_WARRANTY_MONTHS', 18 );
+	define( 'PSB_WARRANTY_MONTHS', $psb_fact( 'warranty_months', 18 ) );
+}
+if ( ! defined( 'PSB_SERVICE_YEARS' ) ) {
+	define( 'PSB_SERVICE_YEARS', $psb_fact( 'service_years', 10 ) );
 }
 if ( ! defined( 'PSB_ISO_9001' ) ) {
-	define( 'PSB_ISO_9001', true );
+	define( 'PSB_ISO_9001', (bool) $psb_fact( 'iso_9001', 1 ) );
 }
-if ( ! defined( 'PSB_FOUNDED_JALALI' ) ) {
-	define( 'PSB_FOUNDED_JALALI', 1355 );
-}
+unset( $psb_fact );
 
 /**
  * Safe ACF option/field getter.
@@ -349,33 +361,6 @@ function psb_icon_sprite() {
 	echo '</defs></svg>';
 }
 add_action( 'wp_body_open', 'psb_icon_sprite', 1 );
-
-/**
- * First hero slide of the front page (ACF repeater "hero-slider"), or null.
- * Shared by header.php (LCP preload) and template-parts/homepage/hero.php.
- */
-function psb_home_hero() {
-	static $hero = false;
-	if ( false !== $hero ) {
-		return $hero;
-	}
-	$hero    = null;
-	$page_id = (int) get_option( 'page_on_front' );
-	if ( ! $page_id || ! function_exists( 'get_field' ) ) {
-		return $hero;
-	}
-	$slides = get_field( 'hero-slider', $page_id );
-	if ( is_array( $slides ) && ! empty( $slides[0] ) ) {
-		$hero           = $slides[0];
-		$hero['slides'] = $slides;
-	}
-	return $hero;
-}
-
-/** `sizes` attribute of the hero image (must match the preload). */
-function psb_hero_sizes() {
-	return '100vw';
-}
 
 /**
  * Quote request (RFQ) URL — page /request-quote/ (RFQ system in inc/rfq/).

@@ -23,7 +23,7 @@ $psb_facts = array(
 	sprintf( 'تأسیس %s', $psb_fa( $psb_founded ) ),
 	'در فهرست توانیر',
 	'آزمون نوعی EPIL',
-	'گارانتی ۱۸ ماه',
+	'گارانتی ' . psb_fa_num( PSB_WARRANTY_MONTHS ) . ' ماه',
 );
 
 get_template_part(
@@ -45,7 +45,7 @@ $psb_trust = array(
 	'مجوز ساخت تابلوهای فشار متوسط SYStem6 از SAREL ایتالیا',
 	'دارای گواهینامه ISO 9001',
 	'آزمون‌های روتین در آزمایشگاه برق کارخانه، با امکان حضور نماینده خریدار',
-	'گارانتی ۱۸ ماه و ۱۰ سال خدمات پس از فروش',
+	'گارانتی ' . psb_fa_num( PSB_WARRANTY_MONTHS ) . ' ماه و ' . psb_fa_num( PSB_SERVICE_YEARS ) . ' سال خدمات پس از فروش',
 );
 
 $psb_phones = function_exists( 'psb_phones' ) ? psb_phones() : array();
