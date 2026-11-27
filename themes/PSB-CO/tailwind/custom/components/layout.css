@@ -538,6 +538,21 @@
 	}
 }
 
+/* Inner-page photo hero (about): the text sits on the photo at every width, so it always gets a
+   strong graphite scrim on the text side (inline-start = right in RTL) plus a bottom fade. */
+.page-hero--photo .hero-overlay {
+	background:
+		linear-gradient(to top, rgb(17 20 24 / 0.95) 0%, rgb(17 20 24 / 0.84) 50%, rgb(17 20 24 / 0.72) 100%);
+}
+
+@media (width >= 48rem) {
+	.page-hero--photo .hero-overlay {
+		background:
+			linear-gradient(to left, rgb(17 20 24 / 0.94) 0%, rgb(17 20 24 / 0.86) 38%, rgb(17 20 24 / 0.45) 68%, rgb(17 20 24 / 0.15) 100%),
+			linear-gradient(to top, rgb(17 20 24 / 0.6) 0%, rgb(17 20 24 / 0) 40%);
+	}
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.site-header,
 	.site-header-inner,
