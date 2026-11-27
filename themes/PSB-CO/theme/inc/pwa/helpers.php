@@ -89,8 +89,8 @@ function psb_pwa_precache() {
 		psb_pwa_home_path() . 'pwa-offline/',
 		$theme . '/style.css?ver=' . psb_pwa_theme_ver( 'style.css' ),
 		$theme . '/js/script.min.js?ver=' . psb_pwa_theme_ver( 'js/script.min.js' ),
-		$theme . '/fonts/Peyda/fonts/woff2/PeydaWebFaNum-Regular.woff2',
-		$theme . '/fonts/Peyda/fonts/woff2/PeydaWebFaNum-Bold.woff2',
+		$theme . '/fonts/Peyda/fonts/woff2/PeydaFa-Regular-s1.woff2',
+		$theme . '/fonts/Peyda/fonts/woff2/PeydaFa-Bold-s1.woff2',
 		psb_pwa_asset( 'icons/icon-192.png' ),
 		psb_pwa_asset( 'icons/apple-touch-icon.png' ),
 	);

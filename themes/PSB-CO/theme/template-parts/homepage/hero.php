@@ -20,6 +20,10 @@ foreach ( psb_pf_rows( 'home_hero_stats', $psb_pid ) as $psb_row ) {
 // Photo: page fields (desktop + optional mobile crop), else the theme photo set «hero».
 $psb_hero_img  = psb_pf_image_id( psb_pf( 'home_hero_image', $psb_pid ) );
 $psb_hero_mob  = psb_pf_image_id( psb_pf( 'home_hero_image_mobile', $psb_pid ) );
+if ( $psb_hero_img && psb_pf_is_theme_photo( $psb_hero_img, 'psb-hero-mv-switchgear-lineup' ) && ( ! $psb_hero_mob || psb_pf_is_theme_photo( $psb_hero_mob, 'psb-hero-mv-switchgear-lineup' ) ) ) {
+	$psb_hero_img = 0; // Same photo as the theme set → use the AVIF/WebP set (smaller LCP image).
+	$psb_hero_mob = 0;
+}
 $psb_eyebrow   = psb_pf_text( psb_pf( 'home_hero_eyebrow', $psb_pid ) );
 $psb_title     = psb_pf_text( psb_pf( 'home_hero_title', $psb_pid ) );
 $psb_lead      = psb_pf( 'home_hero_lead', $psb_pid );

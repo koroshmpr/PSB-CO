@@ -217,17 +217,18 @@ add_action( 'wp_enqueue_scripts', 'bluebox_scripts' );
 /**
  * <head> essentials printed before anything else:
  * - `js` class on <html> (enables reveal animations only when JS runs)
- * - preload of the two above-the-fold font weights (Regular, Bold)
+ * - preload of the three font weights used above the fold (Regular, Medium, Bold) — Persian subsets
+ *   (PeydaFa-*-s1.woff2, ~27 KB each; made from PeydaWebFaNum-* with fontTools, see tailwind/custom/fonts.css)
  */
 function bluebox_preload_fonts() {
 	echo "<script>document.documentElement.classList.add('js')</script>\n";
 	// View-transition direction for back/forward (must run before first render of the new page).
 	echo "<script>(function(){var d=document.documentElement,b=function(t){d.classList.toggle('vt-back',t==='traverse')};addEventListener('pageswap',function(e){if(e.viewTransition&&e.activation)b(e.activation.navigationType)});addEventListener('pagereveal',function(e){if(e.viewTransition&&window.navigation&&navigation.activation){b(navigation.activation.navigationType);e.viewTransition.finished.finally(function(){d.classList.remove('vt-back')})}})})()</script>\n";
 	$font_dir = get_template_directory_uri() . '/fonts/Peyda/fonts/woff2/';
-	foreach ( array( 'Regular', 'Bold' ) as $weight ) {
+	foreach ( array( 'Regular', 'Medium', 'Bold' ) as $weight ) {
 		printf(
 			'<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin>' . "\n",
-			esc_url( $font_dir . 'PeydaWebFaNum-' . $weight . '.woff2' )
+			esc_url( $font_dir . 'PeydaFa-' . $weight . '-s1.woff2' )
 		);
 	}
 }

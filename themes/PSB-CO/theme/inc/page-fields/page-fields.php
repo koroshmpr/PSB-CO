@@ -150,6 +150,19 @@ function psb_pf_picture( $desktop, $mobile = 0, $attrs = array(), $mobile_media 
 	return $html . '</picture>';
 }
 
+/**
+ * Whether a field photo is one of the theme's own optimised photos (uploaded so the manager sees it in
+ * the field). Then templates print the theme set instead (AVIF + WebP, per-breakpoint crops: the mobile
+ * hero is 42 KB AVIF vs 73 KB WebP from the media library).
+ *
+ * @param int    $att_id Attachment ID.
+ * @param string $prefix File-name prefix of the uploaded copy (e.g. psb-hero-mv-switchgear-lineup).
+ */
+function psb_pf_is_theme_photo( $att_id, $prefix ) {
+	$file = $att_id ? basename( (string) get_attached_file( $att_id ) ) : '';
+	return '' !== $file && 0 === strpos( $file, $prefix );
+}
+
 /** Preload links for a field photo (LCP), matching psb_pf_picture(). */
 function psb_pf_preload( $desktop, $mobile, $sizes, $mobile_media = '(max-width: 47.99rem)' ) {
 	$desktop_media = $mobile ? 'not all and ' . $mobile_media : '';

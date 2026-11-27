@@ -21,7 +21,7 @@
 
 	/* «تصویر نمایشی» chip over a text-free illustration (bottom-left = the trailing corner in RTL). */
 	.ph-tag {
-		@apply pointer-events-none absolute bottom-2 left-2 z-[1] rounded-full border border-line bg-white/90 px-2 py-0.5 text-[11px] leading-5 font-medium text-slate-600;
+		@apply pointer-events-none absolute bottom-2 left-2 z-[1] rounded-full border border-line bg-white px-2 py-0.5 text-[11px] leading-5 font-medium text-slate-700;
 	}
 
 	/* No zoom-on-hover for illustrations: it is not a photo to inspect. */

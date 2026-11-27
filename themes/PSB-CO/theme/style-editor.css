@@ -187,21 +187,21 @@ Text Domain: bluebox
   font-style: normal;
   font-display: swap;
   font-weight: 100 400;
-  src: url('../fonts/Peyda/fonts/woff2/PeydaWebFaNum-Regular.woff2') format('woff2');
+  src: url('../fonts/Peyda/fonts/woff2/PeydaFa-Regular-s1.woff2') format('woff2');
 }
 @font-face {
   font-family: Peyda;
   font-style: normal;
   font-display: swap;
   font-weight: 500 600;
-  src: url('../fonts/Peyda/fonts/woff2/PeydaWebFaNum-Medium.woff2') format('woff2');
+  src: url('../fonts/Peyda/fonts/woff2/PeydaFa-Medium-s1.woff2') format('woff2');
 }
 @font-face {
   font-family: Peyda;
   font-style: normal;
   font-display: swap;
   font-weight: 700 900;
-  src: url('../fonts/Peyda/fonts/woff2/PeydaWebFaNum-Bold.woff2') format('woff2');
+  src: url('../fonts/Peyda/fonts/woff2/PeydaFa-Bold-s1.woff2') format('woff2');
 }
 .font-peyda {
   font-family: var(--font-sans);
@@ -1454,8 +1454,8 @@ blockquote {
   .stats--invert .stat-value {
     color: var(--color-white);
   }
-  .stats--invert .stat-value small,	.stats--invert .stat-label {
-    color: var(--color-slate-300);
+  .stats--invert .stat-value small,	.stats--invert .stat-label,	.stats--invert .stat-label .lat {
+    color: var(--color-slate-200);
   }
   .icon-tile {
     display: inline-flex;
@@ -4876,7 +4876,7 @@ html.vt-back::view-transition-new(main) {
     border-style: var(--tw-border-style);
     border-width: 1px;
     border-color: var(--color-line);
-    background-color: color-mix(in oklab, var(--color-white) 90%, transparent);
+    background-color: var(--color-white);
     padding-inline: calc(var(--spacing) * 2);
     padding-block: calc(var(--spacing) * 0.5);
     font-size: 11px;
@@ -4884,7 +4884,7 @@ html.vt-back::view-transition-new(main) {
     line-height: calc(var(--spacing) * 5);
     --tw-font-weight: var(--font-weight-medium);
     font-weight: var(--font-weight-medium);
-    color: var(--color-slate-600);
+    color: var(--color-slate-700);
   }
   .card:hover .card-media img.is-placeholder,	.product-gallery-main:hover img.is-placeholder {
     transform: none;

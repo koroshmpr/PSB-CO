@@ -355,8 +355,9 @@
 	}
 
 	.stats--invert .stat-value small,
-	.stats--invert .stat-label {
-		@apply text-slate-300;
+	.stats--invert .stat-label,
+	.stats--invert .stat-label .lat {
+		@apply text-slate-200;
 	}
 
 	/* ---------------- Icon tile (steel, not tinted) ---------------- */

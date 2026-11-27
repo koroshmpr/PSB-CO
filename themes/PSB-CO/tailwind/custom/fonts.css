@@ -6,14 +6,19 @@
  *   Regular  -> 100–400
  *   Medium   -> 500–600
  *   Bold     -> 700–900
- * Regular + Bold are preloaded in functions.php (above-the-fold weights).
+ * All three are preloaded in functions.php. Files are Persian subsets (PeydaFa-*-s1.woff2, ~27 KB):
+ *   python3 -m fontTools.subset PeydaWebFaNum-<W>.woff2 --layout-features='*' --flavor=woff2 \
+ *     --unicodes=U+0020-007E,U+00A0,U+00A9,U+00AB,U+00B0-00B3,U+00B7,U+00BB,U+00D7,U+03A9,U+03BC,U+060C,U+061B,U+061F,U+0621-063A,
+ *     U+0640-0652,U+0654,U+0660-066D,U+0670,U+067E,U+0686,U+0698,U+06A9,U+06AF,U+06C0,U+06CC,
+ *     U+06F0-06F9,U+200C-200F,U+2013,U+2014,U+2018-201D,U+2026,U+2066-2069,U+2190-2193,U+2212,U+2264,U+2265 --output-file=PeydaFa-<W>-s1.woff2
+ *   Other characters fall back to the system font. Bump -s1 → -s2 when regenerating (1-year cache).
  */
 @font-face {
 	font-family: Peyda;
 	font-style: normal;
 	font-display: swap;
 	font-weight: 100 400;
-	src: url('../../fonts/Peyda/fonts/woff2/PeydaWebFaNum-Regular.woff2') format('woff2');
+	src: url('../../fonts/Peyda/fonts/woff2/PeydaFa-Regular-s1.woff2') format('woff2');
 }
 
 @font-face {
@@ -21,7 +26,7 @@
 	font-style: normal;
 	font-display: swap;
 	font-weight: 500 600;
-	src: url('../../fonts/Peyda/fonts/woff2/PeydaWebFaNum-Medium.woff2') format('woff2');
+	src: url('../../fonts/Peyda/fonts/woff2/PeydaFa-Medium-s1.woff2') format('woff2');
 }
 
 @font-face {
@@ -29,7 +34,7 @@
 	font-style: normal;
 	font-display: swap;
 	font-weight: 700 900;
-	src: url('../../fonts/Peyda/fonts/woff2/PeydaWebFaNum-Bold.woff2') format('woff2');
+	src: url('../../fonts/Peyda/fonts/woff2/PeydaFa-Bold-s1.woff2') format('woff2');
 }
 
 .font-peyda {

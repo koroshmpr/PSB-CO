@@ -20,6 +20,9 @@ global $woo_active;
 	if ( is_front_page() ) {
 		$psb_fp   = (int) get_option( 'page_on_front' );
 		$psb_hero = function_exists( 'psb_pf_image_id' ) ? psb_pf_image_id( psb_pf( 'home_hero_image', $psb_fp ) ) : 0;
+		if ( $psb_hero && psb_pf_is_theme_photo( $psb_hero, 'psb-hero-mv-switchgear-lineup' ) ) {
+			$psb_hero = 0; // Theme photo → preload the AVIF set (matches hero.php).
+		}
 		if ( $psb_hero ) {
 			psb_pf_preload( $psb_hero, psb_pf_image_id( psb_pf( 'home_hero_image_mobile', $psb_fp ) ), '(min-width: 64rem) 60vw, 100vw' );
 		} else {
