@@ -330,6 +330,7 @@ foreach ( array(
 	'/inc/page-fields/page-fields.php',        // Page content fields (home, about): text + photos from ACF.
 	'/inc/placeholders.php',                   // Type-matched fallback illustrations.
 	'/inc/stability.php',                      // HTTP circuit breaker, cache exclusions, cron.
+	'/inc/htaccess-perf.php',                  // gzip + browser-cache block in root .htaccess (live only, self-tested).
 	'/inc/seo.php',                            // JSON-LD on top of Rank Math.
 	'/inc/ai-visibility/ai-visibility.php',    // llms.txt, robots AI rules, dashboard.
 	'/inc/rfq/rfq.php',                        // Quote requests + bot notifications.

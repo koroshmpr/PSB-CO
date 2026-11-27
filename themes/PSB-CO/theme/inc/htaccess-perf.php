@@ -1,0 +1,121 @@
+<?php
+/**
+ * Compression + browser caching rules in the site's root .htaccess (Apache on the live host sent
+ * no Content-Encoding and no Cache-Control: PageSpeed «Use efficient cache lifetimes» ~1 MB and an
+ * uncompressed 229 KB stylesheet).
+ *
+ * - Writes ONLY its own block («# BEGIN PSB Performance» … «# END PSB Performance») with
+ *   insert_with_markers(); WordPress' own rules are untouched. Every directive sits in <IfModule>.
+ * - Runs once per PSB_HTACCESS_VERSION, on the live site only, under a short lock.
+ * - Self-test after writing: if the home page or the stylesheet answers 5xx, the block is removed again.
+ * - Kill switch: define( 'PSB_HTACCESS_DISABLE', true ) in wp-config.php removes the block.
+ * - Report: option psb_htaccess_report.
+ *
+ * Long cache is safe: theme CSS/JS carry a build fingerprint (?ver=…), uploads have unique names.
+ * The PWA service worker (/sw.js) and the manifest stay uncached.
+ *
+ * @package PSB-CO
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+const PSB_HTACCESS_VERSION = 1;
+
+/** Rule lines of the block. */
+function psb_htaccess_lines() {
+	return array(
+		'<IfModule mod_deflate.c>',
+		'AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml text/javascript application/javascript application/x-javascript application/json application/ld+json application/xml application/rss+xml application/manifest+json image/svg+xml font/ttf font/otf application/vnd.ms-fontobject',
+		'</IfModule>',
+		'<IfModule mod_expires.c>',
+		'ExpiresActive On',
+		'ExpiresByType text/css "access plus 1 year"',
+		'ExpiresByType text/javascript "access plus 1 year"',
+		'ExpiresByType application/javascript "access plus 1 year"',
+		'ExpiresByType image/webp "access plus 1 year"',
+		'ExpiresByType image/avif "access plus 1 year"',
+		'ExpiresByType image/jpeg "access plus 1 year"',
+		'ExpiresByType image/png "access plus 1 year"',
+		'ExpiresByType image/gif "access plus 1 year"',
+		'ExpiresByType image/svg+xml "access plus 1 year"',
+		'ExpiresByType image/x-icon "access plus 1 year"',
+		'ExpiresByType font/woff2 "access plus 1 year"',
+		'ExpiresByType font/woff "access plus 1 year"',
+		'ExpiresByType font/ttf "access plus 1 year"',
+		'ExpiresByType video/mp4 "access plus 1 year"',
+		'ExpiresByType text/html "access plus 0 seconds"',
+		'</IfModule>',
+		'<IfModule mod_headers.c>',
+		'<FilesMatch "\.(css|js|mjs|webp|avif|jpe?g|png|gif|svg|ico|woff2?|ttf|otf|mp4)$">',
+		'Header set Cache-Control "public, max-age=31536000"',
+		'</FilesMatch>',
+		'<FilesMatch "^(sw\.js|manifest\.webmanifest)$">',
+		'Header set Cache-Control "no-cache"',
+		'</FilesMatch>',
+		'Header append Vary Accept-Encoding env=!dont-vary',
+		'</IfModule>',
+	);
+}
+
+/** Write (or with $lines = array() remove) the block. */
+function psb_htaccess_write( $lines ) {
+	if ( ! function_exists( 'insert_with_markers' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/misc.php';
+	}
+	$file = ABSPATH . '.htaccess';
+	if ( ! is_writable( $file ) ) {
+		return false;
+	}
+	return insert_with_markers( $file, 'PSB Performance', $lines );
+}
+
+/** 5xx on the home page or the stylesheet after writing → remove the block again. */
+function psb_htaccess_selftest() {
+	foreach ( array( home_url( '/' ), get_stylesheet_uri() ) as $url ) {
+		$r = wp_remote_get( add_query_arg( 'psbht', time(), $url ), array( 'timeout' => 15, 'sslverify' => false ) );
+		if ( ! is_wp_error( $r ) && (int) wp_remote_retrieve_response_code( $r ) >= 500 ) {
+			return $url . ' → ' . wp_remote_retrieve_response_code( $r );
+		}
+	}
+	return '';
+}
+
+add_action(
+	'init',
+	function () {
+		if ( wp_doing_ajax() || wp_doing_cron() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) || isset( $_GET['psbht'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+			return;
+		}
+		if ( 'psb.co.ir' !== strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) ) ) {
+			return;
+		}
+		$disable = defined( 'PSB_HTACCESS_DISABLE' ) && PSB_HTACCESS_DISABLE;
+		$want    = $disable ? -1 : PSB_HTACCESS_VERSION;
+		if ( (int) get_option( 'psb_htaccess_version' ) === $want || get_transient( 'psb_htaccess_lock' ) ) {
+			return;
+		}
+		set_transient( 'psb_htaccess_lock', 1, 120 );
+
+		$ok     = psb_htaccess_write( $disable ? array() : psb_htaccess_lines() );
+		$report = array(
+			'time'   => gmdate( 'c' ),
+			'action' => $disable ? 'removed' : 'written',
+			'ok'     => (bool) $ok,
+		);
+		if ( $ok && ! $disable ) {
+			$fail = psb_htaccess_selftest();
+			if ( $fail ) {
+				psb_htaccess_write( array() );
+				$report['action'] = 'rolled back';
+				$report['reason'] = $fail;
+				$want             = -1;
+			}
+		}
+		update_option( 'psb_htaccess_report', $report, false );
+		if ( $ok ) {
+			update_option( 'psb_htaccess_version', $want, false );
+		}
+		delete_transient( 'psb_htaccess_lock' );
+	},
+	99
+);
