@@ -398,8 +398,8 @@ add_filter(
 			}
 		}
 
-		// 7: services / portfolio singles (Rank Math schema type «None»): page node + Service / CreativeWork.
-		if ( is_singular( array( 'services', 'portfolio' ) ) ) {
+		// 7: services / portfolio / document singles (Rank Math schema type «None»): page node + main entity.
+		if ( is_singular( array( 'services', 'portfolio', 'confirmation', 'certificates', 'type-test', 'customer_letter' ) ) ) {
 			$post_id = get_queried_object_id();
 			$url     = get_permalink( $post_id );
 			$name    = wp_strip_all_tags( get_the_title( $post_id ) );
@@ -421,7 +421,29 @@ add_filter(
 					)
 				);
 			}
-			$main = 'services' === get_post_type( $post_id )
+			$type   = get_post_type( $post_id );
+			$issuer = '';
+			foreach ( array( 'issuing_organization', 'issuing_body', 'issuer', 'certificate_issuer', 'client_name' ) as $f ) {
+				$v = function_exists( 'psb_field_text' ) ? trim( wp_strip_all_tags( (string) psb_field_text( $f, $post_id ) ) ) : '';
+				if ( '' !== $v ) {
+					$issuer = $v;
+					break;
+				}
+			}
+			if ( in_array( $type, array( 'confirmation', 'certificates', 'type-test', 'customer_letter' ), true ) ) {
+				// Scanned approval / certificate / test report / customer letter about the company.
+				$main = array_filter(
+					array(
+						'@type'     => 'DigitalDocument',
+						'@id'       => $url . '#document',
+						'name'      => $name,
+						'about'     => array( '@id' => $org_id ),
+						'publisher' => $issuer ? array( '@type' => 'Organization', 'name' => $issuer ) : null,
+						'datePublished' => get_post_time( 'c', true, $post_id ),
+					)
+				);
+			} else {
+			$main = 'services' === $type
 				? array(
 					'@type'       => 'Service',
 					'@id'         => $url . '#service',
@@ -440,6 +462,7 @@ add_filter(
 					'creator'       => array( '@id' => $org_id ),
 					'datePublished' => get_post_time( 'c', true, $post_id ),
 				);
+			}
 			$data['psb_main'] = array_filter(
 				$main + array(
 					'url'              => $url,
