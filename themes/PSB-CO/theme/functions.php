@@ -338,6 +338,7 @@ foreach ( array(
 	'/inc/owner-panel/owner-panel.php',        // Mobile admin panel.
 	'/inc/project-records/project-records.php',
 	'/inc/live-setup.php',                     // One-time live data setup (runs on psb.co.ir only).
+	'/inc/featured-setup.php',                 // One-time featured images for posts/products without one (live only).
 ) as $psb_module ) {
 	if ( is_readable( get_template_directory() . $psb_module ) ) {
 		require_once get_template_directory() . $psb_module;

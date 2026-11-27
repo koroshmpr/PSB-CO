@@ -3216,6 +3216,14 @@ input[type="search"] {
     background: linear-gradient(to top, rgb(17 20 24 / 0.92) 0%, rgb(17 20 24 / 0.55) 18%, rgb(17 20 24 / 0) 36%);
   }
 }
+.page-hero--photo .hero-overlay {
+  background: linear-gradient(to top, rgb(17 20 24 / 0.95) 0%, rgb(17 20 24 / 0.84) 50%, rgb(17 20 24 / 0.72) 100%);
+}
+@media (width >= 48rem) {
+  .page-hero--photo .hero-overlay {
+    background: linear-gradient(to left, rgb(17 20 24 / 0.94) 0%, rgb(17 20 24 / 0.86) 38%, rgb(17 20 24 / 0.45) 68%, rgb(17 20 24 / 0.15) 100%),	linear-gradient(to top, rgb(17 20 24 / 0.6) 0%, rgb(17 20 24 / 0) 40%);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .site-header,	.site-header-inner,	.mm-top::after,	.brand-swap img {
     transition: none !important;
@@ -5247,9 +5255,6 @@ html.vt-back::view-transition-new(main) {
 .ms-0\.5 {
   margin-inline-start: calc(var(--spacing) * 0.5);
 }
-.ms-1 {
-  margin-inline-start: calc(var(--spacing) * 1);
-}
 .ms-auto {
   margin-inline-start: auto;
 }
@@ -6241,9 +6246,6 @@ html.vt-back::view-transition-new(main) {
 .h-full {
   height: 100%;
 }
-.max-h-15 {
-  max-height: calc(var(--spacing) * 15);
-}
 .max-h-16 {
   max-height: calc(var(--spacing) * 16);
 }
@@ -6796,9 +6798,6 @@ html.vt-back::view-transition-new(main) {
 .gap-y-2\.5 {
   row-gap: calc(var(--spacing) * 2.5);
 }
-.gap-y-3 {
-  row-gap: calc(var(--spacing) * 3);
-}
 .gap-y-4 {
   row-gap: calc(var(--spacing) * 4);
 }
@@ -6807,12 +6806,6 @@ html.vt-back::view-transition-new(main) {
 }
 .gap-y-6 {
   row-gap: calc(var(--spacing) * 6);
-}
-:where(.divide-x-2 > :not(:last-child)) {
-  --tw-divide-x-reverse: 0;
-  border-inline-style: var(--tw-border-style);
-  border-inline-start-width: calc(2px * var(--tw-divide-x-reverse));
-  border-inline-end-width: calc(2px * calc(1 - var(--tw-divide-x-reverse)));
 }
 :where(.divide-y > :not(:last-child)) {
   --tw-divide-y-reverse: 0;
@@ -6826,9 +6819,6 @@ html.vt-back::view-transition-new(main) {
 }
 :where(.divide-slate-100 > :not(:last-child)) {
   border-color: var(--color-slate-100);
-}
-:where(.divide-white\/40 > :not(:last-child)) {
-  border-color: color-mix(in oklab, var(--color-white) 40%, transparent);
 }
 .self-start {
   align-self: flex-start;
@@ -7363,10 +7353,6 @@ html.vt-back::view-transition-new(main) {
   --tw-gradient-from: color-mix(in oklab, var(--color-white) 5%, transparent);
   --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
 }
-.from-white\/20 {
-  --tw-gradient-from: color-mix(in oklab, var(--color-white) 20%, transparent);
-  --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-}
 .from-30\% {
   --tw-gradient-from-position: 30%;
 }
@@ -7399,10 +7385,6 @@ html.vt-back::view-transition-new(main) {
 }
 .to-transparent {
   --tw-gradient-to: transparent;
-  --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-}
-.to-white\/5 {
-  --tw-gradient-to: color-mix(in oklab, var(--color-white) 5%, transparent);
   --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
 }
 .fill-current {
@@ -7545,9 +7527,6 @@ html.vt-back::view-transition-new(main) {
 }
 .py-10 {
   padding-block: calc(var(--spacing) * 10);
-}
-.py-\[0\.5px\] {
-  padding-block: 0.5px;
 }
 .py-section {
   padding-block: var(--spacing-section);
@@ -8041,9 +8020,6 @@ html.vt-back::view-transition-new(main) {
 .tabular-nums {
   --tw-numeric-spacing: tabular-nums;
   font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,) var(--tw-numeric-spacing,) var(--tw-numeric-fraction,);
-}
-.\!underline {
-  text-decoration-line: underline !important;
 }
 .no-underline {
   text-decoration-line: none;
@@ -8892,11 +8868,6 @@ html.vt-back::view-transition-new(main) {
   }
 }
 @media (hover: hover) {
-  .hover\:text-blue-400:hover {
-    color: var(--color-blue-400);
-  }
-}
-@media (hover: hover) {
   .hover\:text-blue-800:hover {
     color: var(--color-blue-800);
   }
@@ -9068,16 +9039,6 @@ html.vt-back::view-transition-new(main) {
 .aria-selected\:bg-slate-100[aria-selected="true"] {
   background-color: var(--color-slate-100);
 }
-@media (width < 80rem) {
-  .max-xl\:justify-center {
-    justify-content: center;
-  }
-}
-@media (width < 80rem) {
-  .max-xl\:text-center {
-    text-align: center;
-  }
-}
 @media (width < 68.75rem) {
   .max-nav\:hidden {
     display: none;
@@ -9177,11 +9138,6 @@ html.vt-back::view-transition-new(main) {
 @media (width < 64rem) {
   .max-lg\:flex-col {
     flex-direction: column;
-  }
-}
-@media (width < 64rem) {
-  .max-lg\:flex-col-reverse {
-    flex-direction: column-reverse;
   }
 }
 @media (width < 64rem) {
@@ -9307,11 +9263,6 @@ html.vt-back::view-transition-new(main) {
 @media (width < 64rem) {
   .max-lg\:pt-5 {
     padding-top: calc(var(--spacing) * 5);
-  }
-}
-@media (width < 64rem) {
-  .max-lg\:pt-8 {
-    padding-top: calc(var(--spacing) * 8);
   }
 }
 @media (width < 64rem) {
@@ -9570,11 +9521,6 @@ html.vt-back::view-transition-new(main) {
 @media (width >= 40rem) {
   .sm\:\[--rail-item\:46\%\] {
     --rail-item: 46%;
-  }
-}
-@media (width >= 48rem) {
-  .md\:col-span-3 {
-    grid-column: span 3 / span 3;
   }
 }
 @media (width >= 48rem) {
@@ -10122,11 +10068,6 @@ html.vt-back::view-transition-new(main) {
   }
 }
 @media (width >= 64rem) {
-  .lg\:justify-end {
-    justify-content: flex-end;
-  }
-}
-@media (width >= 64rem) {
   .lg\:gap-1 {
     gap: calc(var(--spacing) * 1);
   }
@@ -10342,11 +10283,6 @@ html.vt-back::view-transition-new(main) {
   }
 }
 @media (width >= 64rem) {
-  .lg\:pb-10 {
-    padding-bottom: calc(var(--spacing) * 10);
-  }
-}
-@media (width >= 64rem) {
   .lg\:text-2xl {
     font-size: var(--text-2xl);
     line-height: var(--tw-leading, var(--text-2xl--line-height));
@@ -10380,12 +10316,6 @@ html.vt-back::view-transition-new(main) {
   .lg\:text-sm {
     font-size: var(--text-sm);
     line-height: var(--tw-leading, var(--text-sm--line-height));
-  }
-}
-@media (width >= 64rem) {
-  .lg\:text-xl {
-    font-size: var(--text-xl);
-    line-height: var(--tw-leading, var(--text-xl--line-height));
   }
 }
 @media (width >= 64rem) {
@@ -10432,11 +10362,6 @@ html.vt-back::view-transition-new(main) {
   }
 }
 @media (width >= 80rem) {
-  .xl\:col-span-1 {
-    grid-column: span 1 / span 1;
-  }
-}
-@media (width >= 80rem) {
   .xl\:col-span-4 {
     grid-column: span 4 / span 4;
   }
@@ -10474,11 +10399,6 @@ html.vt-back::view-transition-new(main) {
 @media (width >= 80rem) {
   .xl\:justify-center {
     justify-content: center;
-  }
-}
-@media (width >= 80rem) {
-  .xl\:justify-start {
-    justify-content: flex-start;
   }
 }
 @media (width >= 80rem) {
@@ -10770,11 +10690,6 @@ html.vt-back::view-transition-new(main) {
   initial-value: proximity;
 }
 @property --tw-space-y-reverse {
-  syntax: "*";
-  inherits: false;
-  initial-value: 0;
-}
-@property --tw-divide-x-reverse {
   syntax: "*";
   inherits: false;
   initial-value: 0;
