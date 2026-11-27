@@ -255,6 +255,23 @@
 		@apply flex flex-wrap items-center justify-end gap-2 border-t border-line px-4 py-3;
 	}
 
+	/* gallery navigation (on the dialog, so it never scrolls away with a tall image) */
+	.lightbox-nav {
+		@apply absolute top-1/2 z-10 grid size-11 -translate-y-1/2 cursor-pointer place-items-center rounded-full border border-line bg-white/95 text-foreground shadow-[0_6px_18px_-6px_rgb(20_23_28/0.35)] transition-colors hover:bg-white hover:text-primary-700;
+	}
+
+	.lightbox-nav--prev {
+		inset-inline-start: 0.75rem;
+	}
+
+	.lightbox-nav--next {
+		inset-inline-end: 0.75rem;
+	}
+
+	.lightbox-count {
+		@apply ms-auto text-xs tabular-nums text-slate-600;
+	}
+
 	/* ---------------- Article helpers ---------------- */
 	.toc {
 		@apply rounded-card border border-line bg-white;

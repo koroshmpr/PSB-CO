@@ -21,7 +21,7 @@ foreach ( psb_pf_rows( 'home_timeline', $psb_pid ) as $psb_row ) {
 		$psb_steps[] = array( psb_pf_text( $psb_row['year'] ?? '' ), $psb_row['title'] ?? '' );
 	}
 }
-$psb_img_cls = 'aspect-video w-full object-cover object-[50%_60%] lg:aspect-[4/5] lg:object-center';
+$psb_img_cls = 'aspect-[4/3] w-full object-cover object-[50%_45%] lg:aspect-[4/5] lg:object-center';
 ?>
 <section class="bg-background py-section" aria-labelledby="home-about-title">
 	<div class="container grid gap-8 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-x-16 lg:gap-y-0">

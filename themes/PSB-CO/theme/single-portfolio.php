@@ -95,11 +95,11 @@ while ( have_posts() ) :
 
 				<?php
 				get_template_part(
-					'template-parts/portfolio/gallery-rail',
+					'template-parts/global/photo-gallery',
 					null,
 					array(
 						'images' => psb_field( 'project_gallery', array(), $psb_id ),
-						'title'  => 'تصاویر پروژه',
+						'title'  => 'گالری تصاویر پروژه',
 						'id'     => 'project-gallery-title',
 					)
 				);

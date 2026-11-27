@@ -472,64 +472,194 @@
 		@apply rounded-[2px] bg-primary-100 px-0.5 text-inherit;
 	}
 
-	/* ---------------- Home: factory cards (dark band, line illustrations) ---------------- */
-	.fac-rail {
-		@apply -mx-[var(--spacing-gutter)] flex snap-x snap-mandatory gap-4 overflow-x-auto px-[var(--spacing-gutter)] pb-2 lg:mx-0 lg:grid lg:snap-none lg:grid-cols-3 lg:gap-6 lg:overflow-visible lg:px-0 lg:pb-0;
-		scroll-padding-inline: var(--spacing-gutter);
-		scrollbar-width: none;
+	/* ---------------- Photo gallery grid (projects) ---------------- */
+	.photo-grid {
+		@apply m-0 grid list-none grid-cols-2 gap-2 p-0 sm:gap-3 lg:grid-cols-4;
 	}
 
-	.fac-rail::-webkit-scrollbar {
-		display: none;
+	.photo-grid > li {
+		@apply aspect-[4/3];
 	}
 
-	.fac-slide {
-		@apply flex shrink-0 basis-[80%] snap-start sm:basis-[46%] lg:basis-auto;
+	.photo-grid > li.is-lead {
+		@apply col-span-2 lg:row-span-2 lg:aspect-auto;
 	}
 
-	.fac-card {
-		@apply flex w-full flex-col overflow-hidden rounded-card bg-white text-foreground transition-transform duration-300;
+	.photo-grid.is-single > li.is-lead {
+		@apply aspect-[16/9] lg:col-span-4;
 	}
 
-	.fac-card:hover {
-		transform: translateY(-3px);
+	.photo-tile {
+		@apply relative block size-full cursor-zoom-in overflow-hidden rounded-card border border-line bg-slate-100;
 	}
 
-	/* illustration mat: same light grid feel as the artwork, contained with breathing room */
-	.fac-media {
-		@apply relative block aspect-[4/3] overflow-hidden border-b border-line bg-slate-50 p-3;
-	}
-
-	.fac-media img {
+	.photo-tile img {
 		@apply transition-transform duration-500;
 	}
 
-	.fac-card:hover .fac-media img {
-		transform: scale(1.03);
+	.photo-tile:hover img {
+		transform: scale(1.04);
 	}
 
-	.fac-media.is-photo {
-		@apply p-0;
+	.photo-tile-zoom {
+		@apply absolute bottom-2 end-2 grid size-8 place-items-center rounded-full bg-white/90 text-foreground opacity-0 shadow transition-opacity duration-200;
 	}
 
-	.fac-body {
-		@apply flex flex-1 flex-col gap-1.5 p-5 lg:p-6;
+	.photo-tile:hover .photo-tile-zoom,
+	.photo-tile:focus-visible .photo-tile-zoom {
+		@apply opacity-100;
 	}
 
-	.fac-eyebrow {
-		@apply text-xs font-semibold text-slate-600;
+	/* ---------------- Home: production flow (dark band, 6 numbered steps; one row on desktop) ----------------
+	   Mobile: a vertical numbered path (circle + connector line, compact cards with a small illustration).
+	   lg+: four cards in a row, a red arrow between consecutive steps (RTL: the flow reads right → left). */
+	.flow {
+		@apply relative m-0 grid list-none gap-4 p-0 lg:grid-cols-6 lg:gap-4 lg:pt-16;
 	}
 
-	.fac-title {
-		@apply text-lg font-bold leading-normal text-foreground;
+	/* desktop: one journey line through the numbered circles above the cards */
+	.flow::before {
+		content: "";
+		@apply pointer-events-none absolute top-5 hidden h-0.5 rounded-full lg:block;
+		inset-inline: calc(100% / 12);
+		background: linear-gradient(to left, rgb(255 255 255 / 0.18), var(--color-primary-600));
 	}
 
-	.fac-text {
-		@apply line-clamp-3 text-sm leading-[1.8] text-slate-600;
+	/* a light pulse travels along the line from step 1 to 6 (RTL: right → left), 6s loop */
+	.flow::after {
+		content: "";
+		@apply pointer-events-none absolute top-[1.125rem] hidden h-1.5 rounded-full lg:block;
+		inset-inline: calc(100% / 12);
+		background: linear-gradient(to left, transparent 48.5%, rgb(255 255 255 / 0.95) 50%, transparent 51.5%) no-repeat;
+		background-size: 250% 100%;
+		background-position: 0% 0;
+		filter: blur(0.5px) drop-shadow(0 0 6px rgb(255 255 255 / 0.7));
+		opacity: 0;
 	}
 
-	.fac-more {
-		@apply mt-auto inline-flex items-center gap-1.5 pt-3 text-sm font-semibold text-foreground group-hover:text-primary-700;
+	@media (prefers-reduced-motion: no-preference) {
+		.flow::after {
+			animation: psb-flow-pulse 6s linear infinite;
+		}
+
+		/* each circle rings as the pulse reaches it */
+		.flow > .flow-step > .flow-num {
+			animation: psb-flow-ring 6s ease-out 0.9s infinite;
+		}
+
+		.flow > .flow-step:nth-child(2) > .flow-num { animation-delay: 1.75s; }
+		.flow > .flow-step:nth-child(3) > .flow-num { animation-delay: 2.6s; }
+		.flow > .flow-step:nth-child(4) > .flow-num { animation-delay: 3.45s; }
+		.flow > .flow-step:nth-child(5) > .flow-num { animation-delay: 4.3s; }
+		.flow > .flow-step:nth-child(6) > .flow-num { animation-delay: 5.15s; }
+	}
+
+	/* light variant (white section, e.g. the services page) */
+	.flow--light::before {
+		background: linear-gradient(to left, var(--color-line-strong), var(--color-primary-600));
+	}
+
+	.flow--light::after {
+		background-image: linear-gradient(to left, transparent 48.5%, rgb(214 15 26 / 0.85) 50%, transparent 51.5%);
+		filter: drop-shadow(0 0 5px rgb(214 15 26 / 0.45));
+	}
+
+	.flow--light {
+		--flow-gap: #fff;
+	}
+
+	.flow--light .flow-num {
+		box-shadow: 0 0 0 5px #fff;
+	}
+
+	.flow--light .flow-step:not(:last-child)::before {
+		@apply bg-line;
+	}
+
+	.flow--light .flow-card {
+		@apply border border-line;
+	}
+
+	.flow-step {
+		@apply relative ps-14 lg:ps-0;
+	}
+
+	/* mobile connector between circles */
+	.flow-step:not(:last-child)::before {
+		content: "";
+		@apply absolute start-5 top-11 -bottom-5 w-0.5 rounded-full bg-white/15 lg:hidden;
+	}
+
+	.flow-num {
+		@apply absolute start-0 top-0 z-10 grid size-10 place-items-center rounded-full bg-primary-600 text-sm font-bold tabular-nums text-white shadow-[0_0_0_5px_var(--color-dark)] lg:start-1/2 lg:-top-16 lg:translate-x-1/2;
+	}
+
+	/* desktop arrow between steps of the same row (none after the 3rd / last card) */
+	.flow-step:not(:last-child)::after {
+		display: none !important; /* the journey line replaces the arrows */
+	}
+
+	.flow-arrow-unused {
+		content: "";
+		@apply absolute top-[22%] z-20 hidden size-8 rounded-full bg-primary-600 lg:block;
+		inset-inline-end: -2.25rem;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 12H5M11 6l-6 6 6 6'/%3E%3C/svg%3E");
+		background-repeat: no-repeat;
+		background-position: center;
+		background-size: 16px;
+		box-shadow: 0 0 0 5px var(--color-dark);
+	}
+
+	.flow-card {
+		@apply flex w-full items-stretch overflow-hidden rounded-card bg-white text-foreground transition-transform duration-300 lg:h-full lg:flex-col;
+	}
+
+	.flow-card:hover {
+		transform: translateY(-3px);
+	}
+
+	.flow-media {
+		@apply relative block w-24 shrink-0 border-e border-line bg-slate-50 p-1.5 sm:w-32 lg:aspect-[4/3] lg:w-full lg:border-e-0 lg:border-b lg:p-2;
+	}
+
+	.flow-media img {
+		@apply transition-transform duration-500;
+	}
+
+	.flow-card:hover .flow-media img {
+		transform: scale(1.04);
+	}
+
+	.flow-body {
+		@apply flex min-w-0 flex-1 flex-col gap-1 p-4 lg:gap-1 lg:p-3.5;
+	}
+
+	.flow-label {
+		@apply text-xs font-semibold text-primary-700;
+	}
+
+	.flow-title {
+		@apply text-[0.9375rem] font-bold leading-normal text-foreground lg:text-sm;
+	}
+
+	.flow-text {
+		@apply text-[0.8125rem] leading-[1.75] text-slate-600 lg:line-clamp-3 lg:text-xs lg:leading-[1.7];
+	}
+
+	.flow-points {
+		@apply mt-1.5 flex flex-col gap-1;
+	}
+
+	.flow-point {
+		@apply flex items-start gap-1.5 text-[0.78rem] leading-[1.7] text-slate-700 lg:text-[0.72rem] lg:leading-[1.6];
+	}
+
+	.flow-point svg {
+		@apply mt-[0.3rem] text-primary-700;
+	}
+
+	.flow-more {
+		@apply mt-auto hidden items-center gap-1 pt-2 text-xs font-semibold text-foreground group-hover:text-primary-700 lg:inline-flex;
 	}
 
 	/* ---------------- Home: issuer strip (one row, never wraps) ---------------- */

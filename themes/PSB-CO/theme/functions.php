@@ -329,6 +329,7 @@ require get_template_directory() . '/inc/otp-login-form.php';
  */
 foreach ( array(
 	'/inc/page-fields/page-fields.php',        // Page content fields (home, about): text + photos from ACF.
+	'/inc/production-flow.php',                // Six-step production flow (home + services page).
 	'/inc/placeholders.php',                   // Type-matched fallback illustrations.
 	'/inc/stability.php',                      // HTTP circuit breaker, cache exclusions, cron.
 	'/inc/htaccess-perf.php',                  // gzip + browser-cache block in root .htaccess (live only, self-tested).

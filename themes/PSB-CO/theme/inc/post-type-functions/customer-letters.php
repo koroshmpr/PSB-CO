@@ -169,6 +169,7 @@ function psb_project_letters( $project_id, $limit = 6 ) {
 /* -------------------------------------------------------------------------
  * Lightbox (one shared native <dialog>, ~1 KB of vanilla JS, printed only when used)
  * Trigger: <button type="button" data-lightbox="{full image url}" data-lightbox-title="…" data-lightbox-pdf="{url}">
+ * Gallery: give the triggers the same data-lightbox-group="…" to browse them (arrows, keys, swipe, counter).
  * ---------------------------------------------------------------------- */
 
 function psb_lightbox() {
@@ -185,19 +186,30 @@ function psb_lightbox_markup() {
 	<dialog class="lightbox" id="psb-lightbox" aria-labelledby="psb-lightbox-title">
 		<div class="lightbox-head">
 			<p class="text-sm font-bold text-dark" id="psb-lightbox-title"></p>
+			<span class="lightbox-count hidden" data-lightbox-count aria-live="polite"></span>
 			<button type="button" class="btn btn-ghost btn-icon" data-lightbox-close aria-label="بستن"><?php echo psb_icon( 'close' ); // phpcs:ignore ?></button>
 		</div>
 		<div class="lightbox-body"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="" width="1" height="1" decoding="async"></div>
+		<button type="button" class="lightbox-nav lightbox-nav--prev hidden" data-lightbox-prev aria-label="تصویر قبلی"><?php echo psb_icon( 'chevron', 'size-5 -scale-x-100' ); // phpcs:ignore ?></button>
+		<button type="button" class="lightbox-nav lightbox-nav--next hidden" data-lightbox-next aria-label="تصویر بعدی"><?php echo psb_icon( 'chevron', 'size-5' ); // phpcs:ignore ?></button>
 		<div class="lightbox-foot">
 			<a class="btn btn-outline btn-sm hidden" data-lightbox-pdf-link href="#" target="_blank" rel="noopener"><?php echo psb_icon( 'doc', 'size-4' ); // phpcs:ignore ?> مشاهده فایل PDF</a>
 			<a class="btn btn-ghost btn-sm" data-lightbox-full href="#" target="_blank" rel="noopener"><?php echo psb_icon( 'external', 'size-4' ); // phpcs:ignore ?> اندازه اصلی</a>
 		</div>
 	</dialog>
 	<script>
-	(function(){var d=document.getElementById('psb-lightbox');if(!d||!d.showModal)return;var img=d.querySelector('img'),t=d.querySelector('#psb-lightbox-title'),pdf=d.querySelector('[data-lightbox-pdf-link]'),full=d.querySelector('[data-lightbox-full]');
-	document.addEventListener('click',function(e){var b=e.target.closest('[data-lightbox]');if(b){e.preventDefault();img.src=b.getAttribute('data-lightbox');img.alt=b.getAttribute('data-lightbox-title')||'';img.removeAttribute('width');img.removeAttribute('height');t.textContent=b.getAttribute('data-lightbox-title')||'';full.href=b.getAttribute('data-lightbox');var p=b.getAttribute('data-lightbox-pdf');pdf.classList.toggle('hidden',!p);if(p)pdf.href=p;d.showModal();return;}
+	/* Lightbox with gallery navigation: triggers sharing data-lightbox-group browse with the arrow buttons,
+	   ← / → keys (RTL: ← = next) and a swipe; «۳ از ۸» counter. */
+	(function(){var d=document.getElementById('psb-lightbox');if(!d||!d.showModal)return;var img=d.querySelector('img'),t=d.querySelector('#psb-lightbox-title'),pdf=d.querySelector('[data-lightbox-pdf-link]'),full=d.querySelector('[data-lightbox-full]'),cnt=d.querySelector('[data-lightbox-count]'),pv=d.querySelector('[data-lightbox-prev]'),nx=d.querySelector('[data-lightbox-next]'),list=[],idx=0,x0=null;
+	var fa=function(n){return String(n).replace(/\d/g,function(c){return '۰۱۲۳۴۵۶۷۸۹'[c];});};
+	function show(i){idx=(i+list.length)%list.length;var b=list[idx],u=b.getAttribute('data-lightbox');img.src=u;img.alt=b.getAttribute('data-lightbox-title')||'';img.removeAttribute('width');img.removeAttribute('height');t.textContent=b.getAttribute('data-lightbox-title')||'';full.href=u;var p=b.getAttribute('data-lightbox-pdf');pdf.classList.toggle('hidden',!p);if(p)pdf.href=p;var many=list.length>1;[pv,nx,cnt].forEach(function(el){el.classList.toggle('hidden',!many);});if(many)cnt.textContent=fa(idx+1)+' از '+fa(list.length);}
+	document.addEventListener('click',function(e){var b=e.target.closest('[data-lightbox]');if(b&&!d.contains(b)){e.preventDefault();var g=b.getAttribute('data-lightbox-group');list=g?Array.prototype.slice.call(document.querySelectorAll('[data-lightbox-group="'+(window.CSS&&CSS.escape?CSS.escape(g):g)+'"]')):[b];show(Math.max(0,list.indexOf(b)));d.showModal();return;}
+	if(e.target.closest('[data-lightbox-prev]')){show(idx-1);return;}if(e.target.closest('[data-lightbox-next]')){show(idx+1);return;}
 	if(e.target.closest('[data-lightbox-close]')||e.target===d){d.close();}});
-	d.addEventListener('close',function(){img.src='data:image/gif;base64,R0lGODlhAQABAAAAACw=';});})();
+	d.addEventListener('keydown',function(e){if(list.length<2)return;if(e.key==='ArrowLeft'){e.preventDefault();show(idx+1);}else if(e.key==='ArrowRight'){e.preventDefault();show(idx-1);}});
+	d.addEventListener('touchstart',function(e){x0=e.touches[0].clientX;},{passive:true});
+	d.addEventListener('touchend',function(e){if(x0===null||list.length<2)return;var dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>50)show(dx<0?idx+1:idx-1);});
+	d.addEventListener('close',function(){img.src='data:image/gif;base64,R0lGODlhAQABAAAAACw=';list=[];});})();
 	</script>
 	<?php
 }

@@ -83,27 +83,11 @@ if ( $psb_is_page ) {
 				'id'      => 'services-flow-title',
 				'eyebrow' => 'فرایند ساخت',
 				'title'   => 'از نقشه تا تحویل تابلو',
+				'lead'    => 'شش مرحله‌ای که هر تابلو در کارخانه ' . psb_brand_name() . ' طی می‌کند؛ هر مرحله به صفحه همان بخش لینک شده است.',
 			)
 		);
-		$psb_steps = array(
-			array( 'drawing', 'طراحی و مهندسی', 'تهیه نقشه‌های ساخت بر اساس نقشه تک‌خطی و مشخصات کارفرما.' ),
-			array( 'cog', 'ساخت بدنه', 'برش، پانچ و خم‌کاری ورق با ماشین‌آلات CNC و پلیسه‌گیری لبه‌ها.' ),
-			array( 'shield', 'رنگ و کنترل کیفیت', 'آماده‌سازی سطح و رنگ پودری الکترواستاتیک با آزمون‌های آزمایشگاه رنگ.' ),
-			array( 'report', 'مونتاژ و آزمون', 'مونتاژ تجهیزات و آزمون روتین هر تابلو در آزمایشگاه تست برق، با امکان حضور خریدار.' ),
-		);
 		?>
-		<ol class="grid gap-gutter sm:grid-cols-2 lg:grid-cols-4" role="list">
-			<?php foreach ( $psb_steps as $psb_i => $psb_s ) : ?>
-				<li class="panel">
-					<span class="flex items-center justify-between" aria-hidden="true">
-						<?php echo psb_icon( $psb_s[0], 'size-7 text-slate-700' ); // phpcs:ignore ?>
-						<span class="text-2xl font-bold text-slate-300 tabular-nums"><?php echo esc_html( psb_fa_num( str_pad( (string) ( $psb_i + 1 ), 2, '0', STR_PAD_LEFT ) ) ); ?></span>
-					</span>
-					<h3 class="mt-3 text-base font-bold text-foreground"><?php echo esc_html( $psb_s[1] ); ?></h3>
-					<p class="mt-2 text-sm leading-7 text-slate-600"><?php echo esc_html( $psb_s[2] ); ?></p>
-				</li>
-			<?php endforeach; ?>
-		</ol>
+		<?php psb_production_flow( 'light' ); ?>
 	</div>
 </section>
 <?php

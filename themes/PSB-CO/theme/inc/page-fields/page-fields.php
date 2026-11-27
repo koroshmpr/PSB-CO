@@ -362,7 +362,7 @@ function psb_pf_pages() {
  * Seed repeaters once with their default rows, so the manager edits real rows (not empty lists).
  * Only fields that were never saved are touched.
  */
-const PSB_PF_SEED_VERSION = 1;
+const PSB_PF_SEED_VERSION = 2; // v2: home_flow (production steps).
 
 /** Seed never-saved repeaters on the content pages with their default rows. */
 function psb_pf_seed() {
