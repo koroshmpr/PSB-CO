@@ -84,10 +84,36 @@ foreach ( array( 'facebook', 'twitter' ) as $psb_seo_net ) {
 }
 unset( $psb_seo_net );
 
-/** Thin CPT archives (Rank Math default «خدمات - …») get a real meta description. */
+/** About page: the hero photo field is the share image (before Rank Math adds the featured image). */
+add_action(
+	'rank_math/opengraph/facebook/add_images',
+	function ( $image ) {
+		if ( is_object( $image ) && is_page_template( 'about-us.php' ) && function_exists( 'psb_pf' ) ) {
+			$id = psb_pf_image_id( psb_pf( 'about_hero_image', get_queried_object_id() ) );
+			if ( $id ) {
+				$image->add_image_by_id( $id );
+			}
+		}
+	}
+);
+
+/**
+ * Pages and thin CPT archives without a Rank Math description get a real one
+ * (Rank Math's description meta is protected from the remote API, so these live in code).
+ */
 add_filter(
 	'rank_math/frontend/description',
 	function ( $desc ) {
+		$pages = array(
+			'request-quote'      => 'فرم استعلام قیمت تابلو برق فشار ضعیف، فشار متوسط و کمپکت ' . psb_brand_name() . '؛ مشخصات پروژه را ثبت کنید تا کارشناسان فنی قیمت و زمان ساخت را اعلام کنند.',
+			'project-references' => 'سوابق اجرایی ' . psb_brand_name() . ': فهرست پروژه‌های ساخت و تأمین تابلو برق فشار ضعیف و فشار متوسط برای صنایع، شبکه‌های توزیع برق، ساختمان‌ها و نیروگاه‌ها.',
+		);
+		if ( is_page() && '' === trim( (string) $desc ) ) {
+			$slug = urldecode( (string) get_post_field( 'post_name', get_queried_object_id() ) );
+			if ( isset( $pages[ $slug ] ) ) {
+				return $pages[ $slug ];
+			}
+		}
 		$archive = array(
 			'services'  => 'خدمات ' . psb_brand_name() . ': ورق‌کاری CNC، رنگ پودری الکترواستاتیک، مونتاژ و آزمون روتین تابلو برق، نصب و راه‌اندازی، و ' . psb_fa_num( PSB_SERVICE_YEARS ) . ' سال خدمات پس از فروش.',
 			'portfolio' => 'نمونه کارهای ' . psb_brand_name() . ': تابلوهای برق فشار ضعیف و فشار متوسط ساخته‌شده برای کارخانه‌ها، شبکه‌های توزیع برق، ساختمان‌ها و صنایع کشور.',
