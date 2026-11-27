@@ -6,6 +6,7 @@
  * Versioned by psb_rankmath_setup; bump PSB_RANKMATH_SETUP_VERSION to apply a changed set again.
  *
  * - Knowledge graph: company (not person), official spelling «پارس سوئیچ بورد», default share image.
+ * - v2: knowledge-graph logo = the sharp 1200 px PNG made from the vector logo (media «pars-switch-board-logo»).
  * - Pages: no Article schema (static pages are WebPage; seo.php also strips it).
  * - Type tests and customer letters: titles, descriptions, index, in the sitemap (they were missing).
  * - Sitemap: product categories and article series added; featured images included.
@@ -15,7 +16,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-const PSB_RANKMATH_SETUP_VERSION = 1;
+const PSB_RANKMATH_SETUP_VERSION = 2;
 
 /** Option name => [ key => value ]. */
 function psb_rankmath_setup_values() {
@@ -57,6 +58,19 @@ function psb_rankmath_setup_values() {
 		'tax_series_custom_robots'          => 'off',
 		'tax_series_robots'                 => array( 'index' ),
 	);
+	$logo = get_posts(
+		array(
+			'post_type'   => 'attachment',
+			'name'        => 'pars-switch-board-logo',
+			'numberposts' => 1,
+			'fields'      => 'ids',
+		)
+	);
+	$logo = $logo ? (int) $logo[0] : 0;
+	if ( $logo && wp_attachment_is_image( $logo ) ) {
+		$titles['knowledgegraph_logo']    = wp_get_attachment_image_url( $logo, 'full' );
+		$titles['knowledgegraph_logo_id'] = $logo;
+	}
 	if ( $share ) {
 		$src = wp_get_attachment_image_url( $share, 'full' );
 		if ( $src ) {
