@@ -29,11 +29,14 @@ if ( ! $psb_letters->have_posts() ) {
 	return;
 }
 ?>
-<div class="rail [--rail-item:82%] sm:[--rail-item:46%] lg:grid lg:grid-flow-row lg:grid-cols-3 lg:gap-6 lg:overflow-visible <?php echo esc_attr( $args['class'] ?? '' ); ?>">
+<?php // Phones: one swipe row (~1.4 cards); desktop: one row of 4 (extra cards stay in the phone rail only). ?>
+<div class="letter-rail <?php echo esc_attr( $args['class'] ?? '' ); ?>">
 	<?php
 	while ( $psb_letters->have_posts() ) :
 		$psb_letters->the_post();
+		echo '<div class="letter-slide">';
 		get_template_part( 'template-parts/letters/letter-card', null, array( 'post' => get_the_ID() ) );
+		echo '</div>';
 	endwhile;
 	wp_reset_postdata();
 	?>

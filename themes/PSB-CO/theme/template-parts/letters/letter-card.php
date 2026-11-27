@@ -15,10 +15,10 @@ if ( $psb_full ) {
 }
 ?>
 <article class="letter-card">
-	<div class="letter-card-media pb-0">
+	<div class="letter-card-media">
 		<?php if ( $psb_full ) : ?>
 			<button type="button" class="doc-frame relative z-10 cursor-zoom-in" data-lightbox="<?php echo esc_url( $psb_full ); ?>" data-lightbox-title="<?php echo esc_attr( $psb_name ); ?>" <?php echo $psb_l['pdf'] ? 'data-lightbox-pdf="' . esc_url( $psb_l['pdf']['url'] ) . '"' : ''; ?>>
-				<?php echo psb_image( $psb_l['scan'], 'medium', array( 'alt' => 'اسکن ' . $psb_name, 'sizes' => '15rem' ) ); // phpcs:ignore ?>
+				<?php echo psb_image( $psb_l['scan'], 'medium', array( 'alt' => 'اسکن ' . $psb_name, 'sizes' => '(min-width: 64rem) 18rem, (min-width: 40rem) 42vw, 68vw' ) ); // phpcs:ignore ?>
 				<span class="sr-only">نمایش اسکن نامه در اندازه بزرگ</span>
 			</button>
 		<?php else : ?>
@@ -34,16 +34,18 @@ if ( $psb_full ) {
 				<span class="text-xs text-slate-500"><?php echo esc_html( psb_fa_num( $psb_l['date'] ) ); ?></span>
 			<?php endif; ?>
 		</div>
-		<<?php echo $psb_tag; // phpcs:ignore ?> class="cred-card-title"><a class="card-link" href="<?php echo esc_url( get_permalink( $psb_id ) ); ?>"><?php echo esc_html( $psb_l['org'] ? $psb_l['org'] : $psb_name ); ?></a></<?php echo $psb_tag; // phpcs:ignore ?>>
+		<<?php echo $psb_tag; // phpcs:ignore ?> class="cred-card-title line-clamp-2"><a class="card-link" href="<?php echo esc_url( get_permalink( $psb_id ) ); ?>"><?php echo esc_html( $psb_l['org'] ? $psb_l['org'] : $psb_name ); ?></a></<?php echo $psb_tag; // phpcs:ignore ?>>
 		<?php if ( $psb_l['org'] && $psb_name !== $psb_l['org'] ) : ?>
-			<p class="text-xs text-slate-500"><?php echo esc_html( $psb_name ); ?></p>
+			<p class="line-clamp-2 text-xs leading-5 text-slate-500"><?php echo esc_html( $psb_name ); ?></p>
 		<?php endif; ?>
 		<?php if ( $psb_l['quote'] ) : ?>
-			<blockquote class="letter-quote"><p><?php echo esc_html( $psb_l['quote'] ); ?></p></blockquote>
+			<blockquote class="letter-quote line-clamp-3"><p><?php echo esc_html( $psb_l['quote'] ); ?></p></blockquote>
 		<?php endif; ?>
 	</div>
-	<div class="card-footer text-xs">
-		<span class="text-slate-500"><?php echo $psb_l['project'] ? esc_html( 'پروژه: ' . get_the_title( $psb_l['project'] ) ) : ''; ?></span>
+	<div class="card-footer mt-auto text-xs">
+		<?php if ( $psb_l['project'] ) : ?>
+			<span class="line-clamp-1 text-slate-500"><?php echo esc_html( 'پروژه: ' . get_the_title( $psb_l['project'] ) ); ?></span>
+		<?php endif; ?>
 		<span class="link-arrow">متن کامل نامه <?php echo psb_icon( 'arrow', 'btn-arrow size-4' ); // phpcs:ignore ?></span>
 	</div>
 </article>

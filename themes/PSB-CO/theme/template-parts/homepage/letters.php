@@ -38,7 +38,7 @@ if ( ! $psb_real ) {
 				)
 			)
 		);
-		get_template_part( 'template-parts/letters/letters-strip', null, array( 'count' => 6 ) );
+		get_template_part( 'template-parts/letters/letters-strip', null, array( 'count' => 8 ) );
 		?>
 	</div>
 </section>

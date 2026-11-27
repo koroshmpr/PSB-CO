@@ -218,12 +218,45 @@
 		@apply mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3 text-xs text-slate-600;
 	}
 
+	/* the scan sits in a full-width paper mat (same frame as the certificates rail), fixed 4:5 */
 	.letter-card-media {
-		@apply border-b border-line bg-slate-50 p-5;
+		@apply border-b border-line;
 	}
 
 	.letter-card-media .doc-frame {
-		@apply mx-auto w-full max-w-[13rem] bg-white;
+		@apply w-full rounded-none border-0 p-4 sm:p-5;
+		aspect-ratio: 4 / 5;
+	}
+
+	.letter-card .card-body {
+		@apply gap-1.5 p-4;
+	}
+
+	.letter-card .cred-card-title {
+		@apply text-[0.9375rem] leading-6;
+	}
+
+	/* one row: phones swipe (~1.4 cards), desktop shows 4 */
+	.letter-rail {
+		@apply -mx-[var(--spacing-gutter)] flex snap-x snap-mandatory gap-3 overflow-x-auto px-[var(--spacing-gutter)] pb-2 lg:mx-0 lg:grid lg:snap-none lg:grid-cols-4 lg:gap-6 lg:overflow-visible lg:px-0 lg:pb-0;
+		scroll-padding-inline: var(--spacing-gutter);
+		scrollbar-width: none;
+	}
+
+	.letter-rail::-webkit-scrollbar {
+		display: none;
+	}
+
+	.letter-slide {
+		@apply flex shrink-0 basis-[68%] snap-start sm:basis-[42%] lg:basis-auto;
+	}
+
+	.letter-slide > .letter-card {
+		@apply w-full;
+	}
+
+	.letter-rail > .letter-slide:nth-child(n + 5) {
+		@apply lg:hidden;
 	}
 
 	.letter-quote {
