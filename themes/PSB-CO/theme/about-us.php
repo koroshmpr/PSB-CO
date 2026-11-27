@@ -46,16 +46,24 @@ while ( have_posts() ) :
 	?>
 
 	<?php if ( is_array( $psb_stats ) && $psb_stats ) : ?>
-		<section class="border-b border-line bg-white py-section-sm" aria-label="آمار کلیدی">
+		<section class="border-b border-line bg-white" aria-label="آمار کلیدی">
 			<div class="container">
-				<dl class="stats">
-					<?php foreach ( $psb_stats as $psb_s ) : ?>
-						<?php if ( ! empty( $psb_s['number'] ) && ! empty( $psb_s['label'] ) ) : ?>
-							<div class="stat">
-								<dt class="stat-label order-last"><?php echo esc_html( $psb_s['label'] ); ?></dt>
-								<dd class="stat-value"><?php echo esc_html( psb_fa_num( psb_pf_text( $psb_s['number'] ) ) ); ?></dd>
-							</div>
-						<?php endif; ?>
+				<dl class="stats !border-t-0">
+					<?php
+					$psb_stat_icons = array( 'calendar', 'factory', 'warranty', 'wrench' );
+					foreach ( array_values( $psb_stats ) as $psb_i => $psb_s ) :
+						if ( empty( $psb_s['number'] ) || empty( $psb_s['label'] ) ) {
+							continue;
+						}
+						$psb_si = ( ! empty( $psb_s['icon'] ) && psb_icon( sanitize_key( $psb_s['icon'] ) ) ) ? sanitize_key( $psb_s['icon'] ) : $psb_stat_icons[ $psb_i % count( $psb_stat_icons ) ];
+						?>
+						<div class="stat !flex-row items-center gap-4 !py-6 sm:!py-7">
+							<span class="grid size-12 shrink-0 place-items-center rounded-control border border-line bg-slate-50 text-slate-700" aria-hidden="true"><?php echo psb_icon( $psb_si, 'size-6' ); // phpcs:ignore ?></span>
+							<span class="flex min-w-0 flex-col gap-1">
+								<dt class="stat-label order-last"><?php echo psb_pf_html( $psb_s['label'] ); // phpcs:ignore ?></dt>
+								<dd class="stat-value !text-[1.5rem] sm:!text-[1.75rem]"><?php echo esc_html( psb_fa_num( psb_pf_text( $psb_s['number'] ) ) ); ?></dd>
+							</span>
+						</div>
 					<?php endforeach; ?>
 				</dl>
 			</div>

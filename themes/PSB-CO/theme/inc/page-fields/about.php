@@ -51,8 +51,9 @@ psb_pf_register(
 					'key'    => 'field_about_stats',
 					'button' => 'افزودن آمار',
 					'sub'    => array(
-						array( 'text', 'number', 'عدد', '', array( 'width' => 30, 'key' => 'field_stat_number' ) ),
-						array( 'text', 'label', 'عنوان', '', array( 'width' => 70, 'key' => 'field_stat_label' ) ),
+						array( 'text', 'number', 'عدد', '', array( 'width' => 25, 'key' => 'field_stat_number' ) ),
+						array( 'text', 'label', 'عنوان', '', array( 'width' => 55, 'key' => 'field_stat_label' ) ),
+						array( 'select', 'icon', 'آیکون', '', array( 'width' => 20, 'choices' => psb_pf_icon_choices() ) ),
 					),
 				),
 			),

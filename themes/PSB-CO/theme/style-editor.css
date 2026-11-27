@@ -6249,11 +6249,8 @@ html.vt-back::view-transition-new(main) {
 .max-h-16 {
   max-height: calc(var(--spacing) * 16);
 }
-.max-h-\[28rem\] {
-  max-height: 28rem;
-}
-.max-h-\[32rem\] {
-  max-height: 32rem;
+.max-h-\[22rem\] {
+  max-height: 22rem;
 }
 .max-h-\[90vh\] {
   max-height: 90vh;
@@ -6654,6 +6651,9 @@ html.vt-back::view-transition-new(main) {
 .grid-cols-\[minmax\(0\,1fr\)_minmax\(0\,1\.1fr\)\] {
   grid-template-columns: minmax(0,1fr) minmax(0,1.1fr);
 }
+.\!flex-row {
+  flex-direction: row !important;
+}
 .flex-col {
   flex-direction: column;
 }
@@ -6665,6 +6665,9 @@ html.vt-back::view-transition-new(main) {
 }
 .flex-wrap {
   flex-wrap: wrap;
+}
+.place-items-center {
+  place-items: center;
 }
 .content-start {
   align-content: flex-start;
@@ -6930,6 +6933,10 @@ html.vt-back::view-transition-new(main) {
 .border-e {
   border-inline-end-style: var(--tw-border-style);
   border-inline-end-width: 1px;
+}
+.\!border-t-0 {
+  border-top-style: var(--tw-border-style) !important;
+  border-top-width: 0px !important;
 }
 .border-t {
   border-top-style: var(--tw-border-style);
@@ -7489,6 +7496,9 @@ html.vt-back::view-transition-new(main) {
 .px-\[var\(--spacing-gutter\)\] {
   padding-inline: var(--spacing-gutter);
 }
+.\!py-6 {
+  padding-block: calc(var(--spacing) * 6) !important;
+}
 .py-0\.5 {
   padding-block: calc(var(--spacing) * 0.5);
 }
@@ -7722,6 +7732,9 @@ html.vt-back::view-transition-new(main) {
 }
 .\!text-\[0\.8125rem\] {
   font-size: 0.8125rem !important;
+}
+.\!text-\[1\.5rem\] {
+  font-size: 1.5rem !important;
 }
 .text-\[0\.7rem\] {
   font-size: 0.7rem;
@@ -9491,6 +9504,11 @@ html.vt-back::view-transition-new(main) {
   }
 }
 @media (width >= 40rem) {
+  .sm\:\!py-7 {
+    padding-block: calc(var(--spacing) * 7) !important;
+  }
+}
+@media (width >= 40rem) {
   .sm\:pt-\[8vh\] {
     padding-top: 8vh;
   }
@@ -9511,6 +9529,11 @@ html.vt-back::view-transition-new(main) {
   .sm\:text-xl {
     font-size: var(--text-xl);
     line-height: var(--tw-leading, var(--text-xl--line-height));
+  }
+}
+@media (width >= 40rem) {
+  .sm\:\!text-\[1\.75rem\] {
+    font-size: 1.75rem !important;
   }
 }
 @media (width >= 40rem) {

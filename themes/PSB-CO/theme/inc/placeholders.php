@@ -529,6 +529,11 @@ function psb_image_blocked( $att_id ) {
 function psb_best_image( $thing, $slot_w = 400, $ratio = '4 / 3', $args = array() ) {
 	list( $att, $post ) = psb_placeholder_resolve( $thing );
 	$attr = (array) ( $args['attr'] ?? array() );
+	// Product cards keep the line illustration while the featured photo is only the automatic one
+	// (inc/featured-setup.php: it serves og:image / schema); a photo the owner picks is shown.
+	if ( $att && $post && 'product' === $post->post_type && function_exists( 'psb_featured_is_auto' ) && psb_featured_is_auto( $post->ID ) ) {
+		$att = 0;
+	}
 	if ( $att && psb_image_fits( $att, $slot_w, $ratio ) ) {
 		$html = psb_image( $att, $args['size'] ?? 'medium_large', $attr );
 		if ( $html ) {

@@ -45,6 +45,12 @@ function psb_featured_setup_map() {
 	);
 }
 
+/** Whether a post's featured image is still the one this routine set (not chosen by the owner). */
+function psb_featured_is_auto( $post_id ) {
+	$map = psb_featured_setup_map();
+	return isset( $map[ $post_id ] ) && (int) get_post_thumbnail_id( $post_id ) === $map[ $post_id ];
+}
+
 add_action(
 	'init',
 	function () {

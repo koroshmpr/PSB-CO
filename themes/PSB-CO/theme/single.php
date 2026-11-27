@@ -27,48 +27,55 @@ while ( have_posts() ) :
 
 	$psb_modified = get_the_modified_time( 'U' ) > get_the_time( 'U' ) + DAY_IN_SECONDS;
 	?>
+	<?php
+	// Featured image sits in the header beside the title (lg+), below the meta on mobile.
+	$psb_cover = null;
+	if ( has_post_thumbnail() ) {
+		$psb_cover_attr = array( 'alt' => get_the_title(), 'sizes' => '(min-width: 1024px) 34rem, 100vw', 'loading' => 'eager', 'fetchpriority' => 'high', 'class' => 'aspect-[4/3] w-full object-cover', 'style' => 'object-position:50% 40%' );
+		$psb_cover      = function_exists( 'psb_single_image' ) ? psb_single_image( get_post_thumbnail_id(), 544, '4 / 3', array( 'attr' => $psb_cover_attr ) ) : array( 'mode' => 'photo', 'html' => psb_image( get_post_thumbnail_id(), 'large', $psb_cover_attr ) );
+	}
+	?>
 	<header class="page-hero page-hero--light">
-		<div class="container max-w-content">
-			<?php get_template_part( 'template-parts/global/breadcrumb' ); ?>
-			<div class="mt-6 flex flex-wrap items-center gap-2">
-				<?php if ( $psb_pos ) : ?>
-					<a class="badge <?php echo esc_attr( $psb_pos['info']['palette']['soft'] . ' ' . $psb_pos['info']['palette']['text'] . ' ' . $psb_pos['info']['palette']['border'] ); ?>" href="<?php echo esc_url( $psb_pos['info']['url'] ); ?>">سری <?php echo esc_html( $psb_pos['info']['name'] ); ?> · قسمت <?php echo esc_html( psb_fa_num( $psb_pos['number'] ) ); ?></a>
-				<?php elseif ( $psb_cats ) : ?>
-					<a class="badge badge-primary" href="<?php echo esc_url( get_category_link( $psb_cats[0] ) ); ?>"><?php echo esc_html( $psb_cats[0]->name ); ?></a>
+		<div class="container <?php echo $psb_cover ? '' : 'max-w-content'; ?>">
+			<div class="<?php echo $psb_cover ? 'grid items-center gap-8 lg:grid-cols-12 lg:gap-12' : ''; ?>">
+				<div class="<?php echo $psb_cover ? 'min-w-0 lg:col-span-7' : ''; ?>">
+					<?php get_template_part( 'template-parts/global/breadcrumb' ); ?>
+					<div class="mt-6 flex flex-wrap items-center gap-2">
+						<?php if ( $psb_pos ) : ?>
+							<a class="badge <?php echo esc_attr( $psb_pos['info']['palette']['soft'] . ' ' . $psb_pos['info']['palette']['text'] . ' ' . $psb_pos['info']['palette']['border'] ); ?>" href="<?php echo esc_url( $psb_pos['info']['url'] ); ?>">سری <?php echo esc_html( $psb_pos['info']['name'] ); ?> · قسمت <?php echo esc_html( psb_fa_num( $psb_pos['number'] ) ); ?></a>
+						<?php elseif ( $psb_cats ) : ?>
+							<a class="badge badge-primary" href="<?php echo esc_url( get_category_link( $psb_cats[0] ) ); ?>"><?php echo esc_html( $psb_cats[0]->name ); ?></a>
+						<?php endif; ?>
+					</div>
+					<h1 class="page-hero-title !mt-3"><?php echo psb_lat_html( get_the_title() ); // phpcs:ignore -- escaped in helper ?></h1>
+					<?php if ( has_excerpt() ) : ?>
+						<p class="page-hero-lead"><?php echo esc_html( wp_strip_all_tags( get_the_excerpt() ) ); ?></p>
+					<?php endif; ?>
+					<ul class="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-500" role="list">
+						<li class="inline-flex items-center gap-1.5"><?php echo psb_icon( 'calendar', 'size-4' ); // phpcs:ignore ?><time datetime="<?php echo esc_attr( get_the_date( 'c' ) ); ?>"><?php echo esc_html( psb_post_date() ); ?></time></li>
+						<?php if ( $psb_modified ) : ?>
+							<li>به‌روزرسانی: <time datetime="<?php echo esc_attr( get_the_modified_date( 'c' ) ); ?>"><?php echo esc_html( psb_fa_num( function_exists( 'shamsi_date' ) ? ltrim( shamsi_date( 'd F Y', get_the_modified_time( 'U' ) ), '0' ) : get_the_modified_date() ) ); ?></time></li>
+						<?php endif; ?>
+						<li class="inline-flex items-center gap-1.5"><?php echo psb_icon( 'doc', 'size-4' ); // phpcs:ignore ?><?php echo esc_html( psb_fa_num( psb_reading_minutes() ) ); ?> دقیقه مطالعه</li>
+						<li>تیم فنی <?php echo esc_html( psb_brand_name() ); ?></li>
+					</ul>
+				</div>
+				<?php if ( $psb_cover ) : ?>
+					<?php if ( 'lowres' === $psb_cover['mode'] ) : // Too small for the slot: natural size in a frame, never upscaled. ?>
+						<figure class="ph-frame lg:col-span-5">
+							<?php echo str_replace( array( 'aspect-[4/3] w-full object-cover', 'object-position:50% 40%' ), array( 'max-h-[22rem]', '' ), $psb_cover['html'] ); // phpcs:ignore ?>
+						</figure>
+					<?php else : ?>
+						<figure class="overflow-hidden rounded-card border border-line bg-white lg:col-span-5">
+							<?php echo $psb_cover['html']; // phpcs:ignore ?>
+						</figure>
+					<?php endif; ?>
 				<?php endif; ?>
 			</div>
-			<h1 class="page-hero-title !mt-3"><?php echo psb_lat_html( get_the_title() ); // phpcs:ignore -- escaped in helper ?></h1>
-			<?php if ( has_excerpt() ) : ?>
-				<p class="page-hero-lead"><?php echo esc_html( wp_strip_all_tags( get_the_excerpt() ) ); ?></p>
-			<?php endif; ?>
-			<ul class="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-500" role="list">
-				<li class="inline-flex items-center gap-1.5"><?php echo psb_icon( 'calendar', 'size-4' ); // phpcs:ignore ?><time datetime="<?php echo esc_attr( get_the_date( 'c' ) ); ?>"><?php echo esc_html( psb_post_date() ); ?></time></li>
-				<?php if ( $psb_modified ) : ?>
-					<li>به‌روزرسانی: <time datetime="<?php echo esc_attr( get_the_modified_date( 'c' ) ); ?>"><?php echo esc_html( psb_fa_num( function_exists( 'shamsi_date' ) ? ltrim( shamsi_date( 'd F Y', get_the_modified_time( 'U' ) ), '0' ) : get_the_modified_date() ) ); ?></time></li>
-				<?php endif; ?>
-				<li class="inline-flex items-center gap-1.5"><?php echo psb_icon( 'doc', 'size-4' ); // phpcs:ignore ?><?php echo esc_html( psb_fa_num( psb_reading_minutes() ) ); ?> دقیقه مطالعه</li>
-				<li>تیم فنی <?php echo esc_html( psb_brand_name() ); ?></li>
-			</ul>
 		</div>
 	</header>
 
 	<div class="container py-section-sm">
-		<?php if ( has_post_thumbnail() ) : ?>
-			<?php
-			$psb_cover_attr = array( 'alt' => get_the_title(), 'sizes' => '(min-width: 768px) 46rem, 100vw', 'loading' => 'eager', 'fetchpriority' => 'high', 'class' => 'aspect-[16/9] w-full object-cover', 'style' => 'object-position:50% 40%' );
-			$psb_cover      = function_exists( 'psb_single_image' ) ? psb_single_image( get_post_thumbnail_id(), 736, '16 / 9', array( 'attr' => $psb_cover_attr ) ) : array( 'mode' => 'photo', 'html' => psb_image( get_post_thumbnail_id(), 'large', $psb_cover_attr ) );
-			?>
-			<?php if ( 'lowres' === $psb_cover['mode'] ) : // Too small for a 16:9 cover: natural size in a frame, never upscaled. ?>
-				<figure class="ph-frame mx-auto mb-10 max-h-[32rem] max-w-prose">
-					<?php echo str_replace( array( 'aspect-[16/9] w-full object-cover', 'object-position:50% 40%' ), array( 'max-h-[28rem]', '' ), $psb_cover['html'] ); // phpcs:ignore ?>
-				</figure>
-			<?php else : ?>
-				<figure class="mx-auto mb-10 max-w-prose overflow-hidden rounded-card border border-line">
-					<?php echo $psb_cover['html']; // phpcs:ignore ?>
-				</figure>
-			<?php endif; ?>
-		<?php endif; ?>
-
 		<div class="mx-auto grid max-w-prose gap-10 xl:max-w-none xl:grid-cols-[minmax(0,46rem)_18rem] xl:justify-center xl:gap-16">
 			<aside class="order-last" aria-label="فهرست و استعلام">
 				<div class="toc-stick flex flex-col gap-5">
