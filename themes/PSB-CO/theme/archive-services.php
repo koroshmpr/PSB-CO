@@ -50,30 +50,29 @@ if ( $psb_is_page ) {
 	);
 }
 ?>
-<section class="container py-section" aria-labelledby="services-list-title">
-	<h2 id="services-list-title" class="sr-only">فهرست خدمات و امکانات</h2>
-	<?php if ( have_posts() ) : ?>
-		<div class="grid gap-gutter sm:grid-cols-2 lg:grid-cols-3">
-			<?php
-			global $wp_query;
-			while ( have_posts() ) :
-				the_post();
-				get_template_part( 'template-parts/services/service-card', null, array( 'post' => get_the_ID(), 'eager' => 0 === (int) $wp_query->current_post ) );
-			endwhile;
-			?>
-		</div>
-		<?php psb_pagination(); ?>
-	<?php else : ?>
-		<?php get_template_part( 'template-parts/certificates/empty-state', null, array( 'icon' => 'factory', 'title' => 'اطلاعات امکانات به‌زودی منتشر می‌شود' ) ); ?>
-	<?php endif; ?>
-</section>
 <?php
+// One services section (owner, 2026-11-27): the six production steps with their full data (same module
+// and data as the home page), then the services outside the production flow (after delivery).
+$psb_flow_ids = array();
+if ( function_exists( 'psb_production_steps' ) ) {
+	foreach ( psb_production_steps() as $psb_st ) {
+		if ( $psb_st['post'] instanceof WP_Post ) {
+			$psb_flow_ids[] = (int) $psb_st['post']->ID;
+		}
+	}
+}
+$psb_others = array();
+while ( have_posts() ) {
+	the_post();
+	if ( ! in_array( get_the_ID(), $psb_flow_ids, true ) ) {
+		$psb_others[] = get_the_ID();
+	}
+}
 if ( $psb_is_page ) {
 	wp_reset_query();
 }
 ?>
-
-<section class="border-t border-line bg-white py-section-sm" aria-labelledby="services-flow-title">
+<section class="py-section" aria-labelledby="services-flow-title">
 	<div class="container">
 		<?php
 		get_template_part(
@@ -83,12 +82,39 @@ if ( $psb_is_page ) {
 				'id'      => 'services-flow-title',
 				'eyebrow' => 'فرایند ساخت',
 				'title'   => 'از نقشه تا تحویل تابلو',
-				'lead'    => 'شش مرحله‌ای که هر تابلو در کارخانه ' . psb_brand_name() . ' طی می‌کند؛ هر مرحله به صفحه همان بخش لینک شده است.',
+				'lead'    => 'شش مرحله‌ای که هر تابلو در کارخانه ' . psb_brand_name() . ' طی می‌کند؛ برای جزئیات هر مرحله روی کارت آن بزنید.',
 			)
 		);
 		?>
-		<?php psb_production_flow( 'light' ); ?>
+		<?php if ( function_exists( 'psb_production_steps' ) && psb_production_steps() ) : ?>
+			<?php psb_production_flow( 'light' ); ?>
+		<?php else : ?>
+			<?php get_template_part( 'template-parts/certificates/empty-state', null, array( 'icon' => 'factory', 'title' => 'اطلاعات امکانات به‌زودی منتشر می‌شود' ) ); ?>
+		<?php endif; ?>
 	</div>
 </section>
+
+<?php if ( $psb_others ) : ?>
+	<section class="border-t border-line bg-white py-section-sm" aria-labelledby="services-after-title">
+		<div class="container">
+			<?php
+			get_template_part(
+				'template-parts/global/section-head',
+				null,
+				array(
+					'id'      => 'services-after-title',
+					'eyebrow' => 'پس از ساخت',
+					'title'   => 'نصب، راه‌اندازی و پشتیبانی',
+				)
+			);
+			?>
+			<div class="grid gap-gutter sm:grid-cols-2 lg:grid-cols-3">
+				<?php foreach ( $psb_others as $psb_oid ) : ?>
+					<?php get_template_part( 'template-parts/services/service-card', null, array( 'post' => $psb_oid ) ); ?>
+				<?php endforeach; ?>
+			</div>
+		</div>
+	</section>
+<?php endif; ?>
 <?php
 get_footer();

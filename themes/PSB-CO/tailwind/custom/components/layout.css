@@ -692,13 +692,13 @@
 
 @keyframes psb-flow-ring {
 	0% {
-		box-shadow: 0 0 0 5px var(--flow-gap, var(--color-dark)), 0 0 0 5px rgb(214 15 26 / 0.55);
+		box-shadow: 0 0 0 5px var(--flow-gap, var(--color-dark)), 0 0 0 5px rgb(214 15 26 / 0.35);
 	}
 	14% {
-		box-shadow: 0 0 0 5px var(--flow-gap, var(--color-dark)), 0 0 0 14px rgb(214 15 26 / 0);
+		box-shadow: 0 0 0 5px var(--flow-gap, var(--color-dark)), 0 0 0 10px rgb(214 15 26 / 0);
 	}
 	100% {
-		box-shadow: 0 0 0 5px var(--flow-gap, var(--color-dark)), 0 0 0 14px rgb(214 15 26 / 0);
+		box-shadow: 0 0 0 5px var(--flow-gap, var(--color-dark)), 0 0 0 10px rgb(214 15 26 / 0);
 	}
 }
 

@@ -528,12 +528,13 @@
 	/* a light pulse travels along the line from step 1 to 6 (RTL: right → left), 6s loop */
 	.flow::after {
 		content: "";
-		@apply pointer-events-none absolute top-[1.125rem] hidden h-1.5 rounded-full lg:block;
+		@apply pointer-events-none absolute top-5 hidden h-0.5 rounded-full lg:block;
 		inset-inline: calc(100% / 12);
-		background: linear-gradient(to left, transparent 48.5%, rgb(255 255 255 / 0.95) 50%, transparent 51.5%) no-repeat;
+		/* a thin shine in the line's own red, with a small bright core */
+		background: linear-gradient(to left, transparent 48.8%, rgb(255 120 120 / 0.85) 49.6%, rgb(255 236 236) 50%, rgb(255 120 120 / 0.85) 50.4%, transparent 51.2%) no-repeat;
 		background-size: 250% 100%;
 		background-position: 0% 0;
-		filter: blur(0.5px) drop-shadow(0 0 6px rgb(255 255 255 / 0.7));
+		filter: drop-shadow(0 0 3px rgb(255 80 80 / 0.6));
 		opacity: 0;
 	}
 
@@ -560,8 +561,8 @@
 	}
 
 	.flow--light::after {
-		background-image: linear-gradient(to left, transparent 48.5%, rgb(214 15 26 / 0.85) 50%, transparent 51.5%);
-		filter: drop-shadow(0 0 5px rgb(214 15 26 / 0.45));
+		background-image: linear-gradient(to left, transparent 48.8%, rgb(214 15 26 / 0.7) 49.6%, rgb(255 190 190) 50%, rgb(214 15 26 / 0.7) 50.4%, transparent 51.2%);
+		filter: drop-shadow(0 0 3px rgb(214 15 26 / 0.45));
 	}
 
 	.flow--light {

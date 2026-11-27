@@ -2472,9 +2472,9 @@ blockquote {
     content: "";
     pointer-events: none;
     position: absolute;
-    top: 1.125rem;
+    top: calc(var(--spacing) * 5);
     display: none;
-    height: calc(var(--spacing) * 1.5);
+    height: calc(var(--spacing) * 0.5);
     border-radius: calc(infinity * 1px);
   }
   @media (width >= 64rem) {
@@ -2484,10 +2484,10 @@ blockquote {
   }
   .flow::after {
     inset-inline: calc(100% / 12);
-    background: linear-gradient(to left, transparent 48.5%, rgb(255 255 255 / 0.95) 50%, transparent 51.5%) no-repeat;
+    background: linear-gradient(to left, transparent 48.8%, rgb(255 120 120 / 0.85) 49.6%, rgb(255 236 236) 50%, rgb(255 120 120 / 0.85) 50.4%, transparent 51.2%) no-repeat;
     background-size: 250% 100%;
     background-position: 0% 0;
-    filter: blur(0.5px) drop-shadow(0 0 6px rgb(255 255 255 / 0.7));
+    filter: drop-shadow(0 0 3px rgb(255 80 80 / 0.6));
     opacity: 0;
   }
   @media (prefers-reduced-motion: no-preference) {
@@ -2517,8 +2517,8 @@ blockquote {
     background: linear-gradient(to left, var(--color-line-strong), var(--color-primary-600));
   }
   .flow--light::after {
-    background-image: linear-gradient(to left, transparent 48.5%, rgb(214 15 26 / 0.85) 50%, transparent 51.5%);
-    filter: drop-shadow(0 0 5px rgb(214 15 26 / 0.45));
+    background-image: linear-gradient(to left, transparent 48.8%, rgb(214 15 26 / 0.7) 49.6%, rgb(255 190 190) 50%, rgb(214 15 26 / 0.7) 50.4%, transparent 51.2%);
+    filter: drop-shadow(0 0 3px rgb(214 15 26 / 0.45));
   }
   .flow--light {
     --flow-gap: #fff;
@@ -4137,13 +4137,13 @@ input[type="search"] {
 }
 @keyframes psb-flow-ring {
   0% {
-    box-shadow: 0 0 0 5px var(--flow-gap, var(--color-dark)), 0 0 0 5px rgb(214 15 26 / 0.55);
+    box-shadow: 0 0 0 5px var(--flow-gap, var(--color-dark)), 0 0 0 5px rgb(214 15 26 / 0.35);
   }
   14% {
-    box-shadow: 0 0 0 5px var(--flow-gap, var(--color-dark)), 0 0 0 14px rgb(214 15 26 / 0);
+    box-shadow: 0 0 0 5px var(--flow-gap, var(--color-dark)), 0 0 0 10px rgb(214 15 26 / 0);
   }
   100% {
-    box-shadow: 0 0 0 5px var(--flow-gap, var(--color-dark)), 0 0 0 14px rgb(214 15 26 / 0);
+    box-shadow: 0 0 0 5px var(--flow-gap, var(--color-dark)), 0 0 0 10px rgb(214 15 26 / 0);
   }
 }
 @keyframes psb-quote-pulse {
