@@ -19,7 +19,11 @@
  *   3. Cleans the Product node for catalogue products: plain product name, brand + manufacturer = the
  *      organisation, description, no empty offers (catalogue has no prices).
  *   4. Where Rank Math printed nothing (CPT singles), prints a minimal graph: Organization, WebSite, WebPage.
- *   5. Prints BreadcrumbList in the footer only when neither Rank Math nor a theme breadcrumb partial did.
+ *   5. Prints BreadcrumbList in the footer unless Rank Math did (theme breadcrumb partials are markup only).
+ *   6. One representative image per URL (psb_seo_image_id): og:image / twitter:image when Rank Math found
+ *      none, `image` on BlogPosting / Product, primaryImageOfPage on the page node.
+ *   7. Service (services singles) and CreativeWork (portfolio singles) nodes + their WebPage node;
+ *      no stray Person nodes on archives; better descriptions for thin CPT archives.
  *   FAQPage is intentionally not printed here (faq-list.php already does it next to the visible FAQ).
  *
  * @package PSB-CO
@@ -32,7 +36,6 @@ function psb_seo_state( $key = null, $value = null ) {
 	static $state = array(
 		'rm_ran'        => false, // rank_math/json_ld filter ran (Rank Math printed a graph).
 		'rm_breadcrumb' => false, // Rank Math graph contained a BreadcrumbList.
-		'theme_crumb'   => false, // a theme breadcrumb partial (with its own JSON-LD) was rendered.
 	);
 	if ( null === $key ) {
 		return $state;
@@ -281,6 +284,8 @@ function psb_seo_description( $post_id ) {
 	return trim( wp_strip_all_tags( (string) $desc ) );
 }
 
+require_once __DIR__ . '/seo-images.php'; // 6: representative image, og:image fallback, archive descriptions.
+
 /**
  * 1–3: enrich / correct Rank Math's graph.
  */
@@ -370,6 +375,82 @@ add_filter(
 			}
 		}
 
+		// 6: image on articles / products / the page node.
+		$img      = psb_seo_image_object( psb_seo_image_id() );
+		$has_page = false;
+		foreach ( $data as $key => $node ) {
+			if ( ! is_array( $node ) ) {
+				continue;
+			}
+			$types = psb_seo_types( $node );
+			if ( array_intersect( $types, array( 'WebPage', 'ItemPage', 'AboutPage', 'ContactPage', 'CollectionPage', 'ProfilePage', 'SearchResultsPage' ) ) ) {
+				$has_page = true;
+				if ( $img && empty( $node['primaryImageOfPage'] ) ) {
+					$data[ $key ]['primaryImageOfPage'] = $img;
+				}
+			}
+			if ( $img && empty( $node['image'] ) && array_intersect( $types, array( 'Article', 'BlogPosting', 'NewsArticle', 'Product' ) ) ) {
+				$data[ $key ]['image'] = $img;
+			}
+			// Archives have no author: drop Rank Math's stray Person node.
+			if ( ! is_singular() && in_array( 'Person', $types, true ) ) {
+				unset( $data[ $key ] );
+			}
+		}
+
+		// 7: services / portfolio singles (Rank Math schema type «None»): page node + Service / CreativeWork.
+		if ( is_singular( array( 'services', 'portfolio' ) ) ) {
+			$post_id = get_queried_object_id();
+			$url     = get_permalink( $post_id );
+			$name    = wp_strip_all_tags( get_the_title( $post_id ) );
+			$desc    = psb_seo_description( $post_id );
+			if ( ! $has_page ) {
+				$data['psb_webpage'] = array_filter(
+					array(
+						'@type'              => 'WebPage',
+						'@id'                => $url . '#webpage',
+						'url'                => $url,
+						'name'               => $name,
+						'description'        => $desc,
+						'isPartOf'           => array( '@id' => psb_seo_website_id() ),
+						'inLanguage'         => 'fa-IR',
+						'datePublished'      => get_post_time( 'c', true, $post_id ),
+						'dateModified'       => get_post_modified_time( 'c', true, $post_id ),
+						'primaryImageOfPage' => $img,
+						'breadcrumb'         => psb_seo_breadcrumb_node() ? array( '@id' => $url . '#breadcrumb' ) : null,
+					)
+				);
+			}
+			$main = 'services' === get_post_type( $post_id )
+				? array(
+					'@type'       => 'Service',
+					'@id'         => $url . '#service',
+					'name'        => $name,
+					'serviceType' => $name,
+					'provider'    => array( '@id' => $org_id ),
+					'areaServed'  => array(
+						'@type' => 'Country',
+						'name'  => 'Iran',
+					),
+				)
+				: array(
+					'@type'         => 'CreativeWork',
+					'@id'           => $url . '#project',
+					'name'          => $name,
+					'creator'       => array( '@id' => $org_id ),
+					'datePublished' => get_post_time( 'c', true, $post_id ),
+				);
+			$data['psb_main'] = array_filter(
+				$main + array(
+					'url'              => $url,
+					'description'      => $desc,
+					'image'            => $img,
+					'inLanguage'       => 'fa-IR',
+					'mainEntityOfPage' => array( '@id' => $url . '#webpage' ),
+				)
+			);
+		}
+
 		foreach ( array_unique( $old_ids ) as $old ) {
 			$data = psb_seo_replace_ids( $data, $old, $org_id );
 		}
@@ -379,19 +460,6 @@ add_filter(
 	120,
 	2
 );
-
-/**
- * 5: remember when a theme partial already printed a BreadcrumbList.
- */
-foreach ( array( 'template-parts/global/breadcrumb', 'template-parts/blog/single/breadcrumb-arrow' ) as $psb_seo_crumb_slug ) {
-	add_action(
-		'get_template_part_' . $psb_seo_crumb_slug,
-		function () {
-			psb_seo_state( 'theme_crumb', true );
-		}
-	);
-}
-unset( $psb_seo_crumb_slug );
 
 /**
  * Breadcrumb trail for the current request: list of [name, url].
@@ -576,12 +644,9 @@ add_action(
 			if ( $desc ) {
 				$page['description'] = $desc;
 			}
-			$thumb = get_the_post_thumbnail_url( $post_id, 'full' );
-			if ( $thumb ) {
-				$page['primaryImageOfPage'] = array(
-					'@type' => 'ImageObject',
-					'url'   => $thumb,
-				);
+			$img = psb_seo_image_object( psb_seo_image_id() );
+			if ( $img ) {
+				$page['primaryImageOfPage'] = $img;
 			}
 			$graph[] = $page;
 		}
@@ -597,7 +662,7 @@ add_action(
 add_action(
 	'wp_footer',
 	function () {
-		if ( is_admin() || is_feed() || psb_seo_state( 'rm_breadcrumb' ) || psb_seo_state( 'theme_crumb' ) ) {
+		if ( is_admin() || is_feed() || psb_seo_state( 'rm_breadcrumb' ) ) {
 			return;
 		}
 		psb_seo_print( array( psb_seo_breadcrumb_node() ) );
