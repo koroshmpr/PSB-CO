@@ -60,7 +60,7 @@ $psb_step = function ( $i, $st ) use ( $psb_services_url ) {
 	$post = $st['post'];
 	$url  = $post ? get_permalink( $post ) : $psb_services_url;
 	$key  = ( $post && function_exists( 'psb_placeholder_key' ) ) ? psb_placeholder_key( $post ) : 'factory';
-	$img  = function_exists( 'psb_placeholder_img' ) ? psb_placeholder_img( $key, array( 'class' => 'size-full object-contain', 'alt' => $st['title'] ) ) : '';
+	$img  = function_exists( 'psb_placeholder_img' ) ? psb_placeholder_img( $key, array( 'class' => 'size-full object-cover lg:object-contain', 'alt' => $st['title'] ) ) : '';
 	?>
 	<li class="flow-step">
 		<span class="flow-num" aria-hidden="true"><?php echo esc_html( psb_fa_num( sprintf( '%02d', $i + 1 ) ) ); ?></span>

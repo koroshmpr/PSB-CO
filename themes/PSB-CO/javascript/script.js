@@ -12,6 +12,7 @@ import psbSearch from './modules/search';
 import { initNavFeedback } from './modules/nav-feedback';
 import { initHeaderCompact } from './modules/header-compact';
 import { initTimeline } from './modules/timeline';
+import { initFactoryDraw } from './modules/factory-draw';
 
 window.Alpine = Alpine;
 Alpine.plugin(intersect);
@@ -24,6 +25,7 @@ const boot = () => {
 	initNavFeedback();
 	initHeaderCompact();
 	initTimeline();
+	initFactoryDraw();
 };
 
 if (document.readyState === 'loading') {

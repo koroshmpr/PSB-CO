@@ -57,10 +57,10 @@ while ( have_posts() ) :
 						}
 						$psb_si = ( ! empty( $psb_s['icon'] ) && psb_icon( sanitize_key( $psb_s['icon'] ) ) ) ? sanitize_key( $psb_s['icon'] ) : $psb_stat_icons[ $psb_i % count( $psb_stat_icons ) ];
 						?>
-						<div class="stat !flex-row items-center gap-4 !py-6 sm:!py-7">
-							<span class="grid size-12 shrink-0 place-items-center rounded-control border border-line bg-slate-50 text-slate-700" aria-hidden="true"><?php echo psb_icon( $psb_si, 'size-6' ); // phpcs:ignore ?></span>
+						<div class="stat items-start gap-3 !py-5 sm:!flex-row sm:items-center sm:gap-4 sm:!py-7">
+							<span class="grid size-10 shrink-0 place-items-center rounded-control border border-line bg-slate-50 text-slate-700 sm:size-12" aria-hidden="true"><?php echo psb_icon( $psb_si, 'size-5 sm:size-6' ); // phpcs:ignore ?></span>
 							<span class="flex min-w-0 flex-col gap-1">
-								<dt class="stat-label order-last"><?php echo psb_pf_html( $psb_s['label'] ); // phpcs:ignore ?></dt>
+								<dt class="stat-label order-last !text-[0.8125rem] !leading-[1.65] sm:!text-sm"><?php echo psb_pf_html( $psb_s['label'] ); // phpcs:ignore ?></dt>
 								<dd class="stat-value !text-[1.5rem] sm:!text-[1.75rem]"><?php echo esc_html( psb_fa_num( psb_pf_text( $psb_s['number'] ) ) ); ?></dd>
 							</span>
 						</div>
@@ -92,9 +92,20 @@ while ( have_posts() ) :
 				<h2 id="about-story-title" class="section-title"><?php echo psb_pf_html( $psb_t( 'about_intro_title' ) ); // phpcs:ignore ?></h2>
 				<div class="article-prose mt-6"><?php the_content(); ?></div>
 			</div>
+			<?php
+			// The factory front drawing is printed inline so it can draw itself while the text beside it scrolls.
+			$psb_ff_svg = ( $psb_intro_img && 0 === strpos( wp_basename( (string) get_post_meta( $psb_intro_img, '_wp_attached_file', true ) ), 'psb-factory-front' ) ) ? get_theme_file_path( 'images/illustrations/factory-front.svg' ) : '';
+			$psb_ff_svg = ( $psb_ff_svg && is_readable( $psb_ff_svg ) ) ? $psb_ff_svg : '';
+			?>
 			<?php if ( $psb_intro_img ) : ?>
-				<figure class="lg:sticky lg:col-span-5" style="top:calc(var(--header-h,4rem) + var(--wp-admin--admin-bar--height,0px) + 2rem)">
-					<?php echo psb_image( $psb_intro_img, 'large', array( 'alt' => 'کارخانه ' . psb_brand_name(), 'sizes' => '(min-width: 1024px) 30rem, 92vw', 'class' => 'aspect-[4/5] w-full rounded-card object-cover' ) ); // phpcs:ignore ?>
+				<figure class="psb-stick-lg lg:col-span-5<?php echo $psb_ff_svg ? ' ff-sticky-m max-lg:order-first' : ''; ?>">
+					<?php if ( $psb_ff_svg ) : ?>
+						<div class="ff-figure" data-draw-scroll>
+							<?php echo file_get_contents( $psb_ff_svg ); // phpcs:ignore -- theme file ?>
+						</div>
+					<?php else : ?>
+						<?php echo psb_image( $psb_intro_img, 'large', array( 'alt' => 'کارخانه ' . psb_brand_name(), 'sizes' => '(min-width: 1024px) 30rem, 92vw', 'class' => psb_pf_is_wide( $psb_intro_img ) ? 'h-auto w-full rounded-card border border-line' : 'aspect-[4/5] w-full rounded-card object-cover' ) ); // phpcs:ignore ?>
+					<?php endif; ?>
 				</figure>
 			<?php endif; ?>
 		</div>
@@ -113,13 +124,22 @@ while ( have_posts() ) :
 	<?php if ( $psb_timeline ) : ?>
 	<section class="border-y border-line bg-white py-section" aria-labelledby="about-timeline-title">
 		<div class="container grid gap-10 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:gap-16">
-			<?php
-			get_template_part(
-				'template-parts/global/section-head',
-				null,
-				psb_pf_head( 'about_timeline', $psb_id, array( 'id' => 'about-timeline-title' ) )
-			);
-			?>
+			<div class="psb-stick-lg max-lg:contents">
+				<?php
+				get_template_part(
+					'template-parts/global/section-head',
+					null,
+					psb_pf_head( 'about_timeline', $psb_id, array( 'id' => 'about-timeline-title' ) )
+				);
+				// A switchboard draws itself while the timeline beside it scrolls (decorative). Phones: pinned under the header.
+				$psb_sb_svg = get_theme_file_path( 'images/illustrations/switchboard.svg' );
+				if ( is_readable( $psb_sb_svg ) ) :
+					?>
+					<div class="ff-figure ff-sticky-m ff-short-m [--ff-fade:#fff] lg:mt-8" data-draw-scroll aria-hidden="true">
+						<?php echo file_get_contents( $psb_sb_svg ); // phpcs:ignore -- theme file ?>
+					</div>
+				<?php endif; ?>
+			</div>
 			<ol class="timeline" data-timeline>
 				<?php
 				$psb_last = count( $psb_timeline ) - 1;

@@ -105,6 +105,16 @@ function psb_pf_image_id( $value ) {
 }
 
 /**
+ * Whether an attachment is a wide landscape image (e.g. the factory front drawing, about 2:1).
+ * Photo slots with a fixed portrait/4:3 crop show such images at their own ratio instead,
+ * so a wide drawing is never cut at the sides.
+ */
+function psb_pf_is_wide( $id, $ratio = 1.5 ) {
+	$m = $id ? wp_get_attachment_metadata( $id ) : array();
+	return ! empty( $m['width'] ) && ! empty( $m['height'] ) && ( $m['width'] / $m['height'] ) >= $ratio;
+}
+
+/**
  * Section-head args with eyebrow / title / lead / link label from fields «{$prefix}_eyebrow» … «_link».
  *
  * @param string $prefix  Field prefix (e.g. home_products).

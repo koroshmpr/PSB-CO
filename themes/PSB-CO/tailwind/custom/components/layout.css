@@ -45,6 +45,15 @@
 		box-shadow: var(--shadow-header);
 	}
 
+	/* Logged-in phones (< 600px): WordPress lets the admin bar scroll away, so once the page scrolls the
+	   bar would leave a gap above the fixed header; pin the header to the very top instead. */
+	@media (max-width: 600px) {
+		.site-header.is-scrolled,
+		html.is-compact .site-header {
+			top: 0;
+		}
+	}
+
 	.site-header-inner {
 		@apply container flex items-center gap-4 nav:gap-4 xl:gap-5;
 		height: var(--header-live);
@@ -106,6 +115,12 @@
 	.brand-swap .logo-mark {
 		@apply nav:hidden;
 		height: 28px;
+	}
+
+	/* first state after a reload mid-page: no shrink animation (header-compact.js) */
+	html.is-header-still .site-header,
+	html.is-header-still .site-header * {
+		transition: none !important;
 	}
 
 	html.is-compact .brand-swap .logo-full {

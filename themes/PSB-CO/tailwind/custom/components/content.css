@@ -231,6 +231,83 @@
 		}
 	}
 
+	/* ---------------- Scroll-drawn factory drawing (About page) ---------------- */
+	.ff-figure {
+		@apply m-0 rounded-card border border-line bg-[#F5F7F9];
+		--ph-bg: transparent;
+		background-image:
+			linear-gradient(#E3E7EC 1px, transparent 1px),
+			linear-gradient(90deg, #E3E7EC 1px, transparent 1px);
+		background-size: 24px 24px;
+		background-position: center;
+	}
+	.ff-figure .ff-svg > rect[mask] {
+		display: none; /* the drawing's own grid; the figure draws one across its full width */
+	}
+	/* Phones/tablets (.ff-sticky-m): the drawing stays pinned under the header, full width (edge to edge),
+	   while the text / years beside it in the DOM scroll below. 601–1023px: the admin bar stays fixed above. */
+	@media (width < 64rem) {
+		.ff-sticky-m {
+			position: sticky;
+			top: var(--header-live, var(--header-h, 4rem));
+			z-index: 5;
+			margin-inline: calc(-1 * var(--spacing-gutter));
+		}
+		/* soft edge: the text scrolling under the drawing fades into the section background */
+		.ff-sticky-m::after {
+			content: "";
+			position: absolute;
+			inset-inline: 0;
+			top: 100%;
+			height: 2.25rem;
+			pointer-events: none;
+			background: linear-gradient(to bottom, var(--ff-fade, var(--color-background)) 15%, transparent);
+		}
+		.ff-sticky-m .ff-svg {
+			clip-path: none;
+		}
+		.ff-sticky-m.ff-figure,
+		.ff-sticky-m .ff-figure {
+			border-radius: 0 !important;
+			border-inline-width: 0;
+		}
+		.ff-figure.ff-short-m .ff-svg {
+			height: 10.5rem; /* tall drawings (switchboard) stay a short band; the grid fills the sides */
+		}
+	}
+	@media (601px <= width < 64rem) {
+		.ff-sticky-m {
+			top: calc(var(--header-live, var(--header-h, 4rem)) + var(--wp-admin--admin-bar--height, 0px));
+		}
+	}
+	/* desktop sticky column (replaces inline top offsets) */
+	@media (width >= 64rem) {
+		.psb-stick-lg {
+			position: sticky;
+			align-self: start;
+			top: calc(var(--header-h, 4rem) + var(--wp-admin--admin-bar--height, 0px) + 2rem);
+		}
+	}
+	.ff-figure .ff-svg {
+		@apply block h-auto w-full;
+		clip-path: inset(0 round 7px); /* rounded corners without overflow:hidden (keeps the fade below visible) */
+	}
+	.ff-figure.is-anim .ff-svg [pathLength] {
+		stroke-dasharray: 1 1;
+		stroke-dashoffset: calc(1 - clamp(0, var(--ff-draw, 0) * 1.6 - var(--k, 0) * 0.6, 1));
+	}
+	.ff-figure.is-anim .ff-svg :is(.l, .s, .r, .p, .w, .t, .m, .q, .br) {
+		fill-opacity: var(--ff-fill, 0);
+	}
+	.ff-figure.is-anim .ff-svg text {
+		opacity: var(--ff-sign, 0);
+	}
+	.ff-figure.is-anim .ff-svg .a {
+		transform: scaleX(var(--ff-sign, 0));
+		transform-box: fill-box;
+		transform-origin: right;
+	}
+
 	/* ---------------- Logo wall (greyscale issuers) ---------------- */
 	.logo-wall {
 		@apply grid grid-cols-2 gap-px overflow-hidden rounded-card border border-line bg-line sm:grid-cols-3 lg:grid-cols-6;
@@ -511,7 +588,7 @@
 	}
 
 	/* ---------------- Home: production flow (dark band, 6 numbered steps; one row on desktop) ----------------
-	   Mobile: a vertical numbered path (circle + connector line, compact cards with a small illustration).
+	   Mobile: a vertical numbered path (circle + connector line, cards with an illustration band on top).
 	   lg+: four cards in a row, a red arrow between consecutive steps (RTL: the flow reads right → left). */
 	.flow {
 		@apply relative m-0 grid list-none gap-4 p-0 lg:grid-cols-6 lg:gap-4 lg:pt-16;
@@ -612,7 +689,7 @@
 	}
 
 	.flow-card {
-		@apply flex w-full items-stretch overflow-hidden rounded-card bg-white text-foreground transition-transform duration-300 lg:h-full lg:flex-col;
+		@apply flex w-full flex-col overflow-hidden rounded-card bg-white text-foreground transition-transform duration-300 lg:h-full;
 	}
 
 	.flow-card:hover {
@@ -620,7 +697,8 @@
 	}
 
 	.flow-media {
-		@apply relative block w-24 shrink-0 border-e border-line bg-slate-50 p-1.5 sm:w-32 lg:aspect-[4/3] lg:w-full lg:border-e-0 lg:border-b lg:p-2;
+		/* mobile: a short illustration band on top of the card (was a narrow side column that squeezed the text) */
+		@apply relative block aspect-[2/1] w-full shrink-0 overflow-hidden border-b border-line bg-slate-50 sm:aspect-[5/2] lg:aspect-[4/3] lg:p-2;
 	}
 
 	.flow-media img {
@@ -663,6 +741,39 @@
 		@apply mt-auto hidden items-center gap-1 pt-2 text-xs font-semibold text-foreground group-hover:text-primary-700 lg:inline-flex;
 	}
 
+	/* phones/tablets: compact card — title beside a small square illustration, text and points below */
+	@media (width < 64rem) {
+		.flow-card {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) 4.5rem;
+			align-items: center;
+			column-gap: 0.875rem;
+			row-gap: 0.375rem;
+			padding: 0.875rem 1rem 1rem;
+		}
+		.flow-body {
+			display: contents;
+		}
+		.flow-media {
+			grid-column: 2;
+			grid-row: 1;
+			width: 4.5rem;
+			aspect-ratio: 1;
+			padding: 0;
+			border: 1px solid var(--color-line);
+			border-radius: 6px;
+		}
+		.flow-title {
+			grid-column: 1;
+			grid-row: 1;
+		}
+		.flow-label,
+		.flow-text,
+		.flow-points {
+			grid-column: 1 / -1;
+		}
+	}
+
 	/* ---------------- Home: issuer strip (one row, never wraps) ---------------- */
 	.issuer-row {
 		@apply -mx-[var(--spacing-gutter)] flex flex-nowrap items-center gap-6 overflow-x-auto px-[var(--spacing-gutter)] lg:mx-0 lg:justify-between lg:gap-4 lg:px-0;
@@ -679,6 +790,21 @@
 
 	.issuer-name {
 		@apply line-clamp-2 w-[8.5rem];
+	}
+
+	/* ---------------- Home: projects rail (phones: 1.2 cards per view, swipe) ---------------- */
+	.proj-rail {
+		@apply -mx-[var(--spacing-gutter)] flex snap-x snap-mandatory gap-3 overflow-x-auto px-[var(--spacing-gutter)] pb-2 md:mx-0 md:grid md:snap-none md:gap-6 md:overflow-visible md:px-0 md:pb-0;
+		scroll-padding-inline: var(--spacing-gutter);
+		scrollbar-width: none;
+	}
+
+	.proj-rail::-webkit-scrollbar {
+		display: none;
+	}
+
+	.proj-slide {
+		@apply shrink-0 basis-[82%] snap-start sm:basis-[46%] md:basis-auto;
 	}
 
 	/* ---------------- Home: certificates rail ---------------- */

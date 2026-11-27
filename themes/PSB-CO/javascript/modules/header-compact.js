@@ -7,6 +7,15 @@ export function initHeaderCompact() {
 	if (!('IntersectionObserver' in window) || !document.getElementById('header')) return;
 
 	const root = document.documentElement;
+	// A reload in the middle of the page restores the scroll after load: take that first compact state
+	// without the shrink animation. Animate only once the visitor scrolls / touches / types themselves.
+	root.classList.add('is-header-still');
+	const live = () => {
+		root.classList.remove('is-header-still');
+		['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach((t) => window.removeEventListener(t, live));
+	};
+	['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach((t) => window.addEventListener(t, live, { passive: true, once: true }));
+	window.addEventListener('load', () => setTimeout(live, 1200), { once: true });
 	const make = (top) => {
 		const el = document.createElement('div');
 		el.setAttribute('aria-hidden', 'true');
@@ -20,6 +29,10 @@ export function initHeaderCompact() {
 	let timer = null;
 	const set = (compact) => {
 		if (root.classList.contains('is-compact') === compact) return;
+		if (root.classList.contains('is-header-still')) {
+			root.classList.toggle('is-compact', compact);
+			return;
+		}
 		root.classList.add('is-header-animating');
 		root.classList.toggle('is-compact', compact);
 		clearTimeout(timer);

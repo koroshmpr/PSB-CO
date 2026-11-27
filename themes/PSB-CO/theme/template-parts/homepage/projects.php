@@ -49,7 +49,8 @@ $psb_cols = 2 === $psb_q->post_count ? 'md:grid-cols-2' : 'md:grid-cols-3';
 			)
 		);
 		?>
-		<div class="grid gap-6 <?php echo esc_attr( $psb_cols ); ?>">
+		<?php // Phones: one swipeable row, ~1.2 cards in view (snap); md+: the usual grid. ?>
+		<div class="proj-rail <?php echo esc_attr( $psb_cols ); ?>">
 			<?php
 			while ( $psb_q->have_posts() ) :
 				$psb_q->the_post();
@@ -68,7 +69,7 @@ $psb_cols = 2 === $psb_q->post_count ? 'md:grid-cols-2' : 'md:grid-cols-3';
 					)
 				);
 				?>
-				<article class="card card-hover" data-reveal>
+				<article class="card card-hover proj-slide" data-reveal>
 					<div class="card-media" style="--card-ratio:3/2">
 						<?php
 						$psb_img_attr = array( 'alt' => get_the_title(), 'sizes' => '(min-width: 768px) 50vw, 100vw' );

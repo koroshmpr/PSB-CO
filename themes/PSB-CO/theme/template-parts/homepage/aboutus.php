@@ -22,6 +22,11 @@ foreach ( psb_pf_rows( 'home_timeline', $psb_pid ) as $psb_row ) {
 	}
 }
 $psb_img_cls = 'aspect-[4/3] w-full object-cover object-[50%_45%] lg:aspect-[4/5] lg:object-center';
+// The factory front drawing is printed inline so it draws itself with the scroll (same as the About page).
+$psb_ff = $psb_img && 0 === strpos( wp_basename( (string) get_post_meta( $psb_img, '_wp_attached_file', true ) ), 'psb-factory-front' ) && is_readable( get_theme_file_path( 'images/illustrations/factory-front.svg' ) );
+if ( $psb_img && psb_pf_is_wide( $psb_img ) ) {
+	$psb_img_cls = 'h-auto w-full'; // Wide drawing: own ratio, never cropped.
+}
 ?>
 <section class="bg-background py-section" aria-labelledby="home-about-title">
 	<div class="container grid gap-8 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-x-16 lg:gap-y-0">
@@ -37,13 +42,17 @@ $psb_img_cls = 'aspect-[4/3] w-full object-cover object-[50%_45%] lg:aspect-[4/5
 			<?php endif; ?>
 		</div>
 
-		<figure class="about-photo lg:col-start-2 lg:row-span-2 lg:row-start-1" data-reveal>
+		<figure class="about-photo lg:col-start-2 lg:row-span-2 lg:row-start-1<?php echo $psb_ff ? ' ff-figure ff-sticky-m' : ''; ?>" <?php echo $psb_ff ? 'data-draw-scroll' : 'data-reveal'; ?>>
 			<?php
-			echo $psb_img // phpcs:ignore
+			if ( $psb_ff ) {
+				echo file_get_contents( get_theme_file_path( 'images/illustrations/factory-front.svg' ) ); // phpcs:ignore -- theme file
+			} else {
+				echo $psb_img // phpcs:ignore
 				? psb_image( $psb_img, 'large', array( 'class' => $psb_img_cls, 'alt' => $psb_alt, 'sizes' => '(min-width: 80rem) 36rem, (min-width: 64rem) 45vw, (min-width: 48rem) 42rem, 100vw' ) )
 				: psb_photo_picture( 'about', array( 'class' => $psb_img_cls, 'alt' => $psb_alt ) );
+			}
 			?>
-			<?php if ( $psb_cap ) : ?>
+			<?php if ( $psb_cap && ! $psb_ff ) : // The drawing carries the name on its sign. ?>
 				<figcaption class="about-photo-cap"><?php echo esc_html( $psb_cap ); ?></figcaption>
 			<?php endif; ?>
 		</figure>
