@@ -7,6 +7,13 @@
  * without IntersectionObserver or when the user prefers reduced motion.
  */
 const ANCHOR = 0.62; // progress follows the point 62% down the viewport
+const DOT = 12; // dot centre ≈ item top + .45rem + 4.5px
+
+/** The line stops at the last dot: --tl-end = last item's dot centre (px from the list top). */
+function setEnd(list) {
+	const last = list.querySelector(':scope > .timeline-item:last-child');
+	if (last) list.style.setProperty('--tl-end', `${last.offsetTop + DOT}px`);
+}
 
 function setup(list) {
 	const items = Array.from(list.querySelectorAll(':scope > .timeline-item'));
@@ -18,8 +25,9 @@ function setup(list) {
 	let active = false;
 
 	const measure = () => {
-		height = list.offsetHeight;
-		offsets = items.map((li) => li.offsetTop + 10); // dot centre ≈ top + .45rem + 4.5px
+		setEnd(list);
+		height = items[items.length - 1].offsetTop + DOT; // the line ends at the last dot
+		offsets = items.map((li) => li.offsetTop + DOT);
 	};
 
 	const update = () => {
@@ -85,6 +93,12 @@ function setup(list) {
 }
 
 export function initTimeline() {
+	// Line length is set for every timeline (also the static one: reduced motion / no IO).
+	const lists = document.querySelectorAll('ol.timeline');
+	const ends = () => lists.forEach(setEnd);
+	ends();
+	window.addEventListener('resize', ends, { passive: true });
+	if (document.fonts && document.fonts.ready) document.fonts.ready.then(ends);
 	if (!('IntersectionObserver' in window)) return;
 	if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 	document.querySelectorAll('ol.timeline[data-timeline]').forEach(setup);

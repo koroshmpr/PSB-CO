@@ -29,7 +29,12 @@ if ( $psb_is_page ) {
 	if ( '' !== trim( wp_strip_all_tags( $psb_body ) ) ) :
 		?>
 		<section class="container pt-section" aria-label="معرفی خدمات">
-			<div class="article-prose max-w-3xl"><?php echo $psb_body; // phpcs:ignore WordPress.Security.EscapeOutput -- the_content filtered ?></div>
+			<div class="inner-grid">
+				<div class="inner-main">
+					<div class="article-prose"><?php echo $psb_body; // phpcs:ignore WordPress.Security.EscapeOutput -- the_content filtered ?></div>
+				</div>
+				<?php get_template_part( 'template-parts/services/services-aside' ); ?>
+			</div>
 		</section>
 		<?php
 	endif;

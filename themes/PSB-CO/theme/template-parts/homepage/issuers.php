@@ -36,29 +36,31 @@ foreach ( get_posts( array( 'post_type' => 'type-test', 'posts_per_page' => 20, 
 }
 ?>
 <section class="border-b border-line bg-white" aria-label="مراجع تأیید و آزمون">
-	<div class="container flex flex-col gap-4 py-6 md:flex-row md:items-center md:gap-10 md:py-7">
+	<div class="container py-5 md:py-6">
 		<?php $psb_label = psb_pf_text( psb_pf( 'home_issuers_label', (int) get_option( 'page_on_front' ) ) ); ?>
 		<?php if ( $psb_label ) : ?>
-			<p class="max-w-[9.5rem] shrink-0 text-[0.8125rem] font-semibold leading-[1.6] text-slate-600 max-md:max-w-none"><?php echo esc_html( $psb_label ); ?></p>
+			<p class="mb-3 text-xs font-semibold text-slate-600 md:mb-4"><?php echo esc_html( rtrim( $psb_label, ': ' ) ); ?></p>
 		<?php endif; ?>
-		<ul class="-mx-[var(--spacing-gutter)] flex flex-1 items-center gap-7 overflow-x-auto px-[var(--spacing-gutter)] [scrollbar-width:none] md:mx-0 md:flex-wrap md:justify-start md:gap-x-9 md:gap-y-4 md:overflow-visible md:px-0" role="list">
+		<ul class="issuer-row" role="list">
 			<?php foreach ( $psb_issuers as $psb_i ) : ?>
 				<li class="shrink-0">
-					<a class="flex items-center gap-3 text-[0.8125rem] font-medium leading-normal text-slate-700 hover:text-foreground" href="<?php echo esc_url( $psb_i['url'] ); ?>">
+					<a class="issuer-item" href="<?php echo esc_url( $psb_i['url'] ); ?>">
 						<?php if ( $psb_i['thumb'] ) : ?>
-							<?php echo psb_image( $psb_i['thumb'], 'thumbnail', array( 'class' => 'h-10 w-auto opacity-80 grayscale contrast-110 mix-blend-multiply', 'alt' => '', 'srcset' => false, 'sizes' => false ) ); // phpcs:ignore ?>
+							<?php echo psb_image( $psb_i['thumb'], 'thumbnail', array( 'class' => 'h-9 w-auto shrink-0 opacity-80 grayscale contrast-110 mix-blend-multiply', 'alt' => '', 'srcset' => false, 'sizes' => false ) ); // phpcs:ignore ?>
 						<?php endif; ?>
-						<span class="max-w-32"><?php echo esc_html( $psb_i['name'] ); ?></span>
+						<span class="issuer-name"><?php echo esc_html( $psb_i['name'] ); ?></span>
 					</a>
 				</li>
 			<?php endforeach; ?>
 			<?php if ( $psb_labs ) : ?>
-				<li class="hidden h-9 w-px shrink-0 bg-line md:block" aria-hidden="true"></li>
+				<li class="h-9 w-px shrink-0 bg-line" aria-hidden="true"></li>
 				<?php foreach ( $psb_labs as $psb_lab => $psb_info ) : ?>
 					<li class="shrink-0">
-						<a class="flex items-center gap-3 text-[0.8125rem] font-medium text-slate-700 hover:text-foreground" href="<?php echo esc_url( $psb_info[1] ); ?>">
-							<span class="lat text-lg font-bold tracking-[0.06em] text-slate-600"><?php echo esc_html( $psb_lab ); ?></span>
-							<span><?php echo esc_html( $psb_info[0] ); ?></span>
+						<a class="issuer-item" href="<?php echo esc_url( $psb_info[1] ); ?>">
+							<span class="flex flex-col leading-tight">
+								<span class="lat text-base font-bold tracking-[0.06em] text-slate-600"><?php echo esc_html( $psb_lab ); ?></span>
+								<span class="text-xs text-slate-600"><?php echo esc_html( $psb_info[0] ); ?></span>
+							</span>
 						</a>
 					</li>
 				<?php endforeach; ?>
